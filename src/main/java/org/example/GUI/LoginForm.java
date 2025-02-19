@@ -2,6 +2,8 @@ package org.example.GUI;
 
 import javax.swing.*;
 
+import java.awt.*;
+
 import static com.google.protobuf.Any.pack;
 
 public class LoginForm extends javax.swing.JFrame {
@@ -41,6 +43,8 @@ public class LoginForm extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("LOGIN");
         setPreferredSize(new java.awt.Dimension(800, 500));
+     /*   setLocationRelativeTo(null);*/
+        setVisible(true);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setPreferredSize(new java.awt.Dimension(800, 500));
@@ -51,9 +55,9 @@ public class LoginForm extends javax.swing.JFrame {
 
         jLabel5.setIcon(new javax.swing.ImageIcon("C:\\Users\\PC\\IdeaProjects\\Test-Management\\src\\main\\java\\org\\example\\images\\logojavawing.png")); // NOI18N
 
-        jLabel6.setFont(new java.awt.Font("Showcard Gothic", 1, 24)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Showcard Gothic", 1, 20)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel6.setText(" manager Test");
+        jLabel6.setText("QUẢN LÝ THI TRẮC NGHIỆM");
 
         jLabel7.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(204, 204, 204));
@@ -70,7 +74,7 @@ public class LoginForm extends javax.swing.JFrame {
                         .addGroup(RightLayout.createSequentialGroup()
                                 .addGroup(RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(RightLayout.createSequentialGroup()
-                                                .addGap(103, 103, 103)
+                                                .addGap(50, 50, 50)
                                                 .addComponent(jLabel6))
                                         .addGroup(RightLayout.createSequentialGroup()
                                                 .addGap(145, 145, 145)
@@ -120,9 +124,18 @@ public class LoginForm extends javax.swing.JFrame {
         jButton2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jButton2.setForeground(new java.awt.Color(255, 51, 51));
         jButton2.setText("Sign Up");
+        jButton2.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                /*jButton2ActionPerformed(evt);*/
+                SwingUtilities.invokeLater(() -> {
+                    SignUpForm signUp = new SignUpForm();
+                    signUp.setVisible(true);
+                    signUp.setLocationRelativeTo(null);
+                    dispose();
+                    signUp.pack();
+               /*   LoginForm login = new LoginForm();
+                  login.setVisible(false);*/
+                });
             }
         });
 
@@ -194,6 +207,7 @@ public class LoginForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             LoginForm loginForm = new LoginForm();
