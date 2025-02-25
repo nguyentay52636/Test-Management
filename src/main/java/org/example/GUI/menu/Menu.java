@@ -68,7 +68,7 @@ public class Menu extends JPanel {
 
     private final List<MenuEvent> events = new ArrayList<>();
     private boolean menuFull = true;
-    private final String headerName = "Raven Channel";
+    private final String headerName = "";
 
     protected final boolean hideMenuTitleOnMinimum = true;
     protected final int menuTitleLeftInset = 5;
@@ -88,7 +88,12 @@ public class Menu extends JPanel {
                 + "background:$Menu.background;"
                 + "arc:10");
         header = new JLabel(headerName);
-        header.setIcon(new ImageIcon(getClass().getResource("../menu/logo/logojavawing.png")));
+        java.net.URL imgURL = getClass().getResource("/org/example/GUI/menu/logo/logojavawing.png");
+        if (imgURL != null) {
+            header.setIcon(new ImageIcon(imgURL));
+        } else {
+            System.err.println("Couldn't find file: logojavawing.png");
+        }
         header.putClientProperty(FlatClientProperties.STYLE, ""
                 + "font:$Menu.header.font;"
                 + "foreground:$Menu.foreground");

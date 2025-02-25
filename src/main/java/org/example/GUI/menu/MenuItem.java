@@ -77,12 +77,11 @@ public class MenuItem extends JPanel {
     }
 
     private Icon getIcon() {
-        Color lightColor = FlatUIUtils.getUIColor("Menu.icon.lightColor", Color.red);
-        Color darkColor = FlatUIUtils.getUIColor("Menu.icon.darkColor", Color.red);
-        FlatSVGIcon icon = new FlatSVGIcon("raven/menu/icon/" + menuIndex + ".svg");
-        FlatSVGIcon.ColorFilter f = new FlatSVGIcon.ColorFilter();
-        f.add(Color.decode("#969696"), lightColor, darkColor);
-        icon.setColorFilter(f);
+        ClassLoader classLoader = getClass().getClassLoader();
+        FlatSVGIcon icon = new FlatSVGIcon("org/example/GUI/menu/icon/" + menuIndex + ".svg", classLoader);
+        FlatSVGIcon.ColorFilter colorFilter = new FlatSVGIcon.ColorFilter();
+        colorFilter.add(Color.decode("#969696"), Color.WHITE, Color.WHITE);
+        icon.setColorFilter(colorFilter);
         return icon;
     }
 
@@ -93,7 +92,8 @@ public class MenuItem extends JPanel {
                 + "foreground:$Menu.lineColor");
         for (int i = 0; i < menus.length; i++) {
             JButton menuItem = createButtonItem(menus[i]);
-            menuItem.setHorizontalAlignment(menuItem.getComponentOrientation().isLeftToRight() ? JButton.LEADING : JButton.TRAILING);
+            menuItem.setHorizontalAlignment(
+                    menuItem.getComponentOrientation().isLeftToRight() ? JButton.LEADING : JButton.TRAILING);
             if (i == 0) {
                 menuItem.setIcon(getIcon());
                 menuItem.addActionListener((ActionEvent e) -> {
@@ -101,7 +101,8 @@ public class MenuItem extends JPanel {
                         if (menu.isMenuFull()) {
                             MenuAnimation.animate(MenuItem.this, !menuShow);
                         } else {
-                            popup.show(MenuItem.this, (int) MenuItem.this.getWidth() + UIScale.scale(5), UIScale.scale(menuItemHeight) / 2);
+                            popup.show(MenuItem.this, (int) MenuItem.this.getWidth() + UIScale.scale(5),
+                                    UIScale.scale(menuItemHeight) / 2);
                         }
                     } else {
                         menu.runEvent(menuIndex, 0);
@@ -163,7 +164,8 @@ public class MenuItem extends JPanel {
                 if (com instanceof JButton) {
                     JButton button = (JButton) com;
                     button.setText(menus[i]);
-                    button.setHorizontalAlignment(getComponentOrientation().isLeftToRight() ? JButton.LEFT : JButton.RIGHT);
+                    button.setHorizontalAlignment(
+                            getComponentOrientation().isLeftToRight() ? JButton.LEFT : JButton.RIGHT);
                 }
             }
         } else {
