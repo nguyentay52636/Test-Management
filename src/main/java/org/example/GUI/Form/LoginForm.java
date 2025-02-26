@@ -8,7 +8,8 @@ import javax.swing.SwingUtilities;
 public class LoginForm extends javax.swing.JFrame {
         private JPanel Left;
         private JPanel Right;
-        private javax.swing.JButton jButton1;
+        private javax.swing.JButton btnForgotPassword;
+        private javax.swing.JButton btnLogin;
         private javax.swing.JButton jButton2;
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
@@ -37,9 +38,10 @@ public class LoginForm extends javax.swing.JFrame {
                 jTextField1 = new javax.swing.JTextField();
                 jLabel3 = new javax.swing.JLabel();
                 jPasswordField1 = new javax.swing.JPasswordField();
-                jButton1 = new javax.swing.JButton();
+                btnLogin = new javax.swing.JButton();
                 jLabel4 = new javax.swing.JLabel();
                 jButton2 = new javax.swing.JButton();
+                btnForgotPassword = new  javax.swing.JButton();
 
                 setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
                 setTitle("LOGIN");
@@ -55,7 +57,7 @@ public class LoginForm extends javax.swing.JFrame {
                 Right.setPreferredSize(new java.awt.Dimension(400, 500));
 
                 jLabel5.setIcon(new javax.swing.ImageIcon(
-                                "C:\\Users\\PC\\IdeaProjects\\Test-Management\\src\\main\\java\\org\\example\\images\\logojavawing.png")); // NOI18N
+                                getClass().getResource("/org/example/GUI/menu/logo/logojavawing.png")));
 
                 jLabel6.setFont(new java.awt.Font("Showcard Gothic", 1, 20)); // NOI18N
                 jLabel6.setForeground(new java.awt.Color(255, 255, 255));
@@ -121,10 +123,27 @@ public class LoginForm extends javax.swing.JFrame {
                 jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
                 jLabel3.setText("Password");
 
-                jButton1.setBackground(new java.awt.Color(0, 102, 102));
-                jButton1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-                jButton1.setForeground(new java.awt.Color(255, 255, 255));
-                jButton1.setText("Login");
+                btnLogin.setBackground(new java.awt.Color(0, 102, 102));
+                btnLogin.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+                btnLogin.setForeground(new java.awt.Color(255, 255, 255));
+                btnLogin.setOpaque(true);
+                btnLogin.setContentAreaFilled(true);
+                btnLogin.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.BLACK, 1));
+                btnLogin.setEnabled(true);
+                btnLogin.setText("Login");
+                btnForgotPassword = new javax.swing.JButton();
+                btnForgotPassword.setFont(new java.awt.Font("Segoe UI", 0, 14));
+                btnForgotPassword.setForeground(new java.awt.Color(0, 102, 255));
+                btnForgotPassword.setText("Forgot Password?");
+                btnForgotPassword.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnForgotPassword.setBorderPainted(false);
+                btnForgotPassword.setContentAreaFilled(false);
+                btnForgotPassword.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                // Mở form reset password (hoặc hiển thị thông báo)
+                                javax.swing.JOptionPane.showMessageDialog(null, "Redirecting to Forgot Password screen...");
+                        }
+                });
 
                 jLabel4.setText("I don't have an account");
 
@@ -176,7 +195,7 @@ public class LoginForm extends javax.swing.JFrame {
                                                                                                                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                                                                                 343,
                                                                                                                                                 Short.MAX_VALUE)
-                                                                                                                                .addComponent(jButton1,
+                                                                                                                                .addComponent(btnLogin,
                                                                                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                                                                                 93,
                                                                                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -209,7 +228,7 @@ public class LoginForm extends javax.swing.JFrame {
                                                                                 40,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addGap(26, 26, 26)
-                                                                .addComponent(jButton1,
+                                                                .addComponent(btnLogin,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                 36,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -245,6 +264,13 @@ public class LoginForm extends javax.swing.JFrame {
                 getAccessibleContext().setAccessibleName("LOGIN");
 
                 pack();
+        }
+
+        public static void main(String[] args) {
+                SwingUtilities.invokeLater(() -> {
+                        SignUpForm loginForm = new SignUpForm();
+                        loginForm.setVisible(true);
+                });
         }
 
 }

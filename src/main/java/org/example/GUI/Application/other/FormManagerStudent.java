@@ -6,9 +6,9 @@ import com.formdev.flatlaf.FlatClientProperties;
  *
  * @author Raven
  */
-public class FormRead extends javax.swing.JPanel {
+public class FormManagerStudent extends javax.swing.JPanel {
 
-    public FormRead() {
+    public FormManagerStudent() {
         initComponents();
         lb.putClientProperty(FlatClientProperties.STYLE, ""
                 + "font:$h1.font");

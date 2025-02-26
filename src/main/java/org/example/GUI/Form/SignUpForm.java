@@ -1,6 +1,7 @@
 package org.example.GUI.Form;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class SignUpForm extends javax.swing.JFrame {
 
@@ -48,7 +49,7 @@ public class SignUpForm extends javax.swing.JFrame {
                 jPanel2.setBackground(new java.awt.Color(0, 102, 102));
 
                 jLabel1.setIcon(new javax.swing.ImageIcon(
-                                "C:\\Users\\PC\\IdeaProjects\\Test-Management\\src\\main\\java\\org\\example\\images\\logojavawing.png"));
+                                getClass().getResource("/org/example/GUI/menu/logo/logojavawing.png")));
 
                 jLabel2.setFont(new java.awt.Font("Showcard Gothic", 0, 20)); // NOI18N
                 jLabel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -129,8 +130,12 @@ public class SignUpForm extends javax.swing.JFrame {
 
                 jButton1.setBackground(new java.awt.Color(0, 102, 102));
                 jButton1.setForeground(new java.awt.Color(255, 255, 255));
-                jButton1.setText("Sign Up");
+                jButton1.setOpaque(true);
+                jButton1.setContentAreaFilled(true);
+                jButton1.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.BLACK, 1));
+                jButton1.setEnabled(true);
 
+                jButton1.setText("Sign Up");
                 jButton2.setForeground(new java.awt.Color(255, 51, 51));
                 jButton2.setText("Login");
                 jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -293,10 +298,10 @@ public class SignUpForm extends javax.swing.JFrame {
         private javax.swing.JTextField txtFullName;
 
         // End of variables declaration//GEN-END:variables
-        // public static void main(String[] args) {
-        // SwingUtilities.invokeLater(() -> {
-        // SignUpForm loginForm = new SignUpForm();
-        // loginForm.setVisible(true);
-        // });
-        // }
+        public static void main(String[] args) {
+                SwingUtilities.invokeLater(() -> {
+                        SignUpForm loginForm = new SignUpForm();
+                        loginForm.setVisible(true);
+                });
+        }
 }
