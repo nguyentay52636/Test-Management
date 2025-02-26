@@ -29,7 +29,7 @@ public class Menu extends JPanel {
 
     private final String menuItems[][] = {
             { "~MAIN~" },
-            { "Dashboard" },
+            { "Quản Lý người dùng" },
             { "~WEB APP~" },
             { "Email", "Inbox", "Read", "Compost" },
             { "Chat" },
@@ -52,7 +52,9 @@ public class Menu extends JPanel {
         this.menuFull = menuFull;
         if (menuFull) {
             header.setText(headerName);
-            header.setHorizontalAlignment(getComponentOrientation().isLeftToRight() ? JLabel.LEFT : JLabel.RIGHT);
+            header.setHorizontalAlignment(JLabel.CENTER);
+            // header.setHorizontalAlignment(getComponentOrientation().isLeftToRight() ?
+            // JLabel.LEFT : JLabel.RIGHT);
         } else {
             header.setText("");
             header.setHorizontalAlignment(JLabel.CENTER);

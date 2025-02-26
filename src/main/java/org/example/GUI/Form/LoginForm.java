@@ -1,9 +1,12 @@
 package org.example.GUI.Form;
 
-import java.awt.Cursor;
+import org.example.GUI.Application.Application;
 
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import java.awt.Cursor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.*;
 
 public class LoginForm extends javax.swing.JFrame {
         private JPanel Left;
@@ -131,6 +134,33 @@ public class LoginForm extends javax.swing.JFrame {
                 btnLogin.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.BLACK, 1));
                 btnLogin.setEnabled(true);
                 btnLogin.setText("Login");
+                btnLogin.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                btnLogin.addMouseListener(new java.awt.event.MouseAdapter() {
+                        @Override
+                        public void mouseEntered(java.awt.event.MouseEvent evt) {
+                                btnLogin.setBackground(new java.awt.Color(0, 153, 153)); // Màu sáng hơn khi hover
+                        }
+
+                        @Override
+                        public void mouseExited(java.awt.event.MouseEvent evt) {
+                                btnLogin.setBackground(new java.awt.Color(0, 102, 102)); // Trả về màu gốc
+                        }
+                });
+                btnLogin.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                                // Đóng LoginForm và quay lại Application
+                                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(btnLogin);
+                                if (topFrame != null) {
+                                        topFrame.dispose();  // Đóng LoginForm
+                                }
+
+                                // Mở lại giao diện Application
+                                Application.login();
+                        }
+                });
+
+
                 btnForgotPassword = new javax.swing.JButton();
                 btnForgotPassword.setFont(new java.awt.Font("Segoe UI", 0, 14));
                 btnForgotPassword.setForeground(new java.awt.Color(0, 102, 255));

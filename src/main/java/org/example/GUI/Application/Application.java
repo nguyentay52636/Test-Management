@@ -4,8 +4,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import javax.swing.*;
 
 import org.example.GUI.Application.other.MainForm;
 
@@ -14,6 +13,7 @@ import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.extras.FlatAnimatedLafChange;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import org.example.GUI.Form.LoginForm;
 
 /**
  *
@@ -23,17 +23,20 @@ public class Application extends javax.swing.JFrame {
 
     private static Application app;
     private final MainForm mainForm;
-    // private final LoginForm loginForm ;
+     public static  LoginForm loginForm ;
 
     public Application() {
         initComponents();
         setSize(new Dimension(1366, 768));
         setLocationRelativeTo(null);
         mainForm = new MainForm();
-        // loginForm = new LoginForm();
+
         setContentPane(mainForm);
         getRootPane().putClientProperty(FlatClientProperties.FULL_WINDOW_CONTENT, true);
 
+    }
+    public static Application getInstance() {
+        return app;
     }
 
     public static void showForm(Component component) {
@@ -42,6 +45,11 @@ public class Application extends javax.swing.JFrame {
     }
 
     public static void login() {
+        if (app == null) {
+            System.err.println("Application chưa được khởi tạo!");
+            return;
+        }
+
         FlatAnimatedLafChange.showSnapshot();
         app.setContentPane(app.mainForm);
         app.mainForm.applyComponentOrientation(app.getComponentOrientation());
@@ -51,13 +59,33 @@ public class Application extends javax.swing.JFrame {
         FlatAnimatedLafChange.hideSnapshotWithAnimation();
     }
 
-    // public static void logout() {
-    // FlatAnimatedLafChange.showSnapshot();
-    // app.setContentPane(app.loginForm);
-    // app.loginForm.applyComponentOrientation(app.getComponentOrientation());
-    // SwingUtilities.updateComponentTreeUI(app.loginForm);
-    // FlatAnimatedLafChange.hideSnapshotWithAnimation();
-    // }
+
+
+    public static void logout() {
+        if (app == null) {
+            System.err.println("Application chưa được khởi tạo!");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                null,
+                "Bạn có chắc chắn muốn đăng xuất không?",
+                "Xác nhận",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            FlatAnimatedLafChange.showSnapshot();
+            loginForm = new LoginForm();
+            app.setContentPane(loginForm);
+            loginForm.applyComponentOrientation(app.getComponentOrientation());
+            SwingUtilities.updateComponentTreeUI(app);
+            FlatAnimatedLafChange.hideSnapshotWithAnimation();
+        }
+    }
+
+
+
 
     public static void setSelectedMenu(int index, int subIndex) {
         app.mainForm.setSelectedMenu(index, subIndex);

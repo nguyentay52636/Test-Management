@@ -26,6 +26,7 @@ public class MainForm extends JLayeredPane {
 
     public MainForm() {
         init();
+        showForm(new BeginForm("Chào mừng đến với quản lý thi trắc nghiệm")); // Display BeginForm by default
     }
 
     private void init() {
@@ -65,10 +66,10 @@ public class MainForm extends JLayeredPane {
 
     private void initMenuEvent() {
         menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
-            // Application.mainForm.showForm(new DefaultForm("Form : " + index + " " +
-            // subIndex));
+            Application.showForm(new BeginForm("Chào mừng đến với quản lý thi trắc nghiệm"));
             if (index == 0) {
                 Application.showForm(new FormDashboard());
+
             } else if (index == 1) {
                 if (subIndex == 1) {
                     Application.showForm(new FormInbox());
@@ -78,11 +79,12 @@ public class MainForm extends JLayeredPane {
                     action.cancel();
                 }
             } else if (index == 9) {
-                // Application.logout();
+                 Application.logout();
             } else {
                 action.cancel();
             }
         });
+
     }
 
     private void setMenuFull(boolean full) {
