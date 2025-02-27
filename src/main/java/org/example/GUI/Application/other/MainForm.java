@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import org.example.GUI.Application.Application;
+import org.example.GUI.Form.FormManagementUser;
 import org.example.GUI.menu.Menu;
 import org.example.GUI.menu.MenuAction;
 
@@ -64,22 +65,28 @@ public class MainForm extends JLayeredPane {
         menuButton.setIcon(new FlatSVGIcon("org/example/GUI/menu/mode/svg/" + icon, 0.8f));
     }
 
+    // goi thanh phan
     private void initMenuEvent() {
         menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
-            Application.showForm(new BeginForm("Chào mừng đến với quản lý thi trắc nghiệm"));
+
             if (index == 0) {
-                Application.showForm(new FormDashboard());
+                Application.showForm(new FormManagementUser());
 
             } else if (index == 1) {
                 if (subIndex == 1) {
-                    Application.showForm(new FormInbox());
+                    // Application.showForm(new FormInbox());
+                    Application.showForm(new AddButtonAccount("Tay"));
                 } else if (subIndex == 2) {
-                    Application.showForm(new FormManagerStudent());
+                    Application.showForm(new FormManagementUser());
                 } else {
                     action.cancel();
                 }
+            } else if (index == 2) {
+                Application.showForm(new BeginForm("Chào mừng đến với quản lý thi trắc nghiệm"));
+            } else if (index == 3) {
+                Application.showForm(new FormInbox());
             } else if (index == 9) {
-                 Application.logout();
+                Application.logout();
             } else {
                 action.cancel();
             }

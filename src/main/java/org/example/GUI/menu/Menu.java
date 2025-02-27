@@ -30,9 +30,9 @@ public class Menu extends JPanel {
     private final String menuItems[][] = {
             { "~MAIN~" },
             { "Quản Lý người dùng" },
-            { "~WEB APP~" },
+            // { "~WEB APP~" },
             { "Email", "Inbox", "Read", "Compost" },
-            { "Chat" },
+            { "Quản lý câu hỏi" },
             { "Calendar" },
             { "~COMPONENT~" },
             { "Advanced UI", "Cropper", "Owl Carousel", "Sweet Alert" },
