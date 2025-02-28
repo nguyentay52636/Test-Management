@@ -55,9 +55,46 @@ public class UserDAO {
         return null;
     }
 
-    public void someMethod() {
-        // Fix the syntax error here
-        String query = "SELECT * FROM users"; // <-- Add the missing semicolon here
+    public int Login(String userName, String password) {
+        int res = 0;
+        try {
+            Connection conn = (Connection) UtilsJDBC.getConnectDB();
+            String query = "SELECT * FROM users WHERE userName = ? AND userPassword = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, userName);
+            stmt.setString(2, password);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                res = 1;
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 
+    public UsersDTO getInfoUser(String userName, String password) {
+        UsersDTO user = new UsersDTO();
+        try {
+            Connection conn = (Connection) UtilsJDBC.getConnectDB();
+            String query = "SELECT * FROM users WHERE userName = ? AND userPassword = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, userName);
+            stmt.setString(2, password);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                user.setUserID(rs.getInt("userID"));
+                user.setUserName(rs.getString("userName"));
+                user.setUserEmail(rs.getString("userEmail"));
+                user.setUserPassword(rs.getString("userPassword"));
+                user.setUserFullName(rs.getString("userFullName"));
+                user.setIsAdmin(rs.getBoolean("isAdmin"));
+            }
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
 }

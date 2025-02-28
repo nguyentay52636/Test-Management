@@ -29,19 +29,18 @@ public class Menu extends JPanel {
 
     private final String menuItems[][] = {
             { "~MAIN~" },
-            { "Quản Lý người dùng" },
-            // { "~WEB APP~" },
+            { "Quản Lý tài khoản" },
             { "Email", "Inbox", "Read", "Compost" },
-            { "Quản lý câu hỏi" },
-            { "Calendar" },
+            { "Ngân hàng câu hỏi" },
+            { "Chủ đề/Môn học" },
             { "~COMPONENT~" },
-            { "Advanced UI", "Cropper", "Owl Carousel", "Sweet Alert" },
-            { "Forms", "Basic Elements", "Advanced Elements", "Editors", "Wizard" },
+            { "Đề thi", "Cropper", "Owl Carousel", "Sweet Alert" },
+            { "Bài thi", "Basic Elements", "Advanced Elements", "Editors", "Wizard" },
             { "~OTHER~" },
-            { "Charts", "Apex", "Flot", "Peity", "Sparkline" },
-            { "Icons", "Feather Icons", "Flag Icons", "Mdi Icons" },
+            { "Thống kê", "Apex", "Flot", "Peity", "Sparkline" },
+            { "Cài đặt tài khoản", "Feather Icons", "Flag Icons", "Mdi Icons" },
             { "Special Pages", "Blank page", "Faq", "Invoice", "Profile", "Pricing", "Timeline" },
-            { "Logout" }
+            { "Đăng xuất" }
     };
 
     public boolean isMenuFull() {

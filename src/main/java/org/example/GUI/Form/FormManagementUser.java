@@ -39,8 +39,6 @@ public class FormManagementUser extends JPanel {
     }
 
     private void initComponents() {
-        // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents  @formatter:off
-        // Generated using JFormDesigner Evaluation license - Master
         panel1 = new JPanel();
         panel2 = new JPanel();
         button1 = new JButton();
@@ -59,56 +57,62 @@ public class FormManagementUser extends JPanel {
         scrollPane1 = new JScrollPane();
         table1 = new JTable();
 
-        //======== this ========
-        setBorder (new javax. swing. border. CompoundBorder( new javax .swing .border .TitledBorder (new javax.
-                swing. border. EmptyBorder( 0, 0, 0, 0) , "", javax. swing. border
-                . TitledBorder. CENTER, javax. swing. border. TitledBorder. BOTTOM, new java .awt .Font ("D\u0069alog"
-                ,java .awt .Font .BOLD ,12 ), java. awt. Color. red) , getBorder
-                ( )) );  addPropertyChangeListener (new java. beans. PropertyChangeListener( ){ @Override public void propertyChange (java
-                                                                                                                                              .beans .PropertyChangeEvent e) {if ("\u0062order" .equals (e .getPropertyName () )) throw new RuntimeException
-                ( ); }} );
+        // ======== this ========
+        setBorder(
+                new javax.swing.border.CompoundBorder(
+                        new javax.swing.border.TitledBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0), "",
+                                javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.BOTTOM,
+                                new java.awt.Font("D\u0069alog", java.awt.Font.BOLD, 12), java.awt.Color.red),
+                        getBorder()));
+        addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            @Override
+            public void propertyChange(java.beans.PropertyChangeEvent e) {
+                if ("\u0062order".equals(e.getPropertyName()))
+                    throw new RuntimeException();
+            }
+        });
         setLayout(new BorderLayout());
 
-        //======== panel1 ========
+        // ======== panel1 ========
         {
             panel1.setLayout(new GridLayout(3, 1));
 
-            //======== panel2 ========
+            // ======== panel2 ========
             {
                 panel2.setLayout(new FlowLayout());
 
-                //---- button1 ----
+                // ---- button1 ----
                 button1.setText("Th\u00eam");
                 button1.setPreferredSize(new Dimension(144, 43));
                 panel2.add(button1);
 
-                //---- button2 ----
+                // ---- button2 ----
                 button2.setText("X\u00f3a");
                 button2.setPreferredSize(new Dimension(144, 43));
                 panel2.add(button2);
 
-                //---- button3 ----
+                // ---- button3 ----
                 button3.setText("S\u1eeda");
                 button3.setPreferredSize(new Dimension(144, 43));
                 panel2.add(button3);
 
-                //---- button4 ----
+                // ---- button4 ----
                 button4.setText("Xu\u1ea5t Excel");
                 button4.setPreferredSize(new Dimension(144, 43));
                 panel2.add(button4);
 
-                //---- button5 ----
+                // ---- button5 ----
                 button5.setText("Nh\u1eadp Excel");
                 button5.setPreferredSize(new Dimension(144, 43));
                 panel2.add(button5);
             }
             panel1.add(panel2);
 
-            //======== panel3 ========
+            // ======== panel3 ========
             {
                 panel3.setLayout(new FlowLayout());
 
-                //======== paneltr ========
+                // ======== paneltr ========
                 {
                     paneltr.setLayout(new FlowLayout());
                     comboBox2.setPreferredSize(new Dimension(140, 40));
@@ -118,29 +122,29 @@ public class FormManagementUser extends JPanel {
                 paneltr.setPreferredSize(new Dimension(180, 90));
                 panel3.add(paneltr);
 
-                //======== panel5 ========
+                // ======== panel5 ========
                 {
                     panel5.setBorder(new TitledBorder("T\u00ecm ki\u1ebfm"));
                     panel5.setLayout(new FlowLayout());
 
-                    //---- comboBox1 ----
+                    // ---- comboBox1 ----
                     comboBox1.setPreferredSize(new Dimension(130, 40));
                     panel5.add(comboBox1);
 
-                    //---- textField1 ----
+                    // ---- textField1 ----
                     textField1.setPreferredSize(new Dimension(144, 55));
                     panel5.add(textField1);
                 }
                 panel3.add(panel5);
 
-                //---- button6 ----
+                // ---- button6 ----
                 button6.setText("L\u00e0m m\u1edbi");
                 button6.setPreferredSize(new Dimension(144, 45));
                 panel3.add(button6);
             }
             panel1.add(panel3);
 
-            //======== panel4 ========
+            // ======== panel4 ========
             {
                 panel4.setLayout(new FlowLayout());
             }
@@ -148,19 +152,18 @@ public class FormManagementUser extends JPanel {
         }
         add(panel1, BorderLayout.NORTH);
 
-        //======== scrollPane1 ========
+        // ======== scrollPane1 ========
         {
 
-            //---- table1 ----
+            // ---- table1 ----
             table1.setModel(new DefaultTableModel(
                     new Object[][] {
-                            {null, null, null, null, null},
-                            {null, null, null, null, null},
+                            { null, null, null, null, null },
+                            { null, null, null, null, null },
                     },
                     new String[] {
                             null, null, null, null, null
-                    }
-            ));
+                    }));
             scrollPane1.setViewportView(table1);
         }
         add(scrollPane1, BorderLayout.CENTER);
@@ -254,19 +257,20 @@ public class FormManagementUser extends JPanel {
         // });
 
         // su kien khi nhan vao nut them
-//        button1.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent actionEvent) {
-//                System.out.println("Mở form thêm tài khoản...");
-//                DialogAddAccount formAddUser = new DialogAddAccount("Thêm", "");
-//                formAddUser.setVisible(true);
-//            }
-//
-//        });
+        // button1.addActionListener(new ActionListener() {
+        // @Override
+        // public void actionPerformed(ActionEvent actionEvent) {
+        // System.out.println("Mở form thêm tài khoản...");
+        // DialogAddAccount formAddUser = new DialogAddAccount("Thêm", "");
+        // formAddUser.setVisible(true);
+        // }
+        //
+        // });
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                DialogAddAccount dialog = new DialogAddAccount("Thêm","");
+                DialogAddAccount dialog = new DialogAddAccount("Thêm", "");
+    
                 dialog.setVisible(true);
             }
         });

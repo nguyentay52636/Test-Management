@@ -20,7 +20,7 @@ public class DialogAddAccount extends JFrame {
 
     public static AccountAddedListener accountAddedListener;
 
-    String type;
+    private String type; // Initialize the type field
 
     JTextField txUsername = new JTextField(15);
     JTextField txPassword = new JTextField(15);
@@ -41,6 +41,7 @@ public class DialogAddAccount extends JFrame {
     }
 
     public DialogAddAccount(String _type, String _username) {
+        this.type = _type; // Initialize the type field
 
         // inputs
         txtEmail.setBorder(BorderFactory.createTitledBorder("Email"));
@@ -137,9 +138,9 @@ public class DialogAddAccount extends JFrame {
         // btnSua.addActionListener((ae) -> {
         // btnSuaMouseClicked();
         // });
-        // btnHuy.addActionListener((ae) -> {
-        // this.dispose();
-        // });
+        btnHuy.addActionListener((ae) -> {
+            this.dispose();
+        });
         // button1.addActionListener(new ActionListener() {
         // @Override
         // public void actionPerformed(ActionEvent actionEvent) {
@@ -172,7 +173,9 @@ public class DialogAddAccount extends JFrame {
         // });
         // }
         // });
-
+        this.setSize(400, 400);
+        this.setLocationRelativeTo(null);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setVisible(true);
     }
 

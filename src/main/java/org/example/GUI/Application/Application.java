@@ -4,16 +4,18 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.example.GUI.Application.other.MainForm;
+import org.example.GUI.Form.LoginForm;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.extras.FlatAnimatedLafChange;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
-import org.example.GUI.Form.LoginForm;
 
 /**
  *
@@ -23,7 +25,7 @@ public class Application extends javax.swing.JFrame {
 
     private static Application app;
     private final MainForm mainForm;
-     public static  LoginForm loginForm ;
+    public static LoginForm loginForm;
 
     public Application() {
         initComponents();
@@ -35,6 +37,7 @@ public class Application extends javax.swing.JFrame {
         getRootPane().putClientProperty(FlatClientProperties.FULL_WINDOW_CONTENT, true);
 
     }
+
     public static Application getInstance() {
         return app;
     }
@@ -59,8 +62,6 @@ public class Application extends javax.swing.JFrame {
         FlatAnimatedLafChange.hideSnapshotWithAnimation();
     }
 
-
-
     public static void logout() {
         if (app == null) {
             System.err.println("Application chưa được khởi tạo!");
@@ -71,21 +72,19 @@ public class Application extends javax.swing.JFrame {
                 null,
                 "Bạn có chắc chắn muốn đăng xuất không?",
                 "Xác nhận",
-                JOptionPane.YES_NO_OPTION
-        );
+                JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
             FlatAnimatedLafChange.showSnapshot();
             loginForm = new LoginForm();
-            app.setContentPane(loginForm);
-            loginForm.applyComponentOrientation(app.getComponentOrientation());
-            SwingUtilities.updateComponentTreeUI(app);
-            FlatAnimatedLafChange.hideSnapshotWithAnimation();
+            loginForm.setVisible(true);
+            app.dispose();
+            // app.setContentPane(loginForm);
+            // loginForm.applyComponentOrientation(app.getComponentOrientation());
+            // SwingUtilities.updateComponentTreeUI(app);
+            // FlatAnimatedLafChange.hideSnapshotWithAnimation();
         }
     }
-
-
-
 
     public static void setSelectedMenu(int index, int subIndex) {
         app.mainForm.setSelectedMenu(index, subIndex);
