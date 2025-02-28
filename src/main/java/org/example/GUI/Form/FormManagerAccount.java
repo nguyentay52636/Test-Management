@@ -28,6 +28,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumnModel;
 
+import org.example.GUI.FormDialog.DialogUser.DialogAddAccount;
+
 /**
  * @author m1lt43
  */
@@ -427,7 +429,14 @@ public class FormManagerAccount extends JPanel {
             }
 
         });
-
+      btnAdd.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DialogAddAccount dialog = new DialogAddAccount("Thêm", "");
+    
+                dialog.setVisible(true);
+            }
+        });
         // xuat excel
         // button1.addActionListener(new ActionListener() {
         //     @Override
