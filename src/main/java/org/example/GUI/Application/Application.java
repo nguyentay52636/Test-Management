@@ -9,7 +9,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.example.GUI.Application.other.MainForm;
-import org.example.GUI.Form.LoginForm;
+import org.example.GUI.Components.FormAuth.LoginForm;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLaf;

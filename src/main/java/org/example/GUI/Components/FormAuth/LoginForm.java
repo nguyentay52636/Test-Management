@@ -1,12 +1,14 @@
-package org.example.GUI.Form;
-
-import org.example.GUI.Application.Application;
+package org.example.GUI.Components.FormAuth;
 
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+import org.example.GUI.Application.Application;
 
 public class LoginForm extends javax.swing.JFrame {
         private JPanel Left;

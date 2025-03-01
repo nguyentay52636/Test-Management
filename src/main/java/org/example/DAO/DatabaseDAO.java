@@ -12,7 +12,7 @@ import org.example.ConnectDB.UtilsJDBC;
 public class DatabaseDAO {
     public Map<String, Integer> getAllAutoIncrements() {
         Map<String, Integer> autoIncrements = new HashMap<>();
-        String sql = "SELECT TABLE_NAME, AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'testmanager'";
+        String sql = "SELECT TABLE_NAME, AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'tracnghiem'";
 
         try (Connection con = UtilsJDBC.getConnectDB();
                 PreparedStatement pst = con.prepareStatement(sql);

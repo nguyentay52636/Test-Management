@@ -1,28 +1,30 @@
 package org.example.DTO;
 
 public class QuestionDTO {
-    private String questionID;
+    private int questionID;
     private String qContent;
     private int qTopicID;
     private String qLevel;
     private Boolean qStatus;
+    private String qPicture;
 
     public QuestionDTO() {
     }
 
-    public QuestionDTO(String questionID, String qContent, int qTopicID, String qLevel, Boolean qStatus) {
+    public QuestionDTO(int questionID, String qContent, String qPicture, int qTopicID, String qLevel, Boolean qStatus) {
         this.questionID = questionID;
         this.qContent = qContent;
+        this.qPicture = qPicture;
         this.qTopicID = qTopicID;
         this.qLevel = qLevel;
         this.qStatus = qStatus;
     }
 
-    public String getQuestionID() {
+    public int getQuestionID() {
         return questionID;
     }
 
-    public void setQuestionID(String questionID) {
+    public void setQuestionID(int questionID) {
         this.questionID = questionID;
     }
 
@@ -67,5 +69,13 @@ public class QuestionDTO {
                 ", qLevel='" + qLevel + '\'' +
                 ", qStatus=" + qStatus +
                 '}';
+    }
+
+    public void setQPicture(String qPicture) {
+        this.qPicture = qPicture;
+    }
+
+    public String getQPicture() {
+        return qPicture;
     }
 }

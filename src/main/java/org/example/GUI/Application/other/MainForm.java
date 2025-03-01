@@ -15,22 +15,19 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import org.example.GUI.Application.Application;
-import org.example.GUI.Form.FormManagementUser;
-import org.example.GUI.Form.FormManagerAccount;
+import org.example.GUI.Components.FormAccount.FormManagementUser;
 import org.example.GUI.menu.Menu;
 import org.example.GUI.menu.MenuAction;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.formdev.flatlaf.util.UIScale;
 
 public class MainForm extends JLayeredPane {
 
     public MainForm() {
-        FlatLightLaf.setup();
         init();
-        showForm(new BeginForm("Chào mừng đến với quản lý thi trắc nghiệm"));
+        showForm(new BeginForm("Chào mừng đến với quản lý thi trắc nghiệm")); // Display BeginForm by default
     }
 
     private void init() {
@@ -65,8 +62,6 @@ public class MainForm extends JLayeredPane {
             menuButton = new JButton();
         }
         String icon = (getComponentOrientation().isLeftToRight()) ? "menu_left.svg" : "menu_right.svg";
-        // String setIcon = (getComponentOrientation().isRightToLeft()) ?
-        // "menu_left.svg" : "menu_right.svg";
         menuButton.setIcon(new FlatSVGIcon("org/example/GUI/menu/mode/svg/" + icon, 0.8f));
     }
 
@@ -75,15 +70,12 @@ public class MainForm extends JLayeredPane {
         menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
 
             if (index == 0) {
-                // Application.showForm(new FormManagementUser());
-                Application.showForm(new FormManagerAccount());
+                Application.showForm(new FormManagementUser());
 
             } else if (index == 1) {
                 if (subIndex == 1) {
-                    // Application.showForm(new FormInbox())
-                    Application.showForm(new FormManagerAccount());
-                    // System.out.println("click");
-                    // Application.showForm(new AddButtonAccount("Tay"));
+                    // Application.showForm(new FormInbox());
+                    Application.showForm(new AddButtonAccount("Tay"));
                 } else if (subIndex == 2) {
                     Application.showForm(new FormManagementUser());
                 } else {
@@ -92,7 +84,7 @@ public class MainForm extends JLayeredPane {
             } else if (index == 2) {
                 Application.showForm(new BeginForm("Chào mừng đến với quản lý thi trắc nghiệm"));
             } else if (index == 3) {
-                Application.showForm(new FormInbox());
+                Application.showForm(new FormInbox(panelBody));
             } else if (index == 9) {
                 Application.logout();
             } else {

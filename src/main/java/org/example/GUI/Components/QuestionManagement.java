@@ -1,4 +1,4 @@
-package org.example.GUI.Form;
+package org.example.GUI.Components;
 
 public class QuestionManagement {
 }

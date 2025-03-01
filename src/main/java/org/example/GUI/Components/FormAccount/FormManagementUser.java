@@ -1,4 +1,4 @@
-package org.example.GUI.Form;
+package org.example.GUI.Components.FormAccount;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

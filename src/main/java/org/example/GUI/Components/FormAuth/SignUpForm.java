@@ -1,4 +1,4 @@
-package org.example.GUI.Form;
+package org.example.GUI.Components.FormAuth;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
