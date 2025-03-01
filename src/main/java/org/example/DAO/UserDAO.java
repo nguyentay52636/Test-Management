@@ -79,7 +79,7 @@ public class UserDAO {
         return user;
     }
 
-    private boolean checkEmaiExits(String userEmail) {
+    public boolean checkEmaiExits(String userEmail) {
         String sql = "SELECT 1 FROM users WHERE userEmail = ? LIMIT 1";
         try {
             Connection conn = UtilsJDBC.getConnectDB();
