@@ -1,26 +1,16 @@
 package org.example.DTO;
 
 public class ExamsDTO {
-    private int examID;
     private String testCode;
     private String exOrder;
     private String exCode;
     private String exQuestionIDs;
 
-    public ExamsDTO(int examID, String testCode, String exOrder, String exCode, String exQuestionIDs) {
-        this.examID = examID;
+    public ExamsDTO(String testCode, String exOrder, String exCode, String exQuestionIDs) {
         this.testCode = testCode;
         this.exOrder = exOrder;
         this.exCode = exCode;
         this.exQuestionIDs = exQuestionIDs;
-    }
-
-    public int getExamID() {
-        return examID;
-    }
-
-    public void setExamID(int examID) {
-        this.examID = examID;
     }
 
     public String getTestCode() {
@@ -64,5 +54,4 @@ public class ExamsDTO {
                 ", exQuestionIDs='" + exQuestionIDs + '\'' +
                 '}';
     }
-
 }

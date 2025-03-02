@@ -23,7 +23,7 @@ public class ExamDAO {
             stmt.setString(3, exam.getExCode());
             stmt.setString(4, exam.getExQuestionIDs());
             boolean result = stmt.executeUpdate() > 0;
-            UtilsJDBC.closeConnection();
+            // UtilsJDBC.closeConnection();
             return result;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -31,14 +31,14 @@ public class ExamDAO {
         return false;
     }
 
-    public boolean deleteExam(int examId) {
+    public boolean deleteExam(String exCode) {
         try {
-            String query = "DELETE FROM exams WHRE examID = ?";
+            String query = "DELETE FROM exams WHERE exCode = ?";
             Connection conn = UtilsJDBC.getConnectDB();
             PreparedStatement stmt = conn.prepareStatement(query);
-            stmt.setInt(1, examId);
+            stmt.setString(1, exCode);
             boolean result = stmt.executeUpdate() > 0;
-            UtilsJDBC.closeConnection();
+            // UtilsJDBC.closeConnection();
             return result;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -48,16 +48,15 @@ public class ExamDAO {
 
     public boolean updateExam(ExamsDTO exam) {
         try {
-            String query = "UPDATE exams SET testCode = ?, exOrder = ?, exCode = ?, ex_quesIDs = ? WHERE examID = ?";
+            String query = "UPDATE exams SET testCode = ?, exOrder = ?, ex_quesIDs = ? WHERE exCode = ?";
             Connection conn = UtilsJDBC.getConnectDB();
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setString(1, exam.getTestCode());
             stmt.setString(2, exam.getExOrder());
-            stmt.setString(3, exam.getExCode());
-            stmt.setString(4, exam.getExQuestionIDs());
-            stmt.setInt(5, exam.getExamID());
+            stmt.setString(3, exam.getExQuestionIDs());
+            stmt.setString(4, exam.getExCode());
             boolean result = stmt.executeUpdate() > 0;
-            UtilsJDBC.closeConnection();
+            // UtilsJDBC.closeConnection();
             return result;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -65,26 +64,20 @@ public class ExamDAO {
         return false;
     }
 
-    public ExamsDTO getExamById(String examId) {
-        if (examId == null || !examId.matches("\\d+")) {
-            System.err.println("Invalid examId: " + examId);
-            return null;
-        }
-
-        String query = "SELECT * FROM exams WHERE examID = ?";
+    public ExamsDTO getExamByExCode(String exCode) {
+        String query = "SELECT * FROM exams WHERE exCode = ?";
         try (Connection conn = UtilsJDBC.getConnectDB();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setInt(1, Integer.parseInt(examId));
+            stmt.setString(1, exCode);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     String testCode = rs.getString("testCode");
                     String exOrder = rs.getString("exOrder");
-                    String exCode = rs.getString("exCode");
-                    String ex_quesIDs = rs.getString("ex_quesIDs");
+                    String exQuestionIDs = rs.getString("ex_quesIDs");
 
-                    return new ExamsDTO(Integer.parseInt(examId), testCode, exOrder, exCode, ex_quesIDs);
+                    return new ExamsDTO(testCode, exOrder, exCode, exQuestionIDs);
                 }
             }
         } catch (SQLException e) {
@@ -97,15 +90,14 @@ public class ExamDAO {
         ArrayList<ExamsDTO> exams = new ArrayList<>();
         String query = "SELECT * FROM exams";
         try (Connection conn = UtilsJDBC.getConnectDB();
-                PreparedStatement stmt = conn.prepareStatement(query);
-                ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                int examID = rs.getInt("examID");
                 String testCode = rs.getString("testCode");
                 String exOrder = rs.getString("exOrder");
                 String exCode = rs.getString("exCode");
                 String exQuestionIDs = rs.getString("ex_quesIDs");
-                exams.add(new ExamsDTO(examID, testCode, exOrder, exCode, exQuestionIDs));
+                exams.add(new ExamsDTO(testCode, exOrder, exCode, exQuestionIDs));
             }
         } catch (SQLException e) {
             e.printStackTrace();

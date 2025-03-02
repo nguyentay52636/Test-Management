@@ -16,6 +16,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.example.GUI.Application.Application;
 import org.example.GUI.Components.FormAccount.FormManagementUser;
+import org.example.GUI.Components.FormTest.TestForm;
 import org.example.GUI.menu.Menu;
 import org.example.GUI.menu.MenuAction;
 
@@ -82,7 +83,7 @@ public class MainForm extends JLayeredPane {
                     action.cancel();
                 }
             } else if (index == 2) {
-                Application.showForm(new BeginForm("Chào mừng đến với quản lý thi trắc nghiệm"));
+                Application.showForm(new TestForm(panelBody));
             } else if (index == 3) {
                 Application.showForm(new FormInbox(panelBody));
             } else if (index == 9) {

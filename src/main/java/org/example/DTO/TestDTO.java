@@ -5,8 +5,8 @@ import java.util.Date;
 public class TestDTO {
     private Integer testID;
     private String testCode;
-    private String title; // Sửa chữ hoa thành chữ thường để tuân theo quy tắc đặt tên biến
-    private String testTime;
+    private String title;
+    private int testTime; // Đổi từ String thành int
     private int tpID;
     private int numberEasy;
     private int numberMedium;
@@ -18,7 +18,7 @@ public class TestDTO {
     public TestDTO() {
     }
 
-    public TestDTO(Integer testID, String testCode, String title, String testTime, int tpID, int numberEasy, int numberMedium, int numberDiff, Boolean testLimit, Date date, int testStatus) {
+    public TestDTO(Integer testID, String testCode, String title, int testTime, int tpID, int numberEasy, int numberMedium, int numberDiff, Boolean testLimit, Date date, int testStatus) {
         this.testID = testID;
         this.testCode = testCode;
         this.title = title;
@@ -56,11 +56,11 @@ public class TestDTO {
         this.title = title;
     }
 
-    public String getTestTime() {
+    public int getTestTime() { // Đổi kiểu trả về thành int
         return testTime;
     }
 
-    public void setTestTime(String testTime) {
+    public void setTestTime(int testTime) { // Đổi kiểu tham số thành int
         this.testTime = testTime;
     }
 
@@ -126,7 +126,7 @@ public class TestDTO {
                 "testID=" + testID +
                 ", testCode='" + testCode + '\'' +
                 ", title='" + title + '\'' +
-                ", testTime='" + testTime + '\'' +
+                ", testTime=" + testTime + // Không còn dấu nháy vì testTime là số nguyên
                 ", tpID=" + tpID +
                 ", numberEasy=" + numberEasy +
                 ", numberMedium=" + numberMedium +
