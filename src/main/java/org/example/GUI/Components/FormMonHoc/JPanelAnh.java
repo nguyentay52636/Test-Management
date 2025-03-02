@@ -13,7 +13,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.example.DAO.QuestionDAO;
 import org.example.DTO.QuestionDTO;
@@ -28,7 +33,7 @@ public class JPanelAnh extends JPanel {
     private DefaultTableModel tableModel;
     private QuestionDAO questionDAO;
     private JButton btnNhapExcel;
-
+    private JTextField txtCauHoi;
     public JPanelAnh(JPanel contentPanel) {
         this.contentPanel = contentPanel;
         this.questionDAO = new QuestionDAO();
@@ -48,7 +53,7 @@ public class JPanelAnh extends JPanel {
         add(lblTitle);
 
         // Bảng hiển thị dữ liệu câu hỏi
-        tableModel = new DefaultTableModel(new String[] { "ID", "Nội dung", "Hình ảnh", "Mức độ", "Trạng thái" }, 0);
+        tableModel = new DefaultTableModel(new String[] { "ID", "Nội dung", "Mức độ", "Trạng thái" }, 0);
         table = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBounds(50, 276, 893, 300);
@@ -63,7 +68,7 @@ public class JPanelAnh extends JPanel {
         JButton btnXoa = createButton("Xóa", "/icons/delete.png");
         btnXoa.setBounds(160, 80, 100, 40);
         add(btnXoa);
-
+        btnXoa.addActionListener(e -> deleteSelectedQuestion());
         JButton btnSua = createButton("Sửa", "/icons/edit.png");
         btnSua.setBounds(270, 80, 100, 40);
         add(btnSua);
@@ -84,7 +89,7 @@ public class JPanelAnh extends JPanel {
         lblLoc.setBounds(50, 140, 150, 25);
         add(lblLoc);
 
-        JComboBox<String> cboLoc = new JComboBox<>(new String[] { "Tất cả", "Dễ", "Khó" });
+        JComboBox<String> cboLoc = new JComboBox<>(new String[] { "Tất cả", "Easy", "Medium" });
         cboLoc.setBounds(50, 170, 120, 30);
         add(cboLoc);
 
@@ -108,10 +113,22 @@ public class JPanelAnh extends JPanel {
         lblCauHoi.setBounds(350, 140, 150, 25);
         add(lblCauHoi);
 
-        JTextField txtCauHoi = new JTextField();
+        txtCauHoi = new JTextField();
         txtCauHoi.setBounds(350, 170, 200, 30);
         add(txtCauHoi);
+        txtCauHoi.getDocument().addDocumentListener(new DocumentListener() {
+			public void insertUpdate(DocumentEvent e) {
+				findQuestion();
+			}
 
+			public void removeUpdate(DocumentEvent e) {
+				findQuestion();
+			}
+
+			public void changedUpdate(DocumentEvent e) {
+				findQuestion();
+			}
+		});
         // Nút Quay lại
         JButton btnBack = new JButton("Quay lại");
         btnBack.setFont(new Font("Segoe UI", Font.BOLD | Font.ITALIC, 20));
@@ -144,7 +161,6 @@ public class JPanelAnh extends JPanel {
             tableModel.addRow(new Object[] {
                     q.getQuestionID(),
                     q.getQContent(),
-                    q.getQPicture(),
                     q.getQLevel(),
                     q.getQStatus() ? "Hoạt động" : "Ẩn"
             });
@@ -184,11 +200,30 @@ public class JPanelAnh extends JPanel {
             System.out.println("Quay lại FormInbox!");
         }
     }
+    private void deleteSelectedQuestion() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một câu hỏi để xóa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
+        int questionID = (int) tableModel.getValueAt(selectedRow, 0); // Lấy ID câu hỏi từ cột đầu tiên
+
+        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa câu hỏi này?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean deleted = questionDAO.deleteQuestion(questionID);
+            if (deleted) {
+                JOptionPane.showMessageDialog(this, "Xóa câu hỏi thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                loadDataFromDatabase(); // Cập nhật lại bảng sau khi xóa
+            } else {
+                JOptionPane.showMessageDialog(this, "Lỗi khi xóa câu hỏi!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
     private void openAddQuestionPanel() {
         if (contentPanel != null) {
             JPanel currentPanel = (JPanel) contentPanel.getComponent(0); // Lưu panel hiện tại
-            JPanelThemCauHoi panelThemCauHoi = new JPanelThemCauHoi(contentPanel, currentPanel);
+            JPanelThemCauHoi panelThemCauHoi = new JPanelThemCauHoi(contentPanel, currentPanel, tableModel);
 
             contentPanel.removeAll();
             contentPanel.add(panelThemCauHoi);
@@ -198,14 +233,44 @@ public class JPanelAnh extends JPanel {
     }
 
     private void openEditQuestionPanel() {
+  
         if (contentPanel != null) {
-            JPanel currentPanel = (JPanel) contentPanel.getComponent(0);
-            JPanelSuaCauHoi suaCauHoiPanel = new JPanelSuaCauHoi(contentPanel, currentPanel);
-            contentPanel.removeAll();
-            contentPanel.add(suaCauHoiPanel);
-            contentPanel.revalidate();
-            contentPanel.repaint();
-            System.out.println("Chuyển đến giao diện Sửa câu hỏi!");
+        	JPanelAnh currentPanel = (JPanelAnh) contentPanel.getComponent(0);
+            
+       	 int selectedRow = table.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn một câu hỏi để sửa!");
+                return;
+            }
+                JPanelSuaCauHoi suaCauHoiPanel = new JPanelSuaCauHoi(contentPanel, currentPanel);
+                contentPanel.removeAll();
+                contentPanel.add(suaCauHoiPanel);
+                contentPanel.revalidate();
+                contentPanel.repaint();
+                System.out.println("Chuyển đến giao diện Sửa câu hỏi!");
+            }
+            
         }
-    }
+ 
+    private void findQuestion() {
+		String keyword = txtCauHoi.getText().trim().toLowerCase();
+		TableRowSorter<TableModel> rowSorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
+		table.setRowSorter(rowSorter);
+
+		if (!keyword.equals("")) {
+			rowSorter.setRowFilter(new RowFilter<TableModel, Integer>() {
+				@Override
+				public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
+					for (int i = 0; i < entry.getValueCount(); i++) {	
+						if (entry.getStringValue(i).toLowerCase().contains(keyword)) {
+							return true; // Có ít nhất một trường khớp với từ khóa
+						}
+					}
+					return false; // Không có trường nào khớp
+				}
+			});
+		} else {
+			rowSorter.setRowFilter(null); // Nếu không nhập gì, hiển thị tất cả dữ liệu
+		}
+	}
 }

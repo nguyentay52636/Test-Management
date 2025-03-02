@@ -104,7 +104,7 @@ public class QuestionDAO {
 
     // Xóa câu hỏi
     public boolean deleteQuestion(int questionID) {
-        String sql = "DELETE FROM questions WHERE questionID = ?";
+        String sql = "DELETE FROM questions WHERE qID = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, questionID);
             return ps.executeUpdate() > 0;
@@ -117,26 +117,48 @@ public class QuestionDAO {
     // Tìm kiếm câu hỏi theo nội dung hoặc chủ đề
     public List<QuestionDTO> searchQuestions(String keyword) {
         List<QuestionDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM questions WHERE qContent LIKE ? OR qTopicID IN (SELECT topicID FROM topics WHERE topicName LIKE ?)";
+        
+        // Truy vấn chỉ tìm kiếm dựa trên qContent
+        String sql = "SELECT * FROM questions WHERE qContent LIKE ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, "%" + keyword + "%");
-            ps.setString(2, "%" + keyword + "%");
+            ps.setString(1, "%" + keyword + "%"); // Tìm kiếm từ khóa trong nội dung
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                QuestionDTO q = new QuestionDTO(
+                String content = rs.getString("qContent");
+                
+                // Kiểm tra lại nếu content có chứa keyword
+                if (content.toLowerCase().contains(keyword.toLowerCase())) {
+                    QuestionDTO q = new QuestionDTO(
                         rs.getInt("questionID"),
-                        rs.getString("qContent"),
+                        content,
                         rs.getString("qPictures"),
                         rs.getInt("qTopicID"),
                         rs.getString("qLevel"),
-                        rs.getBoolean("qStatus"));
-                list.add(q);
+                        rs.getBoolean("qStatus")
+                    );
+                    list.add(q);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        
         return list;
     }
+
+    public int getNextQuestionID() {
+        String sql = "SELECT MAX(qID) FROM questions";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) + 1; // Lấy ID lớn nhất và tăng lên 1
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 1; // Trả về 1 nếu bảng rỗng
+    }
+
 }

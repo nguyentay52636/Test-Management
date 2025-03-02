@@ -123,7 +123,7 @@ public class JPanelGeneral extends JPanel {
     private void openAddQuestionPanel() {
         if (contentPanel != null) {
             JPanel currentPanel = (JPanel) contentPanel.getComponent(0); // Lưu panel hiện tại
-            JPanelThemCauHoi panelThemCauHoi = new JPanelThemCauHoi(contentPanel, currentPanel);
+            JPanelThemCauHoi panelThemCauHoi = new JPanelThemCauHoi(contentPanel, currentPanel, null);
 
             contentPanel.removeAll();
             contentPanel.add(panelThemCauHoi);

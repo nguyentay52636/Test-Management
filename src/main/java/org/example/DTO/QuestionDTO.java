@@ -8,6 +8,7 @@ public class QuestionDTO {
     private Boolean qStatus;
     private String qPicture;
 
+
     public QuestionDTO() {
     }
 
@@ -78,4 +79,5 @@ public class QuestionDTO {
     public String getQPicture() {
         return qPicture;
     }
+
 }
