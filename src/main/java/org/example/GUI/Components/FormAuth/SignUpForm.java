@@ -1,11 +1,16 @@
 package org.example.GUI.Components.FormAuth;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
+import org.example.BUS.UserBUS;
+import org.example.DTO.UsersDTO;
 
 public class SignUpForm extends javax.swing.JFrame {
 
         private JPanel panel1;
+        UserBUS userBUS = new UserBUS();
 
         public SignUpForm() {
                 initComponents();
@@ -24,18 +29,19 @@ public class SignUpForm extends javax.swing.JFrame {
                 jPanel3 = new javax.swing.JPanel();
                 jLabel4 = new javax.swing.JLabel();
                 jLabel5 = new javax.swing.JLabel();
-                txtUsername = new javax.swing.JTextField();
-                jLabel6 = new javax.swing.JLabel();
-                txtEmail = new javax.swing.JTextField();
-                jLabel7 = new javax.swing.JLabel();
-                txtPassword = new javax.swing.JPasswordField();
-                jLabel8 = new javax.swing.JLabel();
-                jButton1 = new javax.swing.JButton();
-                jButton2 = new javax.swing.JButton();
 
+                jLabel6 = new javax.swing.JLabel();
+
+                jLabel7 = new javax.swing.JLabel();
+
+                jLabel8 = new javax.swing.JLabel();
+                signUp = new javax.swing.JButton();
+                backLogin = new javax.swing.JButton();
+                txtUsername = new javax.swing.JTextField();
                 labelFullName = new javax.swing.JLabel();
                 txtFullName = new javax.swing.JTextField();
-
+                txtPassword = new javax.swing.JPasswordField();
+                txtEmail = new javax.swing.JTextField();
                 setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
                 setTitle("Sign Up");
                 setPreferredSize(new java.awt.Dimension(800, 500));
@@ -128,17 +134,82 @@ public class SignUpForm extends javax.swing.JFrame {
 
                 jLabel8.setText("I've an account");
 
-                jButton1.setBackground(new java.awt.Color(0, 102, 102));
-                jButton1.setForeground(new java.awt.Color(255, 255, 255));
-                jButton1.setOpaque(true);
-                jButton1.setContentAreaFilled(true);
-                jButton1.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.BLACK, 1));
-                jButton1.setEnabled(true);
+                signUp.setBackground(new java.awt.Color(0, 102, 102));
+                signUp.setForeground(new java.awt.Color(255, 255, 255));
+                signUp.setOpaque(true);
+                signUp.setContentAreaFilled(true);
+                signUp.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.BLACK, 1));
+                signUp.setEnabled(true);
 
-                jButton1.setText("Sign Up");
-                jButton2.setForeground(new java.awt.Color(255, 51, 51));
-                jButton2.setText("Login");
-                jButton2.addActionListener(new java.awt.event.ActionListener() {
+                signUp.setText("Sign Up");
+                backLogin.setForeground(new java.awt.Color(255, 51, 51));
+                backLogin.setText("Login");
+                signUp.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                // Lấy dữ liệu từ form
+                                String username = txtUsername.getText().trim();
+                                String fullName = txtFullName.getText().trim();
+                                String email = txtEmail.getText().trim();
+                                String password = txtPassword.getText().trim();
+
+                                // Kiểm tra trùng lặp tên đăng nhập hoặc email
+                                for (UsersDTO user : userBUS.getListAccount()) {
+                                        if (user.getUserName().equalsIgnoreCase(username)
+                                                        || user.getUserEmail().equalsIgnoreCase(email)) {
+                                                JOptionPane.showMessageDialog(null,
+                                                                "Tên đăng nhập hoặc Email đã tồn tại! Vui lòng chọn tên khác.",
+                                                                "Lỗi", JOptionPane.ERROR_MESSAGE);
+                                                return;
+                                        }
+                                }
+
+                                // Kiểm tra các trường không được để trống
+                                if (username.isEmpty() || fullName.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                                        JOptionPane.showMessageDialog(null, "Vui lòng điền đầy đủ thông tin!", "Lỗi",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                        return;
+                                }
+
+                                // Kiểm tra định dạng email
+                                if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                                        JOptionPane.showMessageDialog(null, "Email không hợp lệ! Vui lòng nhập lại.",
+                                                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                                        return;
+                                }
+
+                                // Kiểm tra độ dài mật khẩu (phải từ 6 ký tự trở lên)
+                                if (password.length() < 6) {
+                                        JOptionPane.showMessageDialog(null, "Mật khẩu phải có ít nhất 6 ký tự!", "Lỗi",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                        return;
+                                }
+
+                                // Tạo user mới
+                                UsersDTO newUser = new UsersDTO();
+                                newUser.setUserName(username);
+                                newUser.setUserFullName(fullName);
+                                newUser.setUserEmail(email);
+                                newUser.setUserPassword(password);
+                                newUser.setIsAdmin(false);
+
+                                // Thêm vào database
+                                boolean success = userBUS.insertUser(newUser);
+                                if (success) {
+                                        JOptionPane.showMessageDialog(null, "Đăng ký thành công! 🎉", "Thành công",
+                                                        JOptionPane.INFORMATION_MESSAGE);
+                                        LoginForm loginForm = new LoginForm();
+                                        loginForm.setVisible(true);
+                                        loginForm.pack();
+                                        loginForm.setLocationRelativeTo(null);
+                                        dispose();
+                                } else {
+                                        JOptionPane.showMessageDialog(null, "Đăng ký thất bại! Vui lòng thử lại.",
+                                                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                                }
+                        }
+                });
+
+                backLogin.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                                 LoginForm LoginFrame = new LoginForm();
                                 LoginFrame.setVisible(true);
@@ -185,7 +256,7 @@ public class SignUpForm extends javax.swing.JFrame {
                                                                                                                                                 Short.MAX_VALUE)
                                                                                                                                 .addComponent(jLabel7)
                                                                                                                                 .addComponent(txtPassword))
-                                                                                                                .addComponent(jButton1,
+                                                                                                                .addComponent(signUp,
                                                                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                                                                 91,
                                                                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -194,7 +265,7 @@ public class SignUpForm extends javax.swing.JFrame {
                                                                                                                                 .addComponent(jLabel8)
                                                                                                                                 .addPreferredGap(
                                                                                                                                                 javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                                                                                                .addComponent(jButton2,
+                                                                                                                                .addComponent(backLogin,
                                                                                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                                                                                 84,
                                                                                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)))))
@@ -237,7 +308,7 @@ public class SignUpForm extends javax.swing.JFrame {
                                                                                 40,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addGap(18, 18, 18)
-                                                                .addComponent(jButton1,
+                                                                .addComponent(signUp,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                 37,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -245,7 +316,7 @@ public class SignUpForm extends javax.swing.JFrame {
                                                                 .addGroup(jPanel3Layout.createParallelGroup(
                                                                                 javax.swing.GroupLayout.Alignment.BASELINE)
                                                                                 .addComponent(jLabel8)
-                                                                                .addComponent(jButton2,
+                                                                                .addComponent(backLogin,
                                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                                 31,
                                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -278,8 +349,8 @@ public class SignUpForm extends javax.swing.JFrame {
         }
 
         // Variables declaration - do not modify//GEN-BEGIN:variables
-        private javax.swing.JButton jButton1;
-        private javax.swing.JButton jButton2;
+        private javax.swing.JButton signUp;
+        private javax.swing.JButton backLogin;
         private javax.swing.JLabel jLabel1;
         private javax.swing.JLabel jLabel2;
         private javax.swing.JLabel jLabel3;

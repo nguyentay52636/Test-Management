@@ -8,6 +8,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.example.DTO.SessionManager;
+import org.example.DTO.UsersDTO;
 import org.example.GUI.Application.other.MainForm;
 import org.example.GUI.Components.FormAuth.LoginForm;
 
@@ -17,10 +19,6 @@ import com.formdev.flatlaf.extras.FlatAnimatedLafChange;
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 
-/**
- *
- * @author Raven
- */
 public class Application extends javax.swing.JFrame {
 
     private static Application app;
@@ -31,7 +29,8 @@ public class Application extends javax.swing.JFrame {
         initComponents();
         setSize(new Dimension(1366, 768));
         setLocationRelativeTo(null);
-        mainForm = new MainForm();
+        UsersDTO currentUser = SessionManager.getCurrentUser();
+        mainForm = new MainForm(currentUser);
 
         setContentPane(mainForm);
         getRootPane().putClientProperty(FlatClientProperties.FULL_WINDOW_CONTENT, true);
@@ -63,27 +62,23 @@ public class Application extends javax.swing.JFrame {
     }
 
     public static void logout() {
-        if (app == null) {
-            System.err.println("Application chưa được khởi tạo!");
-            return;
-        }
+        SwingUtilities.invokeLater(() -> {
+            int confirm = JOptionPane.showConfirmDialog(
+                    null,
+                    "Bạn có chắc chắn muốn đăng xuất không?",
+                    "Xác nhận",
+                    JOptionPane.YES_NO_OPTION);
 
-        int confirm = JOptionPane.showConfirmDialog(
-                null,
-                "Bạn có chắc chắn muốn đăng xuất không?",
-                "Xác nhận",
-                JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                app.setVisible(false); // Ẩn Application
 
-        if (confirm == JOptionPane.YES_OPTION) {
-            FlatAnimatedLafChange.showSnapshot();
-            loginForm = new LoginForm();
-            loginForm.setVisible(true);
-            app.dispose();
-            // app.setContentPane(loginForm);
-            // loginForm.applyComponentOrientation(app.getComponentOrientation());
-            // SwingUtilities.updateComponentTreeUI(app);
-            // FlatAnimatedLafChange.hideSnapshotWithAnimation();
-        }
+                // Hiển thị lại LoginForm
+                if (loginForm == null) {
+                    loginForm = new LoginForm();
+                }
+                loginForm.setVisible(true);
+            }
+        });
     }
 
     public static void setSelectedMenu(int index, int subIndex) {
@@ -112,7 +107,8 @@ public class Application extends javax.swing.JFrame {
     public static void main(String args[]) {
         FlatRobotoFont.install();
         FlatLaf.registerCustomDefaultsSource("org.example.GUI.menu.theme");
-        UIManager.put("defaultFont", new Font(FlatRobotoFont.FAMILY, Font.PLAIN, 13));
+        UIManager.put("defaultFont", new Font(FlatRobotoFont.FAMILY, Font.PLAIN,
+                13));
         FlatMacDarkLaf.setup();
         java.awt.EventQueue.invokeLater(() -> {
             app = new Application();

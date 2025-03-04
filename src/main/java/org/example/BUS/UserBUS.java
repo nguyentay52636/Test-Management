@@ -13,9 +13,16 @@ public class UserBUS {
         listAccount = userDAO.getAllUsers();
     }
 
+    public void getUserAll() {
+        listAccount = userDAO.getAllUsers();
+    }
+
+    public ArrayList<UsersDTO> getListAccount() {
+        return listAccount;
+    }
+
     public boolean login(String userEmail, String password) {
         return userDAO.login(userEmail, password);
-
     }
 
     public boolean register(UsersDTO user) {
@@ -51,5 +58,9 @@ public class UserBUS {
             }
         }
         return false;
+    }
+
+    public String[] getHeaders() {
+        return new String[] { "Tên người dùng", "Email", "Mật khẩu", "Tên dầy đủ ", "Vai trò" };
     }
 }

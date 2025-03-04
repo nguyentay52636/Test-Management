@@ -1,29 +1,39 @@
 package org.example.GUI.FormDialog.DialogUser;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import org.example.BUS.UserBUS;
 import org.example.DTO.UsersDTO;
+import org.example.GUI.Components.FormAccount.FormManagerAccount;
 
 public class DialogAddAccount extends JFrame {
-    public interface AccountAddedListener {
-        void onAccountAdded(UsersDTO newAccount);
-    }
+    UserBUS qltkBUS = new UserBUS();
+    UsersDTO tkSua;
+    // private FormManagerAccount.AccountAddedListener accountAddedListener;
 
-    public static AccountAddedListener accountAddedListener;
+    // public interface AccountAddedListener {
+    // void onAccountAdded(UsersDTO newAccount);
+    // }
+
+    private FormManagerAccount.AccountAddedListener accountAddedListener;
 
     private String type; // Initialize the type field
 
     JTextField txUsername = new JTextField(15);
     JTextField txPassword = new JTextField(15);
+    JTextField txtFullName = new JTextField(15);
     JTextField txMaNV = new JTextField(15);
     JTextField txMaQuyen = new JTextField(15);
     JTextField txtEmail = new JTextField(15);
@@ -35,8 +45,13 @@ public class DialogAddAccount extends JFrame {
     JButton btnThem = new JButton("Thêm");
     JButton btnSua = new JButton("Sửa");
     JButton btnHuy = new JButton("Hủy");
+    JComboBox<String> roleComboBox = new JComboBox<>(new String[] { "Admin", "User" });
 
-    public void setDialogAddAccount(AccountAddedListener listener) {
+    // public void setDialogAddAccount(AccountAddedListener listener) {
+    // DialogAddAccount.accountAddedListener = listener;
+    // }
+
+    public void setAccountAddedListener(FormManagerAccount.AccountAddedListener listener) {
         this.accountAddedListener = listener;
     }
 
@@ -47,32 +62,33 @@ public class DialogAddAccount extends JFrame {
         txtEmail.setBorder(BorderFactory.createTitledBorder("Email"));
         txUsername.setBorder(BorderFactory.createTitledBorder("Tên tài khoản"));
         txPassword.setBorder(BorderFactory.createTitledBorder("Mật khẩu"));
-        txMaNV.setBorder(BorderFactory.createTitledBorder(" "));
+        txtFullName.setBorder(BorderFactory.createTitledBorder("Tên đầy đủ "));
         txMaQuyen.setBorder(BorderFactory.createTitledBorder(" "));
 
-        JPanel plChonNhanVien = new JPanel();
-        plChonNhanVien.setBorder(BorderFactory.createTitledBorder("Mã nhân viên"));
-        plChonNhanVien.add(txMaNV);
+        // plChonNhanVien.setBorder(BorderFactory.createTitledBorder("Mã nhân viên"));
+        // plChonNhanVien.add(txMaNV);
         // plChonNhanVien.add(btnChonNhanVien);
-        button1.setPreferredSize(new Dimension(50, 50));
-        button1.setIcon(
-                new ImageIcon(getClass().getResource("/org/example/GUI/resources/images/icons8_assistant_30px.png")));
-        plChonNhanVien.add(button1);
+        // button1.setPreferredSize(new Dimension(50, 50));
+        // button1.setIcon(
+        // new
+        // ImageIcon(getClass().getResource("/org/example/GUI/resources/images/icons8_assistant_30px.png")));
+        // plChonNhanVien.add(button1);
 
         JPanel plChonQuyen = new JPanel();
         plChonQuyen.setBorder(BorderFactory.createTitledBorder("Mã quyền"));
-        plChonQuyen.add(txMaQuyen);
+        plChonQuyen.add(roleComboBox);
         // plChonQuyen.add(btnChonQuyen);
-        button2.setPreferredSize(new Dimension(50, 50));
-        button2.setIcon(new ImageIcon(
-                getClass().getResource("/org/example/GUI/resources/images/icons8_police_badge_30px.png")));
-        plChonQuyen.add(button2);
+        // button2.setPreferredSize(new Dimension(50, 50));
+        // button2.setIcon(new ImageIcon(
+        // getClass().getResource("/org/example/GUI/resources/images/icons8_police_badge_30px.png")));
+        // plChonQuyen.add(button2);
 
         JPanel plInput = new JPanel();
         plInput.add(txtEmail);
         plInput.add(txUsername);
+        plInput.add(txtFullName);
         plInput.add(txPassword);
-        plInput.add(plChonNhanVien);
+        // plInput.add(plChonNhanVien);
         plInput.add(plChonQuyen);
 
         // panel buttons
@@ -87,36 +103,26 @@ public class DialogAddAccount extends JFrame {
             plButton.add(btnThem);
 
         } else {
-            /*
-             * this.setTitle("Sửa tài khoản");
-             * for (Account tk : qltkBUS.getDstk()) {
-             * if (tk.getUsername().equals(_username)) {
-             * this.tkSua = tk;
-             * }
-             */
-
-            // if (this.tkSua == null) {
-            // JOptionPane.showMessageDialog(null, "Lỗi, không tìm thấy tài khoản");
-            // this.dispose();
-            // }
-            // AccountBUS accountBUS = new AccountBUS();
-
-            // txtEmail.setText(this.tkSua.getEmail());
-            // String emailAdmin = "admin@example.com";
-            // String getTxtEmail = txtEmail.getText();
-            // if (getTxtEmail.equals(emailAdmin)) {
-            // txtEmail.setEnabled(false); // Khóa ô input
-            // } else {
-            // txtEmail.setEnabled(true);
-            // }
-            //
-            // txUsername.setText(this.tkSua.getUsername());
+            this.setTitle("Sửa tài khoản");
+            // Iterate over accounts and find the matching one
+            for (UsersDTO tk : qltkBUS.getListAccount()) {
+                if (tk.getUserName().equals(_username)) {
+                    this.tkSua = tk;
+                    break;
+                }
+            }
+            if (this.tkSua == null) {
+                JOptionPane.showMessageDialog(null, "Lỗi, không tìm thấy tài khoản");
+                this.dispose();
+                return;
+            }
+            // Set text fields using tkSua
+            txtEmail.setText(this.tkSua.getUserEmail());
+            txUsername.setText(this.tkSua.getUserName());
             // txUsername.setEditable(false);
-            // txPassword.setText(this.tkSua.getPassword());
-            // txMaNV.setText(this.tkSua.getMaNV());
-            // txMaNV.setEnabled(false);
-            // txMaQuyen.setText(this.tkSua.getMaQuyen());
-            // txMaQuyen.setEnabled(false);
+            txtFullName.setText(this.tkSua.getUserFullName());
+            txPassword.setText(this.tkSua.getUserPassword());
+            roleComboBox.setSelectedItem(this.tkSua.getIsAdmin() ? "Admin" : "User");
             btnSua.setIcon(new ImageIcon(
                     this.getClass().getResource("/org/example/GUI/resources/images/icons8_support_30px.png")));
             plButton.add(btnSua);
@@ -129,171 +135,138 @@ public class DialogAddAccount extends JFrame {
         this.add(plButton, BorderLayout.SOUTH);
 
         // mouse listener
-        // btnThem.addActionListener(new ActionListener() {
-        // @Override
-        // public void actionPerformed(ActionEvent actionEvent) {
-        // btnThemMouseClicked();
-        // }
-        // });
-        // btnSua.addActionListener((ae) -> {
-        // btnSuaMouseClicked();
-        // });
+        btnThem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                btnThemMouseClicked();
+            }
+        });
+        btnSua.addActionListener((ae) -> {
+            btnSuaMouseClicked();
+        });
         btnHuy.addActionListener((ae) -> {
             this.dispose();
         });
-        // button1.addActionListener(new ActionListener() {
-        // @Override
-        // public void actionPerformed(ActionEvent actionEvent) {
-        // FormChooseEmployee form = new FormChooseEmployee();
-        // form.setVisible(true);
-        // form.addButtonAddActionListener(new ActionListener() {
-        // @Override
-        // public void actionPerformed(ActionEvent e) {
-        // String selectedEmployeeId = form.getSelectedEmployeeId();
-        // if (selectedEmployeeId != null) {
-        // txMaNV.setText(selectedEmployeeId);
-        // }
-        // }
-        // });
-        // }
-        // });
-        // button2.addActionListener(new ActionListener() {
-        // @Override
-        // public void actionPerformed(ActionEvent actionEvent) {
-        // FormChoosePermission form = new FormChoosePermission();
-        // form.setVisible(true);
-        // form.addButtonAddActionListener(new ActionListener() {
-        // @Override
-        // public void actionPerformed(ActionEvent actionEvent) {
-        // String selectedPermissionId = form.getSelectedPermissionId();
-        // if (selectedPermissionId != null) {
-        // txMaQuyen.setText(selectedPermissionId);
-        // }
-        // }
-        // });
-        // }
-        // });
+
         this.setSize(400, 400);
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setVisible(true);
     }
 
-    // private void btnThemMouseClicked() {
-    // if (checkEmpty()) {
-    // String email = txtEmail.getText();
-    // String username = txUsername.getText();
-    // String pass = txPassword.getText();
-    // String manv = txMaNV.getText();
-    // txMaNV.setEnabled(false);
-    // String maquyen = txMaQuyen.getText();
-    // txMaQuyen.setEnabled(false);
-    //
-    // // Check if the email or username already exists
-    // AccountBUS accountBUS = new AccountBUS();
-    // boolean emailExists = false;
-    // boolean usernameExists = false;
-    //
-    // for (Account account : accountBUS.getDstk()) {
-    // if (account.getEmail().equals(email)) {
-    // emailExists = true;
-    // }
-    // if (account.getUsername().equals(username)) {
-    // usernameExists = true;
-    // }
-    // }
-    //
-    // if (emailExists) {
-    // JOptionPane.showMessageDialog(this, "Email đã tồn tại!", "Thông báo",
-    // JOptionPane.WARNING_MESSAGE);
-    // } else if (usernameExists) {
-    // JOptionPane.showMessageDialog(this, "Username đã tồn tại!", "Thông báo",
-    // JOptionPane.WARNING_MESSAGE);
-    // } else {
-    // Account newAccount = new Account(email, username, pass, manv, maquyen);
-    // if (qltkBUS.add(email, username, pass, manv, maquyen)) {
-    // JOptionPane.showMessageDialog(this, "Thêm " + username + " thành công!");
-    // if (accountAddedListener != null) {
-    // accountAddedListener.onAccountAdded(newAccount);
-    // }
-    // this.dispose();
-    // }
-    // }
-    // }
-    // }
+    private void btnThemMouseClicked() {
+        if (checkEmpty()) {
+            String email = txtEmail.getText();
+            String username = txUsername.getText();
+            String fullName = txtFullName.getText();
+            String pass = txPassword.getText();
+            String maquyen = roleComboBox.getSelectedItem().toString();
 
-    // private void btnSuaMouseClicked() {
-    // if (checkEmpty()) {
-    // String email = txtEmail.getText();
-    // String username = txUsername.getText();
-    // String pass = txPassword.getText();
-    // String manv = txMaNV.getText();
-    // String maquyen = txMaQuyen.getText();
-    // // Check if the email or username already exists
-    // AccountBUS accountBUS = new AccountBUS();
-    // boolean emailExists = false;
-    // boolean usernameExists = false;
-    //
-    // for (Account account : accountBUS.getDstk()) {
-    // if (account.getEmail().equals(email)) {
-    // emailExists = true;
-    // }
-    // if (account.getUsername().equals(username)) {
-    // usernameExists = true;
-    // }
-    // }
-    //
-    // if (emailExists) {
-    // JOptionPane.showMessageDialog(this, "Email đã tồn tại!", "Thông báo",
-    // JOptionPane.WARNING_MESSAGE);
-    // } else if (usernameExists) {
-    // JOptionPane.showMessageDialog(this, "Username đã tồn tại!", "Thông báo",
-    // JOptionPane.WARNING_MESSAGE);
-    // } else {
-    // Account fixAccount = new Account(email, username, pass, manv, maquyen);
-    // if (qltkBUS.update(email, username, pass, manv, maquyen)) {
-    // JOptionPane.showMessageDialog(this, "Sửa " + username + " thành công!");
-    // if (accountAddedListener != null) {
-    // accountAddedListener.onAccountAdded(fixAccount);
-    // }
-    // this.dispose();
-    // }
-    // }
-    //
-    // }
-    // }
+            // Chuyển đổi maquyen từ String sang Boolean
+            Boolean isAdmin = "Admin".equalsIgnoreCase(maquyen);
 
-    // private Boolean checkEmpty() {
-    // String email = txtEmail.getText();
-    // String username = txUsername.getText();
-    // String pass = txPassword.getText();
-    // String manv = txMaNV.getText();
-    // String maquyen = txMaQuyen.getText();
-    //
-    // if (username.trim().equals("")) {
-    // return showErrorTx(txUsername, "Tên đăng nhập không được để trống");
-    //
-    // } else if (email.trim().equals("")) {
-    // return showErrorTx(txtEmail, "Email không được để trống");
-    //
-    // } else if (pass.equals("")) {
-    // return showErrorTx(txPassword, "Mật khẩu không được để trống");
-    //
-    // } else if (manv.trim().equals("")) {
-    // return showErrorTx(txMaNV, "Mã nhân viên không được để trống");
-    //
-    // } else if (maquyen.trim().equals("")) {
-    // return showErrorTx(txMaQuyen, "Mã quyền không được để trống");
-    // }
-    //
-    // return true;
-    // }
+            // Kiểm tra email và username đã tồn tại chưa
+            UserBUS accountBUS = new UserBUS();
+            boolean emailExists = false;
+            boolean usernameExists = false;
+            int maxId = 0; // Để lưu userID lớn nhất hiện có
 
-    // private Boolean showErrorTx(JTextField tx, String errorInfo) {
-    // JOptionPane.showMessageDialog(tx, errorInfo);
-    // tx.requestFocus();
-    // return false;
-    // }
+            for (UsersDTO account : accountBUS.getListAccount()) {
+                if (account.getUserEmail().equals(email)) {
+                    emailExists = true;
+                }
+                if (account.getUserName().equals(username)) {
+                    usernameExists = true;
+                }
+                // Tìm userID lớn nhất
+                if (account.getUserID() > maxId) {
+                    maxId = account.getUserID();
+                }
+            }
+
+            if (emailExists) {
+                JOptionPane.showMessageDialog(this, "Email đã tồn tại!", "Thông báo",
+                        JOptionPane.WARNING_MESSAGE);
+            } else if (usernameExists) {
+                JOptionPane.showMessageDialog(this, "Username đã tồn tại!", "Thông báo",
+                        JOptionPane.WARNING_MESSAGE);
+            } else {
+                int newUserId = maxId + 1;
+                UsersDTO newAccount = new UsersDTO(newUserId, username, email, pass, fullName, isAdmin);
+
+                // Giả sử qltkBUS.add() thêm tài khoản vào db thành công
+                if (qltkBUS.insertUser(newAccount)) {
+                    JOptionPane.showMessageDialog(this, "Thêm " + username + " thành công!");
+                    if (accountAddedListener != null) {
+                        accountAddedListener.onAccountAdded(newAccount);
+                    }
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Thêm " + username + " thất bại!");
+                }
+            }
+        }
+    }
+
+    private void btnSuaMouseClicked() {
+        if (checkEmpty()) {
+            String email = txtEmail.getText();
+            String username = txUsername.getText();
+            String fullName = txtFullName.getText();
+            String pass = txPassword.getText();
+            String maquyen = roleComboBox.getSelectedItem().toString();
+
+            Boolean isAdmin = "Admin".equalsIgnoreCase(maquyen);
+            UserBUS accountBUS = new UserBUS();
+            boolean emailExists = false;
+            boolean usernameExists = false;
+            int UserID = 0;
+            if (tkSua != null) {
+                UserID = tkSua.getUserID();
+            }
+
+            // ...any other validation code...
+
+            UsersDTO newAccount = new UsersDTO(UserID, username, email, pass, fullName, isAdmin);
+            if (qltkBUS.updateUser(newAccount)) {
+                JOptionPane.showMessageDialog(this, "Sửa " + username + " thành công!");
+                if (accountAddedListener != null) {
+                    accountAddedListener.onAccountAdded(newAccount);
+                }
+                this.dispose();
+            }
+        }
+    }
+
+    private Boolean checkEmpty() {
+        String email = txtEmail.getText();
+        String username = txUsername.getText();
+        String pass = txPassword.getText();
+        String fullName = txtFullName.getText();
+
+        if (fullName.trim().equals("")) {
+            return showErrorTx(txtFullName, "Tên đầy đủ không được để trống");
+        } else if (username.trim().equals("")) {
+            return showErrorTx(txUsername, "Tên đăng nhập không được để trống");
+
+        } else if (email.trim().equals("")) {
+            return showErrorTx(txtEmail, "Email không được để trống");
+
+        } else if (pass.equals("")) {
+            return showErrorTx(txPassword, "Mật khẩu không được để trống");
+
+            // } else if (maquyen.trim().equals("")) {
+            // return showErrorTx(txMaQuyen, "Mã quyền không được để trống");
+        }
+
+        return true;
+    }
+
+    private Boolean showErrorTx(JTextField tx, String errorInfo) {
+        JOptionPane.showMessageDialog(tx, errorInfo);
+        tx.requestFocus();
+        return false;
+    }
 
     public static void main(String[] args) throws UnsupportedLookAndFeelException, ClassNotFoundException,
             InstantiationException, IllegalAccessException {

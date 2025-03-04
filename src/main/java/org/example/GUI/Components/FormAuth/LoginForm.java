@@ -1,16 +1,18 @@
 package org.example.GUI.Components.FormAuth;
 
 import java.awt.Cursor;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import org.example.GUI.Application.Application;
+import org.example.BUS.UserBUS;
+import org.example.DTO.SessionManager;
+import org.example.DTO.UsersDTO;
 
 public class LoginForm extends javax.swing.JFrame {
+        UserBUS userBUS = new UserBUS();
+        private Runnable loginSuccessListener;
         private JPanel Left;
         private JPanel Right;
         private javax.swing.JButton btnForgotPassword;
@@ -24,11 +26,15 @@ public class LoginForm extends javax.swing.JFrame {
         private javax.swing.JLabel jLabel6;
         private javax.swing.JLabel jLabel7;
         private javax.swing.JPanel jPanel1;
-        private javax.swing.JPasswordField jPasswordField1;
-        private javax.swing.JTextField jTextField1;
+        private javax.swing.JPasswordField passwordField;
+        private javax.swing.JTextField emailField;
+        SessionManager sessionManager = new SessionManager();
 
         public LoginForm() {
                 initComponents();
+                if (loginSuccessListener != null) {
+                        loginSuccessListener.run();
+                }
         }
 
         private void initComponents() {
@@ -40,13 +46,13 @@ public class LoginForm extends javax.swing.JFrame {
                 Left = new javax.swing.JPanel();
                 jLabel1 = new javax.swing.JLabel();
                 jLabel2 = new javax.swing.JLabel();
-                jTextField1 = new javax.swing.JTextField();
+                emailField = new javax.swing.JTextField();
                 jLabel3 = new javax.swing.JLabel();
-                jPasswordField1 = new javax.swing.JPasswordField();
+                passwordField = new javax.swing.JPasswordField();
                 btnLogin = new javax.swing.JButton();
                 jLabel4 = new javax.swing.JLabel();
                 jButton2 = new javax.swing.JButton();
-                btnForgotPassword = new  javax.swing.JButton();
+                btnForgotPassword = new javax.swing.JButton();
 
                 setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
                 setTitle("LOGIN");
@@ -121,8 +127,8 @@ public class LoginForm extends javax.swing.JFrame {
                 jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
                 jLabel2.setText("Email");
 
-                jTextField1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-                jTextField1.setForeground(new java.awt.Color(102, 102, 102));
+                emailField.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+                emailField.setForeground(new java.awt.Color(102, 102, 102));
 
                 jLabel3.setBackground(new java.awt.Color(102, 102, 102));
                 jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -148,20 +154,48 @@ public class LoginForm extends javax.swing.JFrame {
                                 btnLogin.setBackground(new java.awt.Color(0, 102, 102)); // Trả về màu gốc
                         }
                 });
-                btnLogin.addActionListener(new ActionListener() {
+                btnLogin.addActionListener(new java.awt.event.ActionListener() {
                         @Override
-                        public void actionPerformed(ActionEvent e) {
-                                // Đóng LoginForm và quay lại Application
-                                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(btnLogin);
-                                if (topFrame != null) {
-                                        topFrame.dispose();  // Đóng LoginForm
+                        public void actionPerformed(java.awt.event.ActionEvent e) {
+                                String email = emailField.getText().trim();
+                                String password = new String(passwordField.getPassword()).trim();
+
+                                if (email.isEmpty() || password.isEmpty()) {
+                                        JOptionPane.showMessageDialog(null, "Email và mật khẩu không được để trống!",
+                                                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                                        return;
                                 }
 
-                                // Mở lại giao diện Application
-                                Application.login();
+                                UsersDTO foundUser = null;
+                                for (UsersDTO user : userBUS.getListAccount()) {
+                                        if (user.getUserEmail().equals(email)) {
+                                                foundUser = user;
+                                                break;
+                                        }
+                                }
+
+                                if (foundUser == null) {
+                                        JOptionPane.showMessageDialog(null, "Email không tồn tại!", "Lỗi",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                        return;
+                                }
+
+                                System.out.println("Mật khẩu trong DB: " + foundUser.getUserPassword());
+                                if (foundUser.getUserPassword().equals(password)) {
+                                        sessionManager.setCurrentUser(foundUser);
+                                        JOptionPane.showMessageDialog(null, "Đăng nhập thành công! 🎉", "Thành công",
+                                                        JOptionPane.INFORMATION_MESSAGE);
+
+                                        if (loginSuccessListener != null) {
+                                                SwingUtilities.invokeLater(loginSuccessListener);
+                                        }
+
+                                } else {
+                                        JOptionPane.showMessageDialog(null, "Mật khẩu không đúng! ❌", "Lỗi",
+                                                        JOptionPane.ERROR_MESSAGE);
+                                }
                         }
                 });
-
 
                 btnForgotPassword = new javax.swing.JButton();
                 btnForgotPassword.setFont(new java.awt.Font("Segoe UI", 0, 14));
@@ -173,7 +207,8 @@ public class LoginForm extends javax.swing.JFrame {
                 btnForgotPassword.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                                 // Mở form reset password (hoặc hiển thị thông báo)
-                                javax.swing.JOptionPane.showMessageDialog(null, "Redirecting to Forgot Password screen...");
+                                javax.swing.JOptionPane.showMessageDialog(null,
+                                                "Redirecting to Forgot Password screen...");
                         }
                 });
 
@@ -221,9 +256,9 @@ public class LoginForm extends javax.swing.JFrame {
                                                                                                                                                 javax.swing.GroupLayout.Alignment.LEADING,
                                                                                                                                                 false)
                                                                                                                                 .addComponent(jLabel2)
-                                                                                                                                .addComponent(jTextField1)
+                                                                                                                                .addComponent(emailField)
                                                                                                                                 .addComponent(jLabel3)
-                                                                                                                                .addComponent(jPasswordField1,
+                                                                                                                                .addComponent(passwordField,
                                                                                                                                                 javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                                                                                                 343,
                                                                                                                                                 Short.MAX_VALUE)
@@ -247,7 +282,7 @@ public class LoginForm extends javax.swing.JFrame {
                                                                 .addComponent(jLabel2)
                                                                 .addPreferredGap(
                                                                                 javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                                .addComponent(jTextField1,
+                                                                .addComponent(emailField,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                 40,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -255,7 +290,7 @@ public class LoginForm extends javax.swing.JFrame {
                                                                 .addComponent(jLabel3)
                                                                 .addPreferredGap(
                                                                                 javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                                .addComponent(jPasswordField1,
+                                                                .addComponent(passwordField,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
                                                                                 40,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -296,6 +331,10 @@ public class LoginForm extends javax.swing.JFrame {
                 getAccessibleContext().setAccessibleName("LOGIN");
 
                 pack();
+        }
+
+        public void setLoginSuccessListener(Runnable listener) {
+                this.loginSuccessListener = listener;
         }
 
         public static void main(String[] args) {

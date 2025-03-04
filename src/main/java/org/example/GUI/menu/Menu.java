@@ -21,10 +21,6 @@ import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.ui.FlatUIUtils;
 import com.formdev.flatlaf.util.UIScale;
 
-/**
- *
- * @author Raven
- */
 public class Menu extends JPanel {
 
     private final String menuItems[][] = {

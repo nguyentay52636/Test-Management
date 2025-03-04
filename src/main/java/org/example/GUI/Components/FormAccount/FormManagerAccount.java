@@ -10,14 +10,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -26,20 +26,28 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 
+import org.example.BUS.UserBUS;
+import org.example.DTO.UsersDTO;
 import org.example.GUI.FormDialog.DialogUser.DialogAddAccount;
 
 /**
  * @author m1lt43
  */
 public class FormManagerAccount extends JPanel {
+    UserBUS userBUS = new UserBUS();
 
     // InvoiceDetailBUS invoiceDetailsBUS = new InvoiceDetailBUS();
 
     public FormManagerAccount() {
         initComponents();
-        // refresh();
+        refresh();
         disableButton();
     }
 
@@ -93,14 +101,15 @@ public class FormManagerAccount extends JPanel {
         table1 = new JTable();
         panel6 = new JPanel();
         panel7 = new JPanel();
-        txtMaHoaDon = new JTextField();
-        txtNhanVien = new JTextField();
-        txtKhachHang = new JTextField();
-        txtKhuyenMai = new JTextField();
+        txtUserId = new JTextField();
+        txtUserName = new JTextField();
+        txtPassword = new JTextField();
+        txtPassword = new JTextField();
+        txtFullName = new JTextField();
         panel8 = new JPanel();
-        txtNgayLap = new JTextField();
-        txtTongTien = new JTextField();
-        txtGioLap = new JTextField();
+        txtEmail = new JTextField();
+        txtRole = new JTextField();
+      
 
         //======== this ========
         setBorder (new javax. swing. border. CompoundBorder( new javax .swing .border .TitledBorder (new javax
@@ -269,24 +278,29 @@ public class FormManagerAccount extends JPanel {
                         table1.setFont(font);
                         table1.getTableHeader().setFont(fontHeader);
                         table1.setRowHeight(30);
+                        JTableHeader header = table1.getTableHeader();
+                      DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) header.getDefaultRenderer();
+                        headerRenderer.setHorizontalAlignment(JLabel.CENTER);
                         TableColumnModel columnModel = table1.getColumnModel();
                         for (int i = 0; i < columnModel.getColumnCount(); i++) {
                             columnModel.getColumn(i).setPreferredWidth(150);
                         }
 
                         ListSelectionModel selectionModel = table1.getSelectionModel();
-                        // selectionModel.addListSelectionListener(new ListSelectionListener() {
-                        //     @Override
-                        //     public void valueChanged(ListSelectionEvent e) {
-                        //         if (!e.getValueIsAdjusting()) {
-                        //             // Lấy chỉ số hàng được chọn
-                        //             int selectedRow = table1.getSelectedRow();
-                        //             if (selectedRow != -1) {String maHD = (String) table1.getValueAt(selectedRow, 1);
-                        //                 displayInfo(maHD);
-                        //             }
-                        //         }
-                        //     }
-                        // });
+
+                        selectionModel.addListSelectionListener(new ListSelectionListener() {
+                            @Override
+                            public void valueChanged(ListSelectionEvent e) {
+                                if (!e.getValueIsAdjusting()) {
+                                    // Lấy chỉ số hàng được chọn
+                                    int selectedRow = table1.getSelectedRow();
+                                    if (selectedRow != -1) {String userName = (String) table1.getValueAt(selectedRow, 1);
+                                        displayInfo(userName);
+                                        System.out.println("Selected row: " + selectedRow);
+                                    }
+                                }
+                            }
+                        });
                         // btnxemChiTiet.addActionListener(new ActionListener() {
                         //     @Override
                         //     public void actionPerformed(ActionEvent e) {
@@ -309,7 +323,7 @@ public class FormManagerAccount extends JPanel {
                         // });
 
                         //---- table1 ----
-                 
+                        
 
 
                         table1.setFocusable(false);
@@ -329,24 +343,24 @@ public class FormManagerAccount extends JPanel {
                             panel7.setLayout(new FlowLayout());
 
                             //---- textField5 ----
-                            txtMaHoaDon.setBorder(new TitledBorder(null, "M\u00e3 ho\u00e1 \u0111\u01a1n ", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, null, Color.black));
-                            txtMaHoaDon.setPreferredSize(new Dimension(200, 55));
-                            panel7.add(txtMaHoaDon);
+                            txtUserId.setBorder(new TitledBorder(null, "Mã tài khoản ", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, null, Color.black));
+                            txtUserId.setPreferredSize(new Dimension(200, 55));
+                            panel7.add(txtUserId);
 
                             //---- textField6 ----
-                            txtNhanVien.setBorder(new TitledBorder(null, "Nh\u00e2n vi\u00ean ", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, null, Color.black));
-                            txtNhanVien.setPreferredSize(new Dimension(200, 55));
-                            panel7.add(txtNhanVien);
+                            txtUserName.setBorder(new TitledBorder(null, "Tên đăng nhập  ", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, null, Color.black));
+                            txtUserName.setPreferredSize(new Dimension(200, 55));
+                            panel7.add(txtUserName);
 
                             //---- textField7 ----
-                            txtKhachHang.setBorder(new TitledBorder(null, "Kh\u00e1ch h\u00e0ng", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, null, Color.black));
-                            txtKhachHang.setPreferredSize(new Dimension(200, 55));
-                            panel7.add(txtKhachHang);
+                            txtPassword.setBorder(new TitledBorder(null, "Mật khẩu", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, null, Color.black));
+                            txtPassword.setPreferredSize(new Dimension(200, 55));
+                            panel7.add(txtPassword);
 
                             //---- textField8 ----
-                            txtKhuyenMai.setBorder(new TitledBorder(null, "Khuy\u1ebfn m\u00e3i", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, null, Color.black));
-                            txtKhuyenMai.setPreferredSize(new Dimension(200, 55));
-                            panel7.add(txtKhuyenMai);
+                            txtFullName.setBorder(new TitledBorder(null, "Họ và tên", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, null, Color.black));
+                            txtFullName.setPreferredSize(new Dimension(200, 55));
+                            panel7.add(txtFullName);
                         }
                         panel6.add(panel7);
 
@@ -355,19 +369,16 @@ public class FormManagerAccount extends JPanel {
                             panel8.setLayout(new FlowLayout());
 
                             //---- textField9 ----
-                            txtNgayLap.setBorder(new TitledBorder(null, "T\u1ed5ng ti\u1ec1n (Tri\u1ec7u VN\u0110)", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, null, Color.black));
-                            txtNgayLap.setPreferredSize(new Dimension(200, 55));
-                            panel8.add(txtNgayLap);
+                            txtEmail.setBorder(new TitledBorder(null, "Emai", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, null, Color.black));
+                            txtEmail.setPreferredSize(new Dimension(200, 55));
+                            panel8.add(txtEmail);
 
                             //---- textField10 ----
-                            txtGioLap.setBorder(new TitledBorder(null, "Ng\u00e0y l\u1eadp", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, null, Color.black));
-                            txtGioLap.setPreferredSize(new Dimension(200, 55));
-                            panel8.add(txtGioLap);
+                            txtRole.setBorder(new TitledBorder(null, "Quyền", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, null, Color.black));
+                            txtRole.setPreferredSize(new Dimension(200, 55));
+                            panel8.add(txtRole);
 
                             //---- textField11 ----
-                            txtTongTien.setBorder(new TitledBorder(null, "Gi\u1edd l\u1eadp", TitledBorder.LEADING, TitledBorder.DEFAULT_POSITION, null, Color.black));
-                            txtTongTien.setPreferredSize(new Dimension(200, 55));
-                            panel8.add(txtTongTien);
                         }
                         panel6.add(panel8);
                     }
@@ -433,10 +444,71 @@ public class FormManagerAccount extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 DialogAddAccount dialog = new DialogAddAccount("Thêm", "");
-    
+                dialog.setAccountAddedListener(new AccountAddedListener() {
+                    @Override
+                    public void onAccountAdded(UsersDTO newAccount) {
+                        refresh();
+                    }
+                });
                 dialog.setVisible(true);
             }
         });
+        btnDelete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = table1.getSelectedRow();
+
+                if (selectedRow != -1) {
+                    int option = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa tài khoản này không?",
+                            "Xác nhận", JOptionPane.YES_NO_OPTION);
+                    if (option == JOptionPane.YES_OPTION) {
+                        int userID = Integer.parseInt(txtUserId.getText());
+                        userBUS.deleteUser(userID);
+                        JOptionPane.showMessageDialog(null, "Xóa tài khoản " + userID + " thành công");
+                        // chấp vá
+                           refresh();
+                           refresh();
+                    }
+
+              
+                } else {
+                    JOptionPane.showMessageDialog(null, "Vui lòng chọn tài khoản cần xóa");
+                }
+            }
+        });
+         btnEdit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                int selectedRow = table1.getSelectedRow();
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(null, "Vui lòng chọn một tài khoản");
+                    return;
+                }
+                String username = (String) table1.getValueAt(selectedRow,1);
+                    // System.out.println(username);
+        
+                DialogAddAccount account = new DialogAddAccount("Sửa", username);
+                account.setAccountAddedListener(new AccountAddedListener() {
+                    @Override
+                    public void onAccountAdded(UsersDTO newAccount) {
+                        // Giữ nguyên userID khi tạo đối tượng mới
+                        UsersDTO updatedAccount = new UsersDTO(newAccount.getUserID(), 
+                                                               newAccount.getUserName(), 
+                                                               newAccount.getUserEmail(),
+                                                               newAccount.getUserPassword(), 
+                                                               newAccount.getUserFullName(), 
+                                                               newAccount.getIsAdmin());
+                
+                      userBUS.updateUser(updatedAccount);
+                      refresh();
+                    }
+                });
+                
+   
+                account.setVisible(true);
+            }
+        });
+        
         // xuat excel
         // button1.addActionListener(new ActionListener() {
         //     @Override
@@ -596,12 +668,77 @@ public class FormManagerAccount extends JPanel {
         //         }
         //     }
         // });
+    
     }
-
     public void disableButton() {
         btnExport.setEnabled(false);
     }
+    public void refresh() {
+        userBUS.getUserAll();
+        setDataToTable(userBUS.getListAccount());
+        
+    }
+private void displayInfo(String userName) {
+    if (userName != null) {
+        System.out.println("UserName cần tìm: " + userName);
 
+        try {
+            for (UsersDTO user : userBUS.getListAccount()) {
+                // System.out.println("So sánh với: " + user.getUserName());
+
+                if (user.getUserName().trim().equalsIgnoreCase(userName.trim())) { 
+
+                    txtUserId.setText(String.valueOf(user.getUserID()));
+                    txtUserName.setText(user.getUserName());
+                    txtPassword.setText(user.getUserPassword());
+                    txtFullName.setText(user.getUserFullName());
+                    txtEmail.setText(user.getUserEmail());
+                    txtRole.setText("Quyền" + "-" + (user.getIsAdmin() ? "Admin" : "User"));
+
+                    // System.out.println("Dữ liệu đã được set vào TextField");
+                    return;
+                }
+            }
+            System.out.println("Không tìm thấy user!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Lỗi khi hiển thị thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+
+
+   public void setDataToTable(ArrayList<UsersDTO> data) {
+    DefaultTableModel model = new DefaultTableModel();
+    model.addColumn("Mã người dùng");
+    model.addColumn("Tên đăng nhập");
+    model.addColumn("Mật khẩu");
+    model.addColumn("Họ và tên");
+    model.addColumn("Email");
+    model.addColumn("Quyền admin");
+
+    for (UsersDTO user : data) {
+        model.addRow(new Object[] {
+            user.getUserID(),
+            user.getUserName(),
+            user.getUserPassword(),
+            user.getUserFullName(),
+            user.getUserEmail(),
+            user.getIsAdmin() ? "Admin" : "User"
+        });
+    }
+
+    table1.setModel(model);
+
+    // Căn giữa nội dung trong các cột
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(JLabel.CENTER); // Căn giữa
+
+    // Áp dụng căn giữa cho tất cả các cột
+    for (int i = 0; i < table1.getColumnCount(); i++) {
+        table1.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+    }
+}
 
     public void checkTable() {
         // Lấy số hàng và số cột của bảng
@@ -621,9 +758,9 @@ public class FormManagerAccount extends JPanel {
             System.out.println();
         }
     }
-
-
-
+    public interface AccountAddedListener {
+        void onAccountAdded(UsersDTO newAccount);
+    }
 
     private JButton btnAdd ; 
     private JButton btnEdit ;
@@ -650,23 +787,13 @@ public class FormManagerAccount extends JPanel {
     private JTable table1;
     private JPanel panel6;
     private JPanel panel7;
-    private JTextField txtMaHoaDon ;
-    private JTextField txtNhanVien;
-    private JTextField txtKhachHang;
-    private JTextField txtKhuyenMai ;
+    private JTextField txtUserId ;
+    private JTextField txtUserName;
+    private JTextField txtPassword;
+    private JTextField txtFullName ;
     private JPanel panel8;
-    private JTextField txtNgayLap;
-    private JTextField txtTongTien;
-    private JTextField txtGioLap;
+    private JTextField txtEmail;
+    private JTextField txtRole;
 
-    public static String format(float num) {
-        BigDecimal trieu = new BigDecimal(num * 1000000);
 
-        Locale vietnam = new Locale("vi", "VN");
-
-        NumberFormat fmoney = NumberFormat.getCurrencyInstance(vietnam);
-
-        return fmoney.format(trieu);
-    }
-    
 }

@@ -30,7 +30,7 @@ public class UserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            // UtilsJDBC.closeConnection();
+            UtilsJDBC.closeConnection();
         }
         return users;
     }
@@ -50,7 +50,7 @@ public class UserDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            // UtilsJDBC.closeConnection();
+            UtilsJDBC.closeConnection();
         }
         return null;
     }
