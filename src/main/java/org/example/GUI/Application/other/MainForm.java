@@ -17,6 +17,7 @@ import javax.swing.border.EmptyBorder;
 import org.example.DTO.UsersDTO;
 import org.example.GUI.Application.Application;
 import org.example.GUI.Components.FormAccount.FormManagerAccount;
+import org.example.GUI.Components.FormTest.TestForm;
 import org.example.GUI.menu.Menu;
 import org.example.GUI.menu.MenuAction;
 
@@ -85,10 +86,9 @@ public class MainForm extends JLayeredPane {
 
             } else if (index == 1) {
                 if (subIndex == 1) {
-                    // Application.showForm(new FormInbox());
-                    // Application.showForm(new AddButtonAccount("Tay"));
+                   
                 } else if (subIndex == 2) {
-                    // Application.showForm(new FormManagementUser());
+                  Application.showForm(new TestForm(panelBody));
 
                 } else {
                     action.cancel();
