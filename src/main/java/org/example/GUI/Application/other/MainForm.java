@@ -18,6 +18,7 @@ import org.example.DTO.UsersDTO;
 import org.example.GUI.Application.Application;
 import org.example.GUI.Components.FormAccount.FormManagerAccount;
 import org.example.GUI.Components.FormTest.TestForm;
+import org.example.GUI.FormDialog.DiaLogForgetPass.DiaLogChangePass;
 import org.example.GUI.menu.Menu;
 import org.example.GUI.menu.MenuAction;
 
@@ -100,8 +101,15 @@ public class MainForm extends JLayeredPane {
 
                 if (!isAdmin()) {
                     Application.showForm(new FormInbox(panelBody));
-                } else if (index == 7) {
-                    System.out.println("ok");
+
+                }} else if (index == 7) {
+                    if(subIndex==1) {
+                        Application.showForm( new DiaLogChangePass("alo,"));
+                        System.out.println("ok");
+                    }
+               
+                else if(index == 8) {
+                   
                 }
             } else if (index == 9) {
                 Application.logout();

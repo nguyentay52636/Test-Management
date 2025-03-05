@@ -24,10 +24,7 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.formdev.flatlaf.ui.FlatUIUtils;
 import com.formdev.flatlaf.util.UIScale;
 
-/**
- *
- * @author Raven
- */
+
 public class MenuItem extends JPanel {
 
     public boolean isMenuShow() {

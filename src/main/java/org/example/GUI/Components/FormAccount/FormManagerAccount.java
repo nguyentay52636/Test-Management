@@ -36,12 +36,14 @@ import javax.swing.table.TableColumnModel;
 import org.example.BUS.UserBUS;
 import org.example.DTO.UsersDTO;
 import org.example.GUI.FormDialog.DialogUser.DialogAddAccount;
+import org.example.Utils.importExcel;
 
 /**
  * @author m1lt43
  */
 public class FormManagerAccount extends JPanel {
     UserBUS userBUS = new UserBUS();
+    public importExcel importExcel;
 
     // InvoiceDetailBUS invoiceDetailsBUS = new InvoiceDetailBUS();
 
@@ -555,62 +557,10 @@ public class FormManagerAccount extends JPanel {
         //     }
         // });
 
-        // nhap excel
-        // button2.addActionListener(new ActionListener() {
+        // btnImport.addActionListener(new ActionListener() {
         //     @Override
         //     public void actionPerformed(ActionEvent actionEvent) {
-        //         JFileChooser fileChooser = new JFileChooser();
-        //         fileChooser.setDialogTitle("Chọn file Excel");
-
-        //         int userSelection = fileChooser.showOpenDialog(null);
-
-        //         if (userSelection == JFileChooser.APPROVE_OPTION) {
-        //             File fileToOpen = fileChooser.getSelectedFile();
-
-        //             try (FileInputStream inputStream = new FileInputStream(fileToOpen)) {
-        //                 Workbook workbook = new XSSFWorkbook(inputStream);
-
-        //                 Sheet sheet = workbook.getSheetAt(0);
-        //                 Iterator<Row> rowIterator = sheet.iterator();
-
-        //                 // skip thee header row
-        //                 if (rowIterator.hasNext()) {
-        //                     rowIterator.next();
-        //                 }
-
-        //                 while (rowIterator.hasNext()) {
-        //                     Row row = rowIterator.next();
-
-        //                     String maHoaDon = row.getCell(1).getStringCellValue();
-        //                     String maNhanVien = row.getCell(2).getStringCellValue();
-        //                     String maKhachHang = row.getCell(3).getStringCellValue();
-        //                     String maKhuyenMai = row.getCell(4).getStringCellValue();
-        //                     String ngayLap = row.getCell(5).getStringCellValue();
-        //                     String gioLap = row.getCell(6).getStringCellValue();
-        //                     float tongTien = (float) row.getCell(7).getNumericCellValue();
-
-        //                     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        //                     DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-
-        //                     LocalDate localDate = LocalDate.parse(ngayLap, dateTimeFormatter);
-        //                     LocalTime localTime = LocalTime.parse(gioLap, timeFormatter);
-
-        //                     Invoice invoice = new Invoice(maHoaDon, maNhanVien, maKhachHang, maKhuyenMai, localDate, localTime, tongTien);
-
-        //                     // add to the database
-        //                     invoiceBUS.add(maHoaDon, maNhanVien, maKhachHang, maKhuyenMai, localDate, localTime, tongTien);
-        //                 }
-
-        //                 //
-        //                 refresh();
-
-        //                 JOptionPane.showMessageDialog(null, "Nhập file thành công");
-        //             } catch (IOException e) {
-        //                 JOptionPane.showMessageDialog(null, "Nhập file không thành công");
-        //                 e.printStackTrace();
-        //             }
-        //         }
-        //     }
+        //         importExcel.readUsersExcel
         // });
 
         // in pdf

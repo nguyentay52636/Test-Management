@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.DTO.QuestionDTO;
+import org.example.DTO.UsersDTO;
 
 public class importExcel {
     public static List<QuestionDTO> readExcel(String filePath) {
@@ -39,17 +40,31 @@ public class importExcel {
         return questions;
     }
 
-    // public static void main(String[] args) {
-    // String filePath = "D:/tracnghiem.xlsx"; // Thay đường dẫn file của bạn
-    // List<QuestionDTO> questions = readExcel(filePath);
-    //
-    // QuestionDAO dao = new QuestionDAO();
-    // for (QuestionDTO q : questions) {
-    // if (dao.insertQuestion(q)) {
-    // System.out.println("Thêm câu hỏi thành công: " + q.getQContent());
-    // } else {
-    // System.out.println("Lỗi khi thêm câu hỏi: " + q.getQContent());
-    // }
-    // }
-    // }
+    public static List<UsersDTO> readUsersExcel(String filePath) {
+        List<UsersDTO> users = new ArrayList<>();
+
+        try (FileInputStream fis = new FileInputStream(new File(filePath));
+                Workbook workbook = new XSSFWorkbook(fis)) {
+
+            Sheet sheet = workbook.getSheetAt(0); // Lấy sheet đầu tiên
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0)
+                    continue; // Bỏ qua dòng tiêu đề
+
+                // Đọc dữ liệu từ các cột trong file Excel
+                int userID = (int) row.getCell(0).getNumericCellValue();
+                String userName = row.getCell(1).getStringCellValue();
+                String userEmail = row.getCell(2).getStringCellValue();
+                String userPassword = row.getCell(3).getStringCellValue();
+                String userFullName = row.getCell(4).getStringCellValue();
+                Boolean isAdmin = row.getCell(5).getNumericCellValue() == 1;
+
+                // Tạo đối tượng UsersDTO và thêm vào danh sách
+                users.add(new UsersDTO(userID, userName, userEmail, userPassword, userFullName, isAdmin));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
 }

@@ -8,9 +8,19 @@ import org.example.DTO.UsersDTO;
 public class UserBUS {
     private ArrayList<UsersDTO> listAccount = new ArrayList<>();
     private UserDAO userDAO = new UserDAO();
+    private static String currentUserName; 
+    
 
     public UserBUS() {
         listAccount = userDAO.getAllUsers();
+    }
+
+    public static String getCurrentUserName() {
+        return currentUserName;
+    }
+
+    public static void setCurrentUserName(String currentUserName) {
+        UserBUS.currentUserName = currentUserName;
     }
 
     public void getUserAll() {
@@ -27,6 +37,14 @@ public class UserBUS {
 
     public boolean register(UsersDTO user) {
         return userDAO.signUp(user);
+    }
+    public UsersDTO getUser(String userName) {
+        for (UsersDTO user : listAccount) {
+            if (user.getUserName().equals(userName)) {
+                return user;
+            }
+        }
+        return null;
     }
 
     public Boolean insertUser(UsersDTO user) {

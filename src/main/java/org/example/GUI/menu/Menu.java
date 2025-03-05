@@ -34,7 +34,7 @@ public class Menu extends JPanel {
             { "Bài thi", "Basic Elements", "Advanced Elements", "Editors", "Wizard" },
             { "~OTHER~" },
             { "Thống kê", "Apex", "Flot", "Peity", "Sparkline" },
-            { "Cài đặt tài khoản", "Feather Icons", "Flag Icons", "Mdi Icons" },
+            { "Cài đặt tài khoản", "Đổi mật khẩu ", "Xem chi tiết tài khoản", "Mdi Icons" },
             { "Special Pages", "Blank page", "Faq", "Invoice", "Profile", "Pricing", "Timeline" },
             { "Đăng xuất" }
     };

@@ -6,3 +6,5 @@ initMenuEvent(MainForm.java) call Components Modules
 <p align="center">
   <img src="./bio.jpg" alt="Mô tả ảnh" width="500">
 </p>
+step 1 : mvm clean install 
+step2 : run Main : mvn exec:java -Dexec.mainClass="com.example.Main
