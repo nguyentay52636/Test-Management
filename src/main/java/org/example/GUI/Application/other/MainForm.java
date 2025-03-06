@@ -17,6 +17,7 @@ import javax.swing.border.EmptyBorder;
 import org.example.DTO.UsersDTO;
 import org.example.GUI.Application.Application;
 import org.example.GUI.Components.FormAccount.FormManagerAccount;
+import org.example.GUI.Components.FormAccount.UserDetailForm;
 import org.example.GUI.Components.FormTest.TestForm;
 import org.example.GUI.FormDialog.DiaLogForgetPass.DiaLogChangePass;
 import org.example.GUI.menu.Menu;
@@ -106,6 +107,8 @@ public class MainForm extends JLayeredPane {
                     if(subIndex==1) {
                         Application.showForm( new DiaLogChangePass("alo,"));
                         System.out.println("ok");
+                    }else if(subIndex ==2) {
+                        Application.showForm(new UserDetailForm());
                     }
                
                 else if(index == 8) {

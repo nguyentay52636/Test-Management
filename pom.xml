@@ -69,11 +69,11 @@
             <version>2.20.0</version>
         </dependency>
 <!-- maven docx  -->
-<dependency>
+<!-- <dependency>
     <groupId>org.apache.poi</groupId>
     <artifactId>poi-ooxml</artifactId>
-    <version>5.2.5</version>
-</dependency>
+    <version>5.2.3</version>
+</dependency> -->
         <!-- Log4j2 Core -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
