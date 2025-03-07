@@ -1,19 +1,20 @@
-package org.example.GUI.Application.other;
+// package org.example.GUI.Application.other;
 
-import javax.swing.JPanel;
+// import javax.swing.JPanel;
+// import com.formdev.flatlaf.FlatClientProperties;
+// import net.miginfocom.swing.MigLayout;
 
-import com.formdev.flatlaf.FlatClientProperties;
+// public class PanelLogin extends JPanel {
 
-import net.miginfocom.swing.MigLayout;
-
-public class PanelLogin extends JPanel {
-
-   public PanelLogin() {
-       setLayout(new MigLayout("fillx,wrap,insets 30 40 50 40, width 320", "[fill]", "[]20[][]15[][]30[]"));
-       putClientProperty(FlatClientProperties.STYLE, ""
-               + "background:$Login.background;"
-               + "arc:20;");
-   }
-
-}
-
+//     public PanelLogin() {
+       
+//         setLayout(new MigLayout("fillx,wrap,insets 30 40 50 40", "[fill]", "[]20[][]15[][]30[]"));
+        
+  
+//         setPreferredSize(new java.awt.Dimension(800, 500));
+        
+//         putClientProperty(FlatClientProperties.STYLE, ""
+//                 + "background:$Login.background;"
+//                 + "arc:20;");
+//     }
+// }

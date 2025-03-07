@@ -23,7 +23,7 @@ public class Application extends javax.swing.JFrame {
 
     private static Application app;
     private final MainForm mainForm;
-    public static LoginForm loginForm;
+    public final LoginForm loginForm;
 
     public Application() {
         initComponents();
@@ -31,8 +31,9 @@ public class Application extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         UsersDTO currentUser = SessionManager.getCurrentUser();
         mainForm = new MainForm(currentUser);
+        loginForm = new LoginForm();
 
-        setContentPane(mainForm);
+        setContentPane(loginForm);
         getRootPane().putClientProperty(FlatClientProperties.FULL_WINDOW_CONTENT, true);
 
     }
@@ -64,24 +65,17 @@ public class Application extends javax.swing.JFrame {
     
 
     public static void logout() {
-        SwingUtilities.invokeLater(() -> {
-            int confirm = JOptionPane.showConfirmDialog(
-                    null,
-                    "Bạn có chắc chắn muốn đăng xuất không?",
-                    "Xác nhận",
-                    JOptionPane.YES_NO_OPTION);
-    
-            if (confirm == JOptionPane.YES_OPTION) {
-                app.setVisible(false); // Ẩn Application
-    
-                // Hiển thị lại LoginForm
-                if (loginForm == null) {
-                    loginForm = new LoginForm();
-                }
-                loginForm.setVisible(true);
-            }
-        });
-    }
+        FlatAnimatedLafChange.showSnapshot();
+
+        if (app.loginForm != null) {
+                app.setContentPane(app.loginForm);
+
+                app.loginForm.applyComponentOrientation(app.getComponentOrientation());
+                SwingUtilities.updateComponentTreeUI(app.loginForm);
+        }
+
+        FlatAnimatedLafChange.hideSnapshotWithAnimation();
+}
     
 
     public static void setSelectedMenu(int index, int subIndex) {

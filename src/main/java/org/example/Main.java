@@ -35,29 +35,30 @@ import javax.swing.SwingUtilities;
 
 public class Main {
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            // Hiển thị màn hình đăng nhập
-            LoginForm login = new LoginForm();
-            login.setVisible(true);
-            login.pack();
-            login.setLocationRelativeTo(null);
+        // SwingUtilities.invokeLater(() -> {
+        //     // Hiển thị màn hình đăng nhập
+        //     LoginForm login = new LoginForm();
+        //     login.setVisible(true);
+        //     login.pack();
+        //     login.setLocationRelativeTo(null);
 
-            // Khi đăng nhập thành công
-            login.setLoginSuccessListener(() -> {
-                login.dispose(); // Đóng LoginForm
-                SwingUtilities.invokeLater(() -> {
-                    Application.main(args); // Mở Application
-                });
-            });
+        //     // Khi đăng nhập thành công
+        //     login.setLoginSuccessListener(() -> {
+        //         login.dispose(); // Đóng LoginForm
+        //         SwingUtilities.invokeLater(() -> {
+        //             Application.main(args); // Mở Application
+        //         });
+        //     });
 
 
-            if (UserBUS.getCurrentUserName() != null) {
-                System.out.println(UserBUS.getCurrentUserName());
-                login.dispose();
-                SwingUtilities.invokeLater(() -> {
-                    Application.main(args);
-                });
-            }
-        });
+        //     if (UserBUS.getCurrentUserName() != null) {
+        //         System.out.println(UserBUS.getCurrentUserName());
+        //         login.dispose();
+        //         SwingUtilities.invokeLater(() -> {
+        //             Application.main(args);
+        //         });
+        //     }
+        // });
+        Application.main(args);
     }
 }
