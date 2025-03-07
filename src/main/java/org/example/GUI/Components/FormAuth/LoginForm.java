@@ -1,14 +1,18 @@
 package org.example.GUI.Components.FormAuth;
 
 import java.awt.Cursor;
+import java.util.function.Consumer;
+import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import org.example.BUS.UserBUS;
 import org.example.DTO.SessionManager;
 import org.example.DTO.UsersDTO;
+import org.example.GUI.Application.Application;
 
 public class LoginForm extends javax.swing.JFrame {
         UserBUS userBUS = new UserBUS();
@@ -29,7 +33,6 @@ public class LoginForm extends javax.swing.JFrame {
         private javax.swing.JPasswordField passwordField;
         private javax.swing.JTextField emailField;
         SessionManager sessionManager = new SessionManager();
-
         public LoginForm() {
                 initComponents();
                 if (loginSuccessListener != null) {
@@ -63,7 +66,16 @@ public class LoginForm extends javax.swing.JFrame {
                 jPanel1.setBackground(new java.awt.Color(255, 255, 255));
                 jPanel1.setPreferredSize(new java.awt.Dimension(800, 500));
                 jPanel1.setLayout(null);
-
+      // sự kiện khi nhấn enter
+      passwordField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    btnLogin.doClick();
+                }
+            }
+        });
+    
                 Right.setBackground(new java.awt.Color(0, 102, 102));
                 Right.setPreferredSize(new java.awt.Dimension(400, 500));
 
@@ -157,45 +169,51 @@ public class LoginForm extends javax.swing.JFrame {
                 btnLogin.addActionListener(new java.awt.event.ActionListener() {
                         @Override
                         public void actionPerformed(java.awt.event.ActionEvent e) {
-                                String email = emailField.getText().trim();
-                                String password = new String(passwordField.getPassword()).trim();
-
-                                if (email.isEmpty() || password.isEmpty()) {
-                                        JOptionPane.showMessageDialog(null, "Email và mật khẩu không được để trống!",
-                                                        "Lỗi", JOptionPane.ERROR_MESSAGE);
-                                        return;
+                            String email = emailField.getText().trim();
+                            String password = new String(passwordField.getPassword()).trim();
+                    
+                            // Kiểm tra dữ liệu đầu vào
+                            if (email.isEmpty() || password.isEmpty()) {
+                                JOptionPane.showMessageDialog(null, "Email và mật khẩu không được để trống!",
+                                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                    
+                            UsersDTO foundUser = null;
+                            for (UsersDTO user : userBUS.getListAccount()) {
+                                if (user.getUserEmail().equals(email)) {
+                                    foundUser = user;
+                                    userBUS.setCurrentUserName(user.getUserName());
+                                    break;
                                 }
-
-                                UsersDTO foundUser = null;
-                                for (UsersDTO user : userBUS.getListAccount()) {
-                                        if (user.getUserEmail().equals(email)) {
-                                                foundUser = user;
-                                                break;
-                                        }
+                            }
+                    
+                            if (foundUser == null) {
+                                JOptionPane.showMessageDialog(null, "Email không tồn tại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+                    
+                            System.out.println("Mật khẩu trong DB: " + foundUser.getUserPassword());
+                            
+                            // Kiểm tra mật khẩu
+                            if (foundUser.getUserPassword().equals(password)) {
+                                // Lưu thông tin người dùng vào session
+                                sessionManager.setCurrentUser(foundUser);
+                                JOptionPane.showMessageDialog(null, "Đăng nhập thành công! 🎉", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    
+                                // Lưu trạng thái đăng nhập vào file (ví dụ: Preferences hoặc JSON)
+                                saveLoginStatus(foundUser);
+                    
+                                // Gọi listener khi đăng nhập thành công (nếu có)
+                                if (loginSuccessListener != null) {
+                                    SwingUtilities.invokeLater(loginSuccessListener);
                                 }
-
-                                if (foundUser == null) {
-                                        JOptionPane.showMessageDialog(null, "Email không tồn tại!", "Lỗi",
-                                                        JOptionPane.ERROR_MESSAGE);
-                                        return;
-                                }
-
-                                System.out.println("Mật khẩu trong DB: " + foundUser.getUserPassword());
-                                if (foundUser.getUserPassword().equals(password)) {
-                                        sessionManager.setCurrentUser(foundUser);
-                                        JOptionPane.showMessageDialog(null, "Đăng nhập thành công! 🎉", "Thành công",
-                                                        JOptionPane.INFORMATION_MESSAGE);
-
-                                        if (loginSuccessListener != null) {
-                                                SwingUtilities.invokeLater(loginSuccessListener);
-                                        }
-
-                                } else {
-                                        JOptionPane.showMessageDialog(null, "Mật khẩu không đúng! ❌", "Lỗi",
-                                                        JOptionPane.ERROR_MESSAGE);
-                                }
+                    
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Mật khẩu không đúng! ❌", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            }
                         }
-                });
+                    });
 
                 btnForgotPassword = new javax.swing.JButton();
                 btnForgotPassword.setFont(new java.awt.Font("Segoe UI", 0, 14));
@@ -336,7 +354,16 @@ public class LoginForm extends javax.swing.JFrame {
         public void setLoginSuccessListener(Runnable listener) {
                 this.loginSuccessListener = listener;
         }
-
+        
+private void saveLoginStatus(UsersDTO user) {
+    // Giả sử bạn lưu trạng thái đăng nhập vào Preferences (có thể thay bằng JSON hoặc cơ sở dữ liệu)
+    Preferences prefs = Preferences.userNodeForPackage(Application.class);
+    prefs.put("currentUserEmail", user.getUserEmail());
+    prefs.put("currentUserName", user.getUserName());
+    prefs.put("isLoggedIn", "true"); // Đánh dấu là đã đăng nhập
+    // Cập nhật thêm thông tin nếu cần
+    System.out.println("Thông tin người dùng đã được lưu.");
+}
         public static void main(String[] args) {
                 SwingUtilities.invokeLater(() -> {
                         SignUpForm loginForm = new SignUpForm();

@@ -51,7 +51,8 @@ public class Application extends javax.swing.JFrame {
             System.err.println("Application chưa được khởi tạo!");
             return;
         }
-
+    
+        // Chuyển nội dung của app sang MainForm
         FlatAnimatedLafChange.showSnapshot();
         app.setContentPane(app.mainForm);
         app.mainForm.applyComponentOrientation(app.getComponentOrientation());
@@ -60,6 +61,7 @@ public class Application extends javax.swing.JFrame {
         SwingUtilities.updateComponentTreeUI(app.mainForm);
         FlatAnimatedLafChange.hideSnapshotWithAnimation();
     }
+    
 
     public static void logout() {
         SwingUtilities.invokeLater(() -> {
@@ -68,10 +70,10 @@ public class Application extends javax.swing.JFrame {
                     "Bạn có chắc chắn muốn đăng xuất không?",
                     "Xác nhận",
                     JOptionPane.YES_NO_OPTION);
-
+    
             if (confirm == JOptionPane.YES_OPTION) {
                 app.setVisible(false); // Ẩn Application
-
+    
                 // Hiển thị lại LoginForm
                 if (loginForm == null) {
                     loginForm = new LoginForm();
@@ -80,6 +82,7 @@ public class Application extends javax.swing.JFrame {
             }
         });
     }
+    
 
     public static void setSelectedMenu(int index, int subIndex) {
         app.mainForm.setSelectedMenu(index, subIndex);
@@ -113,10 +116,9 @@ public class Application extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(() -> {
             app = new Application();
             // app.applyComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+            
             app.setVisible(true);
         });
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    // End of variables declaration//GEN-END:variables
 }

@@ -6,7 +6,7 @@ import org.example.DAO.UserDAO;
 import org.example.DTO.UsersDTO;
 
 public class UserBUS {
-    private ArrayList<UsersDTO> listAccount = new ArrayList<>();
+    private static ArrayList<UsersDTO> listAccount = new ArrayList<>();
     private UserDAO userDAO = new UserDAO();
     private static String currentUserName; 
     
@@ -77,8 +77,74 @@ public class UserBUS {
         }
         return false;
     }
+    public Boolean insertUsers(ArrayList<UsersDTO> users) {
+        boolean allInserted = true;
+        
+       
+        for (UsersDTO user : users) {
+            if (userDAO.checkIfUserExists(user.getUserName(), user.getUserEmail())) {
+                allInserted = false; 
+                return false; 
+            }
+        }
+        if (allInserted) {
+            boolean inserted = userDAO.addUsersBatch(users);
+            if (inserted) {
+                listAccount.addAll(users); 
+            } else {
+                allInserted = false;
+            }
+        }
+        
+        return allInserted;
+    }
+    
+    
 
     public String[] getHeaders() {
         return new String[] { "Tên người dùng", "Email", "Mật khẩu", "Tên dầy đủ ", "Vai trò" };
+    }
+    public static ArrayList<UsersDTO> search(String keyword, String type) {
+        ArrayList<UsersDTO> result = new ArrayList<>();
+        listAccount.forEach((user) -> {
+            switch (type) {
+                case "Tất cả":
+                    if (String.valueOf(user.getUserID()).toString().toLowerCase().contains(keyword.toLowerCase())
+                            || user.getUserName().toLowerCase().contains(keyword.toLowerCase())
+                            || user.getUserEmail().toLowerCase().contains(keyword.toLowerCase())
+                            || user.getUserPassword().toLowerCase().contains(keyword.toLowerCase())
+                            || user.getUserFullName().toString().toLowerCase().contains(keyword.toLowerCase())) {
+                        result.add(user);
+                    }
+                    break;
+                case "Mã người dùng":
+                    if (String.valueOf(user.getUserID()).toString().toLowerCase().contains(keyword.toLowerCase())) {
+                        result.add(user);
+                    }
+                    break;
+                case "Tên người dùng":
+                    if (user.getUserName().toLowerCase().contains(keyword.toLowerCase())) {
+                        result.add(user);
+                    }
+                    break;
+                case "Email":
+                    if (user.getUserEmail().toLowerCase().contains(keyword.toLowerCase())) {
+                        result.add(user);
+                    }
+                    break;
+                case "Mật khẩu":
+                    if ( user.getUserPassword().toLowerCase().contains(keyword.toLowerCase())) {
+                        result.add(user);
+                    }
+                    break;
+                case "Họ và tên":
+                    if ( user.getUserFullName().toString().toLowerCase().contains(keyword.toLowerCase())) {
+                        result.add(user);
+                    }
+                    break;
+            }
+           
+        });
+        return result;
     }
 }

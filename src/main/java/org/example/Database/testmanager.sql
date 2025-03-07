@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 24, 2025 at 09:57 AM
+-- Generation Time: Feb 13, 2025 at 11:00 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `quanlytracnghiem`
+-- Database: `tracnghiem`
 --
 
 -- --------------------------------------------------------
@@ -28,13 +28,13 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `answers` (
-                           `awID` int(11) NOT NULL,
-                           `qID` int(11) NOT NULL,
-                           `awContent` text DEFAULT NULL,
-                           `awPictures` text DEFAULT NULL,
-                           `isRight` tinyint(4) DEFAULT NULL,
-                           `awStatus` tinyint(4) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `awID` int(11) NOT NULL,
+  `qID` int(11) NOT NULL COMMENT 'id câu hỏi',
+  `awContent` text NOT NULL,
+  `awPictures` text NOT NULL COMMENT 'url ảnh',
+  `isRight` tinyint(4) NOT NULL COMMENT '1: đúng; 0: Sai',
+  `awStatus` tinyint(4) NOT NULL COMMENT '1: active; 0: hidden'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -43,11 +43,11 @@ CREATE TABLE `answers` (
 --
 
 CREATE TABLE `exams` (
-                         `testCode` varchar(20) NOT NULL,
-                         `exOrder` varchar(1) NOT NULL,
-                         `exCode` varchar(20) NOT NULL,
-                         `ex_quesIDs` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `testCode` varchar(20) NOT NULL,
+  `exOrder` varchar(1) NOT NULL COMMENT 'A;B;C;D;E;F',
+  `exCode` varchar(20) NOT NULL COMMENT '=testCode + exOrder',
+  `ex_quesIDs` text NOT NULL COMMENT 'mảng các id câu hỏi'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -56,12 +56,12 @@ CREATE TABLE `exams` (
 --
 
 CREATE TABLE `logs` (
-                        `logID` int(11) NOT NULL,
-                        `logContent` text DEFAULT NULL,
-                        `logUserID` int(11) NOT NULL,
-                        `logExID` int(11) DEFAULT NULL,
-                        `logDate` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `logID` int(11) NOT NULL,
+  `logContent` text NOT NULL,
+  `logUserID` int(11) NOT NULL,
+  `logExCode` varchar(20) NOT NULL,
+  `logDate` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -70,13 +70,13 @@ CREATE TABLE `logs` (
 --
 
 CREATE TABLE `questions` (
-                             `qID` int(11) NOT NULL,
-                             `qContent` text NOT NULL,
-                             `qPictures` text DEFAULT NULL,
-                             `qTopicID` int(11) NOT NULL,
-                             `qLevel` varchar(10) DEFAULT NULL,
-                             `qStatus` tinyint(4) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `qID` int(11) NOT NULL,
+  `qContent` text NOT NULL COMMENT 'nội dung câu hỏi',
+  `qPictures` text NOT NULL COMMENT 'url hình đính kèm',
+  `qTopicID` int(11) NOT NULL,
+  `qLevel` varchar(10) NOT NULL COMMENT 'easy, meidum, diff',
+  `qStatus` tinyint(4) NOT NULL COMMENT '1: active; 0: hidden'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -85,13 +85,13 @@ CREATE TABLE `questions` (
 --
 
 CREATE TABLE `result` (
-                          `rs_num` tinyint(1) NOT NULL,
-                          `userID` int(11) NOT NULL,
-                          `exCode` varchar(20) NOT NULL,
-                          `rs_answers` longtext DEFAULT NULL,
-                          `rs_mark` decimal(10,0) DEFAULT NULL,
-                          `rs_date` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `rs_num` tinyint(11) NOT NULL,
+  `userID` int(11) NOT NULL,
+  `exCode` varchar(20) NOT NULL,
+  `rs_anwsers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'các đáp án đã chọn' CHECK (json_valid(`rs_anwsers`)),
+  `rs_mark` decimal(10,0) NOT NULL,
+  `rs_date` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -100,18 +100,18 @@ CREATE TABLE `result` (
 --
 
 CREATE TABLE `test` (
-                        `testID` int(11) NOT NULL,
-                        `testCode` varchar(20) NOT NULL,
-                        `testTitle` text NOT NULL,
-                        `tpID` int(11) NOT NULL,
-                        `testTime` int(11) DEFAULT NULL,
-                        `num_easy` int(11) DEFAULT NULL,
-                        `num_medium` int(11) DEFAULT NULL,
-                        `num_diff` int(11) DEFAULT NULL,
-                        `testLimit` tinyint(4) DEFAULT NULL,
-                        `testDate` date DEFAULT NULL,
-                        `testStatus` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `testID` int(11) NOT NULL,
+  `testCode` varchar(20) NOT NULL COMMENT 'mã bài thi',
+  `testTilte` text NOT NULL,
+  `testTime` int(11) NOT NULL COMMENT 'thời gian làm bài (phút)',
+  `tpID` int(11) NOT NULL COMMENT 'id của chủ đề/bài học',
+  `num_easy` int(11) NOT NULL COMMENT 'số lượng câu dễ',
+  `num_medium` int(11) NOT NULL COMMENT 'số lượng câu trung bình',
+  `num_diff` int(11) NOT NULL COMMENT 'số lượng câu khó',
+  `testLimit` tinyint(4) NOT NULL COMMENT 'số lần thi',
+  `testDate` date NOT NULL,
+  `testStatus` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -120,11 +120,11 @@ CREATE TABLE `test` (
 --
 
 CREATE TABLE `topics` (
-                          `tpID` int(11) NOT NULL,
-                          `tpTitle` text NOT NULL,
-                          `tpParent` int(11) DEFAULT NULL,
-                          `tpStatus` tinyint(4) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `tpID` int(11) NOT NULL,
+  `tpTitle` text NOT NULL COMMENT 'tên topic',
+  `tpParent` int(11) NOT NULL COMMENT 'id của topic cha',
+  `tpStatus` tinyint(4) NOT NULL COMMENT '1: active; 0: hidden'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -133,23 +133,13 @@ CREATE TABLE `topics` (
 --
 
 CREATE TABLE `users` (
-                         `userID` int(11) NOT NULL,
-                         `userName` varchar(40) NOT NULL,
-                         `userEmail` varchar(20) NOT NULL,
-                         `userPassword` varchar(40) NOT NULL,
-                         `userFullName` varchar(40) DEFAULT NULL,
-                         `isAdmin` tinyint(4) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`userID`, `userName`, `userEmail`, `userPassword`, `userFullName`, `isAdmin`) VALUES
-                                                                                                       (1, 'admin', 'admin@gmail.com', '123456', 'Lê Văn A', 1),
-                                                                                                       (2, 'tester1', 'tester1@gmail.com', '123456', 'tester', 0),
-                                                                                                       (3, 'tester2', 'asd@gmail.com', '11111', 'á', 0),
-                                                                                                       (4, 'wib', 'wib@gmail.com', '111111', 'dora', 0);
+  `userID` int(11) NOT NULL,
+  `userName` varchar(40) NOT NULL COMMENT 'login = userName',
+  `userEmail` varchar(20) NOT NULL,
+  `userPassword` varchar(40) NOT NULL COMMENT 'mã hóa dùng md5',
+  `userFullName` varchar(40) NOT NULL,
+  `isAdmin` tinyint(4) NOT NULL COMMENT '1: admin; 0: user'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Indexes for dumped tables
@@ -159,57 +149,59 @@ INSERT INTO `users` (`userID`, `userName`, `userEmail`, `userPassword`, `userFul
 -- Indexes for table `answers`
 --
 ALTER TABLE `answers`
-    ADD PRIMARY KEY (`awID`),
-  ADD KEY `fk_answers_qID` (`qID`);
+  ADD PRIMARY KEY (`awID`),
+  ADD KEY `qID` (`qID`);
 
 --
 -- Indexes for table `exams`
 --
 ALTER TABLE `exams`
-    ADD PRIMARY KEY (`testCode`,`exOrder`),
-  ADD UNIQUE KEY `unique_exCode` (`exCode`);
+  ADD PRIMARY KEY (`testCode`,`exOrder`),
+  ADD KEY `testCode` (`testCode`),
+  ADD KEY `exCode` (`exCode`);
 
 --
 -- Indexes for table `logs`
 --
 ALTER TABLE `logs`
-    ADD PRIMARY KEY (`logID`),
-  ADD KEY `fk_logs_userID` (`logUserID`);
+  ADD PRIMARY KEY (`logID`),
+  ADD KEY `logUserID` (`logUserID`);
 
 --
 -- Indexes for table `questions`
 --
 ALTER TABLE `questions`
-    ADD PRIMARY KEY (`qID`),
-  ADD KEY `fk_questions_tpID` (`qTopicID`);
+  ADD PRIMARY KEY (`qID`),
+  ADD KEY `qTopicID` (`qTopicID`);
 
 --
 -- Indexes for table `result`
 --
 ALTER TABLE `result`
-    ADD PRIMARY KEY (`rs_num`,`userID`,`exCode`),
-  ADD KEY `fk_result_userID` (`userID`),
-  ADD KEY `fk_result_exCode` (`exCode`);
+  ADD PRIMARY KEY (`rs_num`,`userID`,`exCode`),
+  ADD KEY `userID` (`userID`),
+  ADD KEY `exID` (`exCode`),
+  ADD KEY `exCode` (`exCode`);
 
 --
 -- Indexes for table `test`
 --
 ALTER TABLE `test`
-    ADD PRIMARY KEY (`testID`),
-  ADD UNIQUE KEY `testCode` (`testCode`),
-  ADD KEY `fk_test_tpID` (`tpID`);
+  ADD PRIMARY KEY (`testID`,`tpID`) USING BTREE,
+  ADD KEY `tpID` (`tpID`),
+  ADD KEY `testCode` (`testCode`);
 
 --
 -- Indexes for table `topics`
 --
 ALTER TABLE `topics`
-    ADD PRIMARY KEY (`tpID`);
+  ADD PRIMARY KEY (`tpID`);
 
 --
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-    ADD PRIMARY KEY (`userID`);
+  ADD PRIMARY KEY (`userID`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -219,37 +211,31 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `answers`
 --
 ALTER TABLE `answers`
-    MODIFY `awID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `awID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
-    MODIFY `logID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `logID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `questions`
 --
 ALTER TABLE `questions`
-    MODIFY `qID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `test`
---
-ALTER TABLE `test`
-    MODIFY `testID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `qID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `topics`
 --
 ALTER TABLE `topics`
-    MODIFY `tpID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `tpID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-    MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `userID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -259,38 +245,38 @@ ALTER TABLE `users`
 -- Constraints for table `answers`
 --
 ALTER TABLE `answers`
-    ADD CONSTRAINT `fk_answers_qID` FOREIGN KEY (`qID`) REFERENCES `questions` (`qID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `answers_ibfk_1` FOREIGN KEY (`qID`) REFERENCES `questions` (`qID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `exams`
 --
 ALTER TABLE `exams`
-    ADD CONSTRAINT `fk_exams_testCode` FOREIGN KEY (`testCode`) REFERENCES `test` (`testCode`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `exams_ibfk_1` FOREIGN KEY (`exCode`) REFERENCES `result` (`exCode`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `logs`
 --
 ALTER TABLE `logs`
-    ADD CONSTRAINT `fk_logs_userID` FOREIGN KEY (`logUserID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `logs_ibfk_1` FOREIGN KEY (`logUserID`) REFERENCES `users` (`userID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `questions`
 --
 ALTER TABLE `questions`
-    ADD CONSTRAINT `fk_questions_tpID` FOREIGN KEY (`qTopicID`) REFERENCES `topics` (`tpID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `questions_ibfk_1` FOREIGN KEY (`qTopicID`) REFERENCES `topics` (`tpID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `result`
 --
 ALTER TABLE `result`
-    ADD CONSTRAINT `fk_result_exCode` FOREIGN KEY (`exCode`) REFERENCES `exams` (`exCode`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_result_userID` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `result_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `test`
 --
 ALTER TABLE `test`
-    ADD CONSTRAINT `fk_test_tpID` FOREIGN KEY (`tpID`) REFERENCES `topics` (`tpID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `test_ibfk_1` FOREIGN KEY (`tpID`) REFERENCES `topics` (`tpID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `test_ibfk_2` FOREIGN KEY (`testCode`) REFERENCES `exams` (`testCode`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

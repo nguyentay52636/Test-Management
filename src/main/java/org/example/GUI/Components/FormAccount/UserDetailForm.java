@@ -1,7 +1,12 @@
 package org.example.GUI.Components.FormAccount;
 
 import javax.swing.*;
+
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 
 public class UserDetailForm extends JPanel {
     private JTextField txtUserName, txtUserEmail, txtFullName;
@@ -31,14 +36,27 @@ public class UserDetailForm extends JPanel {
         txtUserEmail = new JTextField();
         txtPassword = new JPasswordField();
         txtFullName = new JTextField();
+        txtUserEmail.setEnabled(false);
+        
 
         // Tạo Nút Lưu và Hủy
+        ImageIcon iconXoa = new ImageIcon(
+            getClass().getResource("/org/example/GUI/resources/images/icons8_delete_forever_30px_1.png"));
+    ImageIcon IconSua = new ImageIcon(
+            getClass().getResource("/org/example/GUI/resources/images/icons8_wrench_30px.png"));
         btnSave = new JButton("Lưu thay đổi");
-        btnSave.setBackground(new Color(50, 205, 50)); // Màu xanh lá
-        btnSave.setForeground(Color.WHITE);
-        btnCancel = new JButton("Hủy");
-        btnCancel.setBackground(new Color(220, 20, 60)); // Màu đỏ
-        btnCancel.setForeground(Color.WHITE);
+        btnSave.setIcon(IconSua);
+   
+   
+        btnCancel = new JButton("Làm mới");
+        btnCancel.setIcon(iconXoa);
+        btnCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                resetFields();
+            }
+        });
 
         // Bố cục form bằng GroupLayout
         GroupLayout layout = new GroupLayout(panel);
@@ -69,7 +87,7 @@ public class UserDetailForm extends JPanel {
             layout.createSequentialGroup()
                 .addComponent(lblTitle)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblUserName)
+.addComponent(lblUserName)
                     .addComponent(txtUserName))
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(lblEmail)
@@ -85,11 +103,18 @@ public class UserDetailForm extends JPanel {
                     .addComponent(btnCancel))
         );
 
-        // Thêm panel vào JPanel chính
         add(panel, BorderLayout.CENTER);
     }
+    private void resetFields() {
+        txtPassword.setText("");  
+        txtFullName.setText(""); 
+    }
+    // public void getUserNameAndEmail() {
+    //     UserBUS userBus = new UserBUS();
 
-    // Phương thức lấy JPanel này để nhúng vào JFrame khác
+    // }
+
+  
     public JPanel getPanel() {
         return this;
     }

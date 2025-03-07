@@ -12,7 +12,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -206,7 +205,7 @@ public class FormManagerAccount extends JPanel {
 //                                panel3.setMinimumSize(new Dimension(500, 49));
 //                                panel3.setPreferredSize(new Dimension(220, 49));
                                 panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS));
-                                String[] items = { "Tất cả", "Mã hóa đơn", "Mã nhân viên", "Mã khách hàng", "Mã khuyến mãi", "Ngày lập","Giờ lập","Tổng kết" };
+                                String[] items = { "Tất cả", "Mã người dùng", "Tên người dùng", "Mật khẩu", "Họ và tên", "Email" };
                                 for (String item : items) {
                                     comboBox1.addItem(item);
                                 }
@@ -396,47 +395,30 @@ public class FormManagerAccount extends JPanel {
         add(this2, BorderLayout.CENTER);
     
 
-        DocumentListener documentListener = new DocumentListener() {
+        textField1.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
-                // performSearch();
+            public void insertUpdate(DocumentEvent documentEvent) {
+                performSearch();
             }
 
             @Override
-            public void removeUpdate(DocumentEvent e) {
-                // performSearch();
+            public void removeUpdate(DocumentEvent documentEvent) {
+                performSearch();
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e) {
-                // performSearch();
+            public void changedUpdate(DocumentEvent documentEvent) {
+                performSearch();
             }
 
-            // public void performSearch() {
-            //     String fromDate = textField2.getText();
-            //     String toDate = textField3.getText();
-
-            //     // Chuyển đổi từ String sang LocalDate
-            //     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            //     try {
-            //         LocalDate from = LocalDate.parse(fromDate, formatter);
-            //         LocalDate to = LocalDate.parse(toDate, formatter);
-
-            //         // Tìm kiếm hóa đơn có ngày lập nằm trong khoảng từ 'from' đến 'to'
-            //         ArrayList<Invoice> result = invoiceBUS.searchByDate(from, to);
-
-            //         // Cập nhật bảng với kết quả tìm kiếm
-            //         setDataToTable(result);
-            //     } catch (DateTimeParseException e) {
-            //         // Xử lý ngoại lệ ở đây
-            //         System.out.println("Ngày không hợp lệ. Vui lòng nhập lại.");
-            //     }
-            // }
-        };
-
-        textField2.getDocument().addDocumentListener(documentListener);
-        textField3.getDocument().addDocumentListener(documentListener);
-
+            public void performSearch() {
+                String value = textField1.getText();
+                String type = (String) comboBox1.getSelectedItem();
+                ArrayList<UsersDTO> result = userBUS.search(value, type);
+                setDataToTable(result);
+            }
+        });
+    
         btnReload.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -514,51 +496,7 @@ public class FormManagerAccount extends JPanel {
             }
         });
         
-        // xuat excel
-        // button1.addActionListener(new ActionListener() {
-        //     @Override
-        //     public void actionPerformed(ActionEvent actionEvent) {
-        //         JFileChooser fileChooser = new JFileChooser();
-        //         fileChooser.setDialogTitle("Chọn nơi lưu file");
-
-        //         int userSelection = fileChooser.showSaveDialog(null);
-
-        //         if (userSelection == JFileChooser.APPROVE_OPTION) {
-        //             File fileToSave = fileChooser.getSelectedFile();
-
-        //             Workbook workbook = new XSSFWorkbook();
-        //             Sheet sheet = workbook.createSheet("Hóa Đơn");
-
-        //             // tao row header
-        //             Row headerRow = sheet.createRow(0);
-        //             headerRow.createCell(0).setCellValue("STT");
-        //             headerRow.createCell(1).setCellValue("Mã hoá đơn");
-        //             headerRow.createCell(2).setCellValue("Mã nhân viên");
-        //             headerRow.createCell(3).setCellValue("Mã khách hàng");
-        //             headerRow.createCell(4).setCellValue("Mã khuyến mãi");
-        //             headerRow.createCell(5).setCellValue("Ngày lập");
-        //             headerRow.createCell(6).setCellValue("Giờ lập");
-        //             headerRow.createCell(7).setCellValue("Tổng tiền");
-
-        //             // them du lieu vao sheet
-        //             for (int i = 0; i < table1.getRowCount(); i++) {
-        //                 Row row = sheet.createRow(i + 1);
-        //                 for (int j = 0; j < table1.getColumnCount(); j++) {
-        //                     row.createCell(j).setCellValue(table1.getValueAt(i, j).toString());
-        //                 }
-        //             }
-
-        //             // ghi vao file
-        //             try (FileOutputStream outputStream = new FileOutputStream(fileToSave)) {
-        //                 workbook.write(outputStream);
-        //                 JOptionPane.showMessageDialog(null, "Xuất file thành công");
-        //             } catch (IOException e) {
-        //                 JOptionPane.showMessageDialog(null, "Xuất file không thành công");
-        //                 e.printStackTrace();
-        //             }
-        //         }
-        //     }
-        // });
+    
 
  btnImport.addActionListener(new ActionListener() {
     @Override
@@ -573,73 +511,12 @@ public class FormManagerAccount extends JPanel {
             File selectedFile = fileChooser.getSelectedFile();
             ArrayList<UsersDTO> users  = importExcel.readUsersExcel(selectedFile.getAbsolutePath());
           setDataToTable(users);
-          if (!users.isEmpty()) {
-            setDataToTable(users);
-            JOptionPane.showMessageDialog(null, "Nhập dữ liệu thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(null, "Không có dữ liệu hợp lệ trong file!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
-        }
         }
     }
 });
 
 
-        // in pdf
-        // button3.addActionListener(new ActionListener() {
-        //     @Override
-        //     public void actionPerformed(ActionEvent e) {
-        //         JFileChooser fileChooser = new JFileChooser();
-        //         fileChooser.setDialogTitle("Chọn nơi lưu file PDF");
-
-        //         int userSelection = fileChooser.showSaveDialog(null);
-
-        //         if (userSelection == JFileChooser.APPROVE_OPTION) {
-        //             File fileToSave = fileChooser.getSelectedFile();
-
-        //             try {
-        //                 // Tạo một Document
-        //                 Document document = new Document();
-
-        //                 // Tạo một PdfWriter
-        //                 PdfWriter.getInstance(document, new FileOutputStream(fileToSave));
-
-        //                 // Mở Document
-        //                 document.open();
-
-        //                 // Tạo một PdfPTable với số cột tương ứng với số cột của bảng
-        //                 PdfPTable table = new PdfPTable(table1.getColumnCount());
-
-        //                 // Điều chỉnh kích thước cột
-        //                 float[] columnWidths = new float[] {30f, 30f, 30f, 40f, 40f, 60f, 70f, 80f};
-        //                 table.setWidths(columnWidths);
-
-        //                 // Thêm tiêu đề cột vào PdfPTable
-        //                 for (int i = 0; i < table1.getColumnCount(); i++) {
-        //                     table.addCell(table1.getColumnName(i));
-        //                 }
-
-        //                 // Thêm dữ liệu từ bảng vào PdfPTable
-        //                 for (int i = 0; i < table1.getRowCount(); i++) {
-        //                     for (int j = 0; j < table1.getColumnCount(); j++) {
-        //                         table.addCell(table1.getValueAt(i, j).toString());
-        //                     }
-        //                 }
-
-        //                 // Thêm PdfPTable vào Document
-        //                 document.add(table);
-
-        //                 // Đóng Document
-        //                 document.close();
-
-        //                 JOptionPane.showMessageDialog(null, "Tạo file PDF thành công");
-        //             } catch (Exception ex) {
-        //                 ex.printStackTrace();
-        //                 JOptionPane.showMessageDialog(null, "Lỗi khi tạo file PDF");
-        //             }
-        //         }
-        //     }
-        // });
-    
+      
     }
     public void disableButton() {
         btnExport.setEnabled(false);
