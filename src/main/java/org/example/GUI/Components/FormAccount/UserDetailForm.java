@@ -2,6 +2,9 @@ package org.example.GUI.Components.FormAccount;
 
 import javax.swing.*;
 
+import org.example.BUS.UserBUS;
+import org.example.DTO.SessionManager;
+import org.example.DTO.UsersDTO;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,8 +15,13 @@ public class UserDetailForm extends JPanel {
     private JTextField txtUserName, txtUserEmail, txtFullName;
     private JPasswordField txtPassword;
     private JButton btnSave, btnCancel;
+    public UsersDTO currentUser; 
+    UserBUS userBUS = new UserBUS();
+
 
     public UserDetailForm() {
+        currentUser = SessionManager.getCurrentUser();
+userBUS = new UserBUS();
         setLayout(new BorderLayout());
 
         // Tạo Panel chính
@@ -37,7 +45,10 @@ public class UserDetailForm extends JPanel {
         txtPassword = new JPasswordField();
         txtFullName = new JTextField();
         txtUserEmail.setEnabled(false);
-        
+        txtFullName.setText(currentUser.getUserFullName());
+        txtUserEmail.setText(currentUser.getUserEmail());
+        txtPassword.setText(currentUser.getUserPassword());
+        txtUserName.setText(currentUser.getUserName());
 
         // Tạo Nút Lưu và Hủy
         ImageIcon iconXoa = new ImageIcon(
@@ -46,7 +57,13 @@ public class UserDetailForm extends JPanel {
             getClass().getResource("/org/example/GUI/resources/images/icons8_wrench_30px.png"));
         btnSave = new JButton("Lưu thay đổi");
         btnSave.setIcon(IconSua);
-   
+        btnSave.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleSaveAction();
+             
+            }
+        });
    
         btnCancel = new JButton("Làm mới");
         btnCancel.setIcon(iconXoa);
@@ -109,11 +126,45 @@ public class UserDetailForm extends JPanel {
         txtPassword.setText("");  
         txtFullName.setText(""); 
     }
-    // public void getUserNameAndEmail() {
-    //     UserBUS userBus = new UserBUS();
+    private void handleSaveAction() {
+        // Retrieve updated values from fields
+        String newPassword = new String(txtPassword.getPassword()).trim();
+        String newFullName = txtFullName.getText().trim();
+        String userName = txtUserName.getText().trim();
+        // Validate inputs
+        if (newPassword.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Mật khẩu không được để trống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            txtPassword.requestFocus();
+            return;
+        }
+        if (newFullName.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Họ và tên không được để trống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            txtFullName.requestFocus();
+            return;
+        }
+        if (newPassword.length() < 6) {
+            JOptionPane.showMessageDialog(this, "Mật khẩu phải có ít nhất 6 ký tự!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            txtPassword.requestFocus();
+            return;
+        }
+        if (userName.length() < 6) {
+            JOptionPane.showMessageDialog(this, "Mật khẩu phải có ít nhất 6 ký tự!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            txtPassword.requestFocus();
+            return;
+        }
 
-    // }
+        // Update currentUser with new values
+        currentUser.setUserPassword(newPassword);
+        currentUser.setUserFullName(newFullName);
+        currentUser.setUserName(userName);
 
+        // Save changes using UserBUS
+        if (userBUS.updateUser(currentUser)) {
+            JOptionPane.showMessageDialog(this, "🎉 Lưu thông tin thành công cho người dùng " + currentUser.getUserName() + "!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "❌ Lưu thông tin thất bại! Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
   
     public JPanel getPanel() {
         return this;

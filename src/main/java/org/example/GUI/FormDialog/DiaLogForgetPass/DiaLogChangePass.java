@@ -4,11 +4,14 @@ import java.awt.*;
 import java.net.URL;
 import javax.swing.*;
 import org.example.BUS.UserBUS;
+import org.example.DTO.SessionManager;
 import org.example.DTO.UsersDTO;
+import org.example.GUI.Application.Application;
 
 public class DiaLogChangePass extends JPanel {
-    private UsersDTO tk;
-
+    private UsersDTO currentUser;
+    private String currentUsername;
+    UserBUS userBUS = new UserBUS();
     private JPasswordField txMatKhauCu = new JPasswordField(15);
     private JPasswordField txMatKhauMoi = new JPasswordField(15);
     private JPasswordField txXacNhanMatKhau = new JPasswordField(15);
@@ -16,9 +19,11 @@ public class DiaLogChangePass extends JPanel {
     private JButton btnDongY = new JButton("Đồng ý");
     private JButton btnHuy = new JButton("Hủy");
 
-    public DiaLogChangePass(String matk) {
+    public DiaLogChangePass(String username) {
+ currentUser  = SessionManager.getCurrentUser();
+ username = currentUser.getUserName();
         this.setLayout(new BorderLayout(10, 10));
-        tk = new UserBUS().getUser(matk);
+
 
         // Input Panel using BoxLayout
         JPanel plInput = new JPanel();
@@ -81,14 +86,27 @@ public class DiaLogChangePass extends JPanel {
         
         btnDongY.addActionListener(ae -> {
             if (checkPass()) {
-                if (new UserBUS().updateUser(tk)) {
-                    JOptionPane.showMessageDialog(this, "🎉 Đổi mật khẩu thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                    SwingUtilities.getWindowAncestor(this).dispose();
+              String newPassword = new String(txMatKhauMoi.getPassword());
+                currentUser.setUserPassword(newPassword);
+
+              
+                if (userBUS.updateUser(currentUser)) {
+                    JOptionPane.showMessageDialog(this, "🎉 Đổi mật khẩu thành công cho người dùng " + currentUsername + "!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                    resetField();
+                } else {
+                    JOptionPane.showMessageDialog(this, "❌ Đổi mật khẩu thất bại! Vui lòng thử lại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
+   
+
         this.add(plButton, BorderLayout.SOUTH);
+    }
+    public void resetField() {
+        txMatKhauCu.setText("");
+        txMatKhauMoi.setText("");
+        txXacNhanMatKhau.setText("");
     }
 
     private Boolean checkPass() {
@@ -96,7 +114,7 @@ public class DiaLogChangePass extends JPanel {
         String mkmoi = new String(txMatKhauMoi.getPassword());
         String xnmk = new String(txXacNhanMatKhau.getPassword());
         
-        if (!mkcu.equals(tk.getUserPassword())) {
+        if (!mkcu.equals(currentUser.getUserPassword())) {
             JOptionPane.showMessageDialog(this, "❌ Mật khẩu cũ không đúng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             txMatKhauCu.requestFocus();
             return false;
@@ -109,6 +127,15 @@ public class DiaLogChangePass extends JPanel {
             txXacNhanMatKhau.requestFocus();
             return false;
         }
+        
         return true;
+    }
+    public static void showChangePasswordDialog(String username) {
+        JDialog dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(Application.getInstance()), "Đổi Mật Khẩu", true);
+        DiaLogChangePass changePassPanel = new DiaLogChangePass(username);
+        dialog.setContentPane(changePassPanel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(null);
+        dialog.setVisible(true);
     }
 }

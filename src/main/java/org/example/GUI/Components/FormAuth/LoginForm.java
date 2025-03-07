@@ -15,6 +15,7 @@ import org.example.BUS.UserBUS;
 import org.example.DTO.SessionManager;
 import org.example.DTO.UsersDTO;
 import org.example.GUI.Application.Application;
+import org.example.GUI.FormDialog.DiaLogForgetPass.DiaLogChangePass;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -220,7 +221,14 @@ public class LoginForm extends JPanel {
             saveLoginInfo(email, password); // Save login info
             JOptionPane.showMessageDialog(null, "Đăng nhập thành công! 🎉", "Thành công",
                     JOptionPane.INFORMATION_MESSAGE);
-
+UsersDTO currentUser = SessionManager.getCurrentUser();
+        if (currentUser != null) {
+            String currentUsername = currentUser.getUserName(); // Assuming UsersDTO has a getUserName() method
+            System.out.println("Current username: " + currentUsername);
+                
+        } else {
+            System.err.println("Current user is null after login!");
+        }
             if (loginSuccessListener != null) {
                 SwingUtilities.invokeLater(loginSuccessListener);
             }
