@@ -26,9 +26,50 @@ public class QuizDAO {
     // Lấy danh sách câu hỏi theo testCode từ ExamsDTO
     public List<QuestionDTO> getQuestionsByTestCode(String testCode) {
         List<QuestionDTO> questions = new ArrayList<>();
-        String sql = "SELECT q.* FROM questions q JOIN exams e ON FIND_IN_SET(q.qID, e.ex_quesIDs) WHERE e.testCode = ?";
+        
+        String queryStructure = "SELECT numberEasy, numberMedium, numberDiff FROM test_structure WHERE testCode = ?";
+        
+        try (PreparedStatement stmt = conn.prepareStatement(queryStructure)) {
+            stmt.setString(1, testCode);
+            ResultSet rs = stmt.executeQuery();
+    
+            if (rs.next()) {
+                int numEasy = rs.getInt("numberEasy");
+                int numMedium = rs.getInt("numberMedium");
+                int numDiff = rs.getInt("numberDiff");
+    
+                questions.addAll(getQuestionsByLevel(testCode, "easy", numEasy));
+                questions.addAll(getQuestionsByLevel(testCode, "medium", numMedium));
+                questions.addAll(getQuestionsByLevel(testCode, "diff", numDiff));
+                System.out.println("Dễ: " + getQuestionsByLevel(testCode, "Easy", numEasy).size());
+System.out.println("Trung bình: " + getQuestionsByLevel(testCode, "Medium", numMedium).size());
+System.out.println("Khó: " + getQuestionsByLevel(testCode, "diff", numDiff).size());
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return questions;
+    }
+    private List<QuestionDTO> getQuestionsByLevel(String testCode, String level, int limit) {
+        List<QuestionDTO> questions = new ArrayList<>();
+        
+        if (limit <= 0) return questions; // Nếu số lượng cần lấy = 0 thì bỏ qua
+        
+        String sql = """
+                SELECT q.* 
+                FROM questions q 
+                JOIN test_structure ts ON q.qTopicID = ts.tpID 
+                WHERE ts.testCode = ? AND q.qLevel = ? 
+                ORDER BY RAND() 
+                LIMIT ?
+                """;
+    
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, testCode);
+            stmt.setString(2, level);
+            stmt.setInt(3, limit);
+    
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 questions.add(new QuestionDTO(
@@ -37,13 +78,17 @@ public class QuizDAO {
                         rs.getString("qPictures"),
                         rs.getInt("qTopicID"),
                         rs.getString("qLevel"),
-                        rs.getBoolean("qStatus")));
+                        rs.getBoolean("qStatus")
+                ));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    
         return questions;
     }
+    
+    
 
     // Lấy danh sách đáp án theo questionID
     public List<AnswersDTO> getAnswersByQuestionID(int questionID) {

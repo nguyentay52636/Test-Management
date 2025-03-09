@@ -10,10 +10,13 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.example.BUS.TestBUS;
 import org.example.BUS.TopicBUS;
+import org.example.DTO.TestDTO;
 import org.example.DTO.TopicsDTO;
 
 public class TestForm extends JPanel {
@@ -70,14 +73,23 @@ public class TestForm extends JPanel {
         }
     }
 
-    private void openExamUI(int topicID) {
-        if (contentPanel != null) {
-            TestUI examUI = new TestUI(contentPanel, topicID); // Truyền topicID để lấy bài thi
-            contentPanel.removeAll();
-            contentPanel.setLayout(new BorderLayout());
-            contentPanel.add(examUI, BorderLayout.CENTER);
-            contentPanel.revalidate();
-            contentPanel.repaint();
+private void openExamUI(int topicID) {
+    if (contentPanel != null) {
+        TestBUS testBUS = new TestBUS();
+        List<TestDTO> testList = testBUS.getTestsByTopicID(topicID);
+
+        if (testList.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Không có bài thi nào cho chủ đề này!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            return;
         }
+
+        TestUI examUI = new TestUI(contentPanel, topicID); // Truyền topicID vào TestUI
+        contentPanel.removeAll();
+        contentPanel.setLayout(new BorderLayout());
+        contentPanel.add(examUI, BorderLayout.CENTER);
+        contentPanel.revalidate();
+        contentPanel.repaint();
     }
+}
+
 }

@@ -15,6 +15,7 @@ import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 
+import org.example.BUS.QuizBUS;
 import org.example.DAO.QuizDAO;
 import org.example.DAO.TestDAO;
 import org.example.DTO.AnswersDTO;
@@ -37,10 +38,14 @@ public class QuizUI extends JPanel {
     private String testCode;
     private List<Integer> userAnswers = new ArrayList<>();
     private int correctCount = 0;
+    private QuizBUS quizBUS;
+
 
     public QuizUI(int userID, String testCode) {
         this.userID = userID;
         this.testCode = testCode;
+        this.quizBUS = new QuizBUS();
+        questions = quizBUS.getQuestionsByTestCode(testCode);
         setLayout(null);
         setBackground(new Color(50, 50, 60));
 
@@ -113,10 +118,9 @@ public class QuizUI extends JPanel {
         QuestionDTO question = questions.get(index);
         questionLabel.setText("Câu " + (index + 1) + ": " + question.getQContent());
         levelLabel.setText("Mức độ: " + question.getQLevel());
-
-        QuizDAO quizDAO = new QuizDAO();
-        answers = quizDAO.getAnswersByQuestionID(question.getQuestionID());
-
+    
+        answers = quizBUS.getAnswersByQuestionID(question.getQuestionID());
+    
         answerGroup.clearSelection();
         for (int i = 0; i < answerButtons.length; i++) {
             if (i < answers.size()) {
@@ -155,21 +159,19 @@ public class QuizUI extends JPanel {
         }
     
         saveUserAnswer();
-        QuizDAO quizDAO = new QuizDAO();
     
+        correctCount = 0;
         for (int i = 0; i < questions.size(); i++) {
-            int questionID = questions.get(i).getQuestionID();
-            int correctAnswerID = quizDAO.getCorrectAnswerByQuestionID(questionID);
+            int correctAnswerID = quizBUS.getCorrectAnswerByQuestionID(questions.get(i).getQuestionID());
             if (userAnswers.get(i) == correctAnswerID) {
                 correctCount++;
             }
         }
     
-        double score = ((double) correctCount / totalQuestions) * 10.0;
+        int score = ( correctCount / totalQuestions) * 10;
         LocalDate today = LocalDate.now();
     
-        // 🔥 Gọi DAO với danh sách câu hỏi
-        boolean success = quizDAO.saveQuizResult(userID, testCode, questions, userAnswers, correctCount, score, today);
+        boolean success = quizBUS.saveQuizResult(userID, testCode, questions, userAnswers, correctCount, score, today);
     
         if (success) {
             JOptionPane.showMessageDialog(this, "Bài kiểm tra đã được nộp!\nĐiểm của bạn: " + score);

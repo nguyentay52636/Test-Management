@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.example.BUS.TestBUS;
 import org.example.DAO.TestDAO;
 import org.example.DTO.TestDTO;
 
@@ -20,10 +21,13 @@ public class TestUI extends JPanel {
     private JComboBox<String> testComboBox;
     private JLabel timeLabel, questionLabel;
     private List<TestDTO> testList;
+    private TestBUS testBUS;
 
     public TestUI(JPanel contentPanel, int tpID) {
         this.contentPanel = contentPanel;
         initComponents(tpID);
+        this.testBUS = new TestBUS();
+        testList = testBUS.getTestsByTopicID(tpID);
     }
 
     private void initComponents(int tpID) {
