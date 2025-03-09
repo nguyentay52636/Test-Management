@@ -88,31 +88,27 @@ public class MainForm extends JLayeredPane {
 
             } else if (index == 1) {
                 if (subIndex == 1) {
-                   
+
                 } else if (subIndex == 2) {
-                  Application.showForm(new TestForm(panelBody));
+                    Application.showForm(new TestForm(panelBody));
 
                 } else {
                     action.cancel();
                 }
             } else if (index == 2) {
-                // Application.showForm(new BeginForm("Chào mừng đến với quản lý thi trắc
-                // nghiệm"));
+                Application.showForm(new FormInbox(panelBody));
             } else if (index == 3) {
 
-                if (!isAdmin()) {
-                    Application.showForm(new FormInbox(panelBody));
+            } else if (index == 7) {
+                if (subIndex == 1) {
+                    Application.showForm(new DiaLogChangePass("alo,"));
+                    System.out.println("ok");
+                } else if (subIndex == 2) {
+                    Application.showForm(new UserDetailForm());
+                }
 
-                }} else if (index == 7) {
-                    if(subIndex==1) {
-                        Application.showForm( new DiaLogChangePass("alo,"));
-                        System.out.println("ok");
-                    }else if(subIndex ==2) {
-                        Application.showForm(new UserDetailForm());
-                    }
-               
-                else if(index == 8) {
-                   
+                else if (index == 8) {
+
                 }
             } else if (index == 9) {
                 Application.logout();

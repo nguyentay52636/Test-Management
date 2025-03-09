@@ -18,7 +18,8 @@ public class TestDTO {
     public TestDTO() {
     }
 
-    public TestDTO(Integer testID, String testCode, String title, int testTime, int tpID, int numberEasy, int numberMedium, int numberDiff, Boolean testLimit, Date date, int testStatus) {
+    public TestDTO(Integer testID, String testCode, String title, int testTime, int tpID, int numberEasy,
+            int numberMedium, int numberDiff, Boolean testLimit, Date date, int testStatus) {
         this.testID = testID;
         this.testCode = testCode;
         this.title = title;

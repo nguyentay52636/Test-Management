@@ -37,8 +37,7 @@ public class QuizDAO {
                         rs.getString("qPictures"),
                         rs.getInt("qTopicID"),
                         rs.getString("qLevel"),
-                        rs.getBoolean("qStatus")
-                ));
+                        rs.getBoolean("qStatus")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -56,11 +55,11 @@ public class QuizDAO {
             while (rs.next()) {
                 answers.add(new AnswersDTO(
                         rs.getInt("awID"),
+                        rs.getInt("qID"),
                         rs.getString("awContent"),
                         rs.getString("awPictures"),
                         rs.getBoolean("isRight"),
-                        rs.getBoolean("awStatus")
-                ));
+                        rs.getBoolean("awStatus")));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -83,11 +82,12 @@ public class QuizDAO {
         return -1; // Trả về -1 nếu không tìm thấy
     }
 
-    public boolean saveQuizResult(int userID, String testCode, List<QuestionDTO> questions, List<Integer> userAnswers, int correctCount, double score, LocalDate date) {
+    public boolean saveQuizResult(int userID, String testCode, List<QuestionDTO> questions, List<Integer> userAnswers,
+            int correctCount, double score, LocalDate date) {
         String sql = "INSERT INTO result (rs_num, userID, exCode, rs_anwsers, rs_mark, rs_date) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = UtilsJDBC.getConnectDB();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             // 🔥 Chuyển danh sách câu trả lời thành JSON {"q1":"A", "q2":"B", ...}
             JSONObject answerJson = new JSONObject();
@@ -116,11 +116,16 @@ public class QuizDAO {
     // 🔥 Hàm chuyển đổi answerID thành A/B/C/D
     private String getAnswerLetter(int answerID) {
         switch (answerID % 4) { // Giả sử ID lần lượt theo thứ tự
-            case 0: return "D";
-            case 1: return "A";
-            case 2: return "B";
-            case 3: return "C";
-            default: return "?";
+            case 0:
+                return "D";
+            case 1:
+                return "A";
+            case 2:
+                return "B";
+            case 3:
+                return "C";
+            default:
+                return "?";
         }
     }
 

@@ -1,13 +1,20 @@
 package org.example.GUI.Components.FormTest;
 
-import org.example.DAO.TopicsDAO;
-import org.example.DTO.TopicsDTO;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
+import org.example.BUS.TopicBUS;
+import org.example.DTO.TopicsDTO;
 
 public class TestForm extends JPanel {
     private JPanel contentPanel; // Panel chứa giao diện chính
@@ -33,8 +40,8 @@ public class TestForm extends JPanel {
         topicsListPanel.setBackground(new Color(45, 50, 70));
 
         // Lấy danh sách chủ đề từ database
-        TopicsDAO topicsDAO = new TopicsDAO();
-        List<TopicsDTO> topicsList = topicsDAO.getAllTopics();
+        TopicBUS topicsBUS = new TopicBUS();
+        List<TopicsDTO> topicsList = topicsBUS.getAllTopics();
 
         if (topicsList.isEmpty()) {
             JLabel noTopicsLabel = new JLabel("Không có chủ đề nào!", SwingConstants.CENTER);

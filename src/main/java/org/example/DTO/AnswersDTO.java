@@ -1,6 +1,7 @@
 package org.example.DTO;
 
 public class AnswersDTO {
+    private int qID;
     private int awID;
     private String awContent;
     private String awPicture;
@@ -10,8 +11,9 @@ public class AnswersDTO {
     public AnswersDTO() {
     }
 
-    public AnswersDTO(int awID, String awContent, String awPicture, Boolean isRight, Boolean isStatus) {
+    public AnswersDTO(int awID, int qID, String awContent, String awPicture, Boolean isRight, Boolean isStatus) {
         this.awID = awID;
+        this.qID = qID;
         this.awContent = awContent;
         this.awPicture = awPicture;
         this.isRight = isRight;
@@ -67,5 +69,13 @@ public class AnswersDTO {
                 ", isRight=" + isRight +
                 ", isStatus=" + isStatus +
                 '}';
+    }
+
+    public int getQID() {
+        return qID;
+    }
+
+    public void setQID(int qID) {
+        this.qID = qID;
     }
 }

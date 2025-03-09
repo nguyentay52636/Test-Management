@@ -3,6 +3,7 @@ package org.example.GUI.Components.FormAuth;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
 import org.example.BUS.UserBUS;
 import org.example.DTO.UsersDTO;
 import org.example.GUI.Application.Application;
@@ -66,7 +67,8 @@ public class SignUpForm extends JPanel {
 
         // Left Panel (Logo and Text)
         jPanel2.setBackground(new java.awt.Color(0, 102, 102));
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/example/GUI/menu/logo/logojavawing.png")));
+        jLabel1.setIcon(
+                new javax.swing.ImageIcon(getClass().getResource("/org/example/GUI/menu/logo/logojavawing.png")));
         jLabel2.setFont(new java.awt.Font("Showcard Gothic", 0, 20));
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("QUẢN LÝ THI TRẮC NGHIỆM");
@@ -77,28 +79,27 @@ public class SignUpForm extends JPanel {
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addGap(50, 50, 50)
-                    .addComponent(jLabel2))
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addGap(145, 145, 145)
-                    .addComponent(jLabel1))
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addGap(40, 40, 40)
-                    .addComponent(jLabel3))
-        );
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(50, 50, 50)
+                                .addComponent(jLabel2))
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(145, 145, 145)
+                                .addComponent(jLabel1))
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(40, 40, 40)
+                                .addComponent(jLabel3)));
         jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addGap(129, 129, 129)
-                    .addComponent(jLabel1)
-                    .addGap(30, 30, 30)
-                    .addComponent(jLabel2)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel3)
-                    .addGap(64, 64, 64))
-        );
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(129, 129, 129)
+                                .addComponent(jLabel1)
+                                .addGap(30, 30, 30)
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel3)
+                                .addGap(64, 64, 64)));
 
         // Right Panel (Sign Up Form)
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));

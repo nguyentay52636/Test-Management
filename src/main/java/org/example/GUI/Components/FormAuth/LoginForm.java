@@ -8,14 +8,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
 import org.example.BUS.UserBUS;
 import org.example.DTO.SessionManager;
 import org.example.DTO.UsersDTO;
 import org.example.GUI.Application.Application;
-import org.example.GUI.FormDialog.DiaLogForgetPass.DiaLogChangePass;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -62,56 +63,56 @@ public class LoginForm extends JPanel {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-    
+
         setLayout(new MigLayout("al center center", "[grow]", "[grow]"));
-    
+
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new MigLayout("ins 0", "[400px][grow]", "[500px]"));
-    
+
         // Left Panel (Logo and Text)
         Left.setBackground(new java.awt.Color(0, 102, 102));
-        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/example/GUI/menu/logo/logojavawing.png")));
+        jLabel5.setIcon(
+                new javax.swing.ImageIcon(getClass().getResource("/org/example/GUI/menu/logo/logojavawing.png")));
         jLabel6.setFont(new java.awt.Font("Showcard Gothic", 1, 20));
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("QUẢN LÝ THI TRẮC NGHIỆM");
         jLabel7.setFont(new java.awt.Font("Segoe UI Light", 0, 14));
         jLabel7.setForeground(new java.awt.Color(204, 204, 204));
         jLabel7.setText("copyright © company name All rights reserved");
-    
+
         javax.swing.GroupLayout LeftLayout = new javax.swing.GroupLayout(Left);
         Left.setLayout(LeftLayout);
         LeftLayout.setHorizontalGroup(
-            LeftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                .addGroup(LeftLayout.createSequentialGroup()
-                    .addGap(50, 50, 50)
-                    .addComponent(jLabel6))
-                .addGroup(LeftLayout.createSequentialGroup()
-                    .addGap(145, 145, 145)
-                    .addComponent(jLabel5))
-                .addGroup(LeftLayout.createSequentialGroup()
-                    .addGap(40, 40, 40)
-                    .addComponent(jLabel7))
-        );
+                LeftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                        .addGroup(LeftLayout.createSequentialGroup()
+                                .addGap(50, 50, 50)
+                                .addComponent(jLabel6))
+                        .addGroup(LeftLayout.createSequentialGroup()
+                                .addGap(145, 145, 145)
+                                .addComponent(jLabel5))
+                        .addGroup(LeftLayout.createSequentialGroup()
+                                .addGap(40, 40, 40)
+                                .addComponent(jLabel7)));
         LeftLayout.setVerticalGroup(
-            LeftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                .addGroup(LeftLayout.createSequentialGroup()
-                    .addGap(136, 136, 136)
-                    .addComponent(jLabel5)
-                    .addGap(26, 26, 26)
-                    .addComponent(jLabel6)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel7)
-                    .addGap(78, 78, 78))
-        );
-    
+                LeftLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                        .addGroup(LeftLayout.createSequentialGroup()
+                                .addGap(136, 136, 136)
+                                .addComponent(jLabel5)
+                                .addGap(26, 26, 26)
+                                .addComponent(jLabel6)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel7)
+                                .addGap(78, 78, 78)));
+
         // Right Panel (Login Form)
         Right.setBackground(new java.awt.Color(255, 255, 255));
         Right.setLayout(new MigLayout("al center, wrap 1", "[grow]", "[grow]"));
-    
+
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36));
         jLabel1.setForeground(new java.awt.Color(0, 102, 102));
         jLabel1.setText("LOGIN");
-    
+
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14));
         jLabel2.setText("Email");
         emailField.setFont(new java.awt.Font("Segoe UI", 0, 14));
@@ -123,7 +124,7 @@ public class LoginForm extends JPanel {
                 }
             }
         });
-    
+
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14));
         jLabel3.setText("Password");
         passwordField.setFont(new java.awt.Font("Segoe UI", 0, 14));
@@ -135,7 +136,7 @@ public class LoginForm extends JPanel {
                 }
             }
         });
-    
+
         btnLogin.setBackground(new java.awt.Color(0, 102, 102));
         btnLogin.setFont(new java.awt.Font("Segoe UI", 0, 14));
         btnLogin.setForeground(new java.awt.Color(255, 255, 255));
@@ -146,21 +147,23 @@ public class LoginForm extends JPanel {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 btnLogin.setBackground(new java.awt.Color(0, 153, 153));
             }
+
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 btnLogin.setBackground(new java.awt.Color(0, 102, 102));
             }
         });
         btnLogin.addActionListener(e -> performLogin());
-    
+
         btnForgotPassword.setFont(new java.awt.Font("Segoe UI", 0, 14));
         btnForgotPassword.setForeground(new java.awt.Color(0, 102, 255));
         btnForgotPassword.setText("Forgot Password?");
         btnForgotPassword.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnForgotPassword.setBorderPainted(false);
         btnForgotPassword.setContentAreaFilled(false);
-        btnForgotPassword.addActionListener(e -> JOptionPane.showMessageDialog(null, "Redirecting to Forgot Password screen..."));
-    
+        btnForgotPassword.addActionListener(
+                e -> JOptionPane.showMessageDialog(null, "Redirecting to Forgot Password screen..."));
+
         jLabel4.setText("I don't have an account");
         jButton2.setFont(new java.awt.Font("Segoe UI", 0, 14));
         jButton2.setForeground(new java.awt.Color(255, 51, 51));
@@ -174,7 +177,7 @@ public class LoginForm extends JPanel {
                 Application.getInstance().repaint();
             });
         });
-    
+
         Right.add(jLabel1, "center, wrap");
         Right.add(jLabel2, "center, wrap");
         Right.add(emailField, "width 343px, center, wrap");
@@ -184,10 +187,10 @@ public class LoginForm extends JPanel {
         Right.add(btnForgotPassword, "center, wrap");
         Right.add(jLabel4, "split 2, center");
         Right.add(jButton2, "wrap");
-    
+
         jPanel1.add(Left, "width pref, height 500px");
         jPanel1.add(Right, "width pref, height 500px");
-    
+
         add(jPanel1, "center");
     }
 
@@ -221,14 +224,14 @@ public class LoginForm extends JPanel {
             saveLoginInfo(email, password); // Save login info
             JOptionPane.showMessageDialog(null, "Đăng nhập thành công! 🎉", "Thành công",
                     JOptionPane.INFORMATION_MESSAGE);
-UsersDTO currentUser = SessionManager.getCurrentUser();
-        if (currentUser != null) {
-            String currentUsername = currentUser.getUserName(); // Assuming UsersDTO has a getUserName() method
-            System.out.println("Current username: " + currentUsername);
-                
-        } else {
-            System.err.println("Current user is null after login!");
-        }
+            UsersDTO currentUser = SessionManager.getCurrentUser();
+            if (currentUser != null) {
+                String currentUsername = currentUser.getUserName(); // Assuming UsersDTO has a getUserName() method
+                System.out.println("Current username: " + currentUsername);
+
+            } else {
+                System.err.println("Current user is null after login!");
+            }
             if (loginSuccessListener != null) {
                 SwingUtilities.invokeLater(loginSuccessListener);
             }
