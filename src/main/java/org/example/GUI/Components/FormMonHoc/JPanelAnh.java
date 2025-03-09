@@ -20,6 +20,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import org.example.BUS.QuestionBUS;
 import org.example.DAO.QuestionDAO;
 import org.example.DTO.QuestionDTO;
 import org.example.GUI.Application.other.FormInbox;
@@ -208,11 +209,13 @@ public class JPanelAnh extends JPanel {
         }
 
         int questionID = (int) tableModel.getValueAt(selectedRow, 0); // Lấy ID câu hỏi từ cột đầu tiên
-
+        QuestionBUS questionBUS = new QuestionBUS();
         int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa câu hỏi này?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
-            boolean deleted = questionDAO.deleteQuestion(questionID);
+            boolean deleted = questionBUS.deleteQuestion(questionID);
             if (deleted) {
+            	QuestionDAO questionDAO = new QuestionDAO();
+            	questionDAO.deleteQuestion(questionID);
                 JOptionPane.showMessageDialog(this, "Xóa câu hỏi thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
                 loadDataFromDatabase(); // Cập nhật lại bảng sau khi xóa
             } else {
