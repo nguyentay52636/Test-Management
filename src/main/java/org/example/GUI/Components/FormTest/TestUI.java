@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.example.BUS.TestBUS;
 import org.example.DAO.TestDAO;
 import org.example.DTO.TestDTO;
 
@@ -20,10 +21,13 @@ public class TestUI extends JPanel {
     private JComboBox<String> testComboBox;
     private JLabel timeLabel, questionLabel;
     private List<TestDTO> testList;
+    private TestBUS testBUS;
 
     public TestUI(JPanel contentPanel, int tpID) {
         this.contentPanel = contentPanel;
         initComponents(tpID);
+        this.testBUS = new TestBUS();
+        testList = testBUS.getTestsByTopicID(tpID);
     }
 
     private void initComponents(int tpID) {
@@ -120,7 +124,7 @@ public class TestUI extends JPanel {
             JOptionPane.showMessageDialog(this, "Bắt đầu bài kiểm tra: " + selectedTest.getTitle());
             // Chuyển sang giao diện làm bài kiểm tra nếu cần
             if (contentPanel != null) {
-                QuizUI quizUI = new QuizUI(1,testCode);                
+                QuizUI quizUI = new QuizUI(testCode);                
                 contentPanel.removeAll();
                 contentPanel.setLayout(new BorderLayout());
                 contentPanel.add(quizUI, BorderLayout.CENTER);
