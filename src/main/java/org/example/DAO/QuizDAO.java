@@ -89,7 +89,6 @@ System.out.println("Khó: " + getQuestionsByLevel(testCode, "diff", numDiff).siz
     }
     
     
-
     // Lấy danh sách đáp án theo questionID
     public List<AnswersDTO> getAnswersByQuestionID(int questionID) {
         List<AnswersDTO> answers = new ArrayList<>();
@@ -112,6 +111,7 @@ System.out.println("Khó: " + getQuestionsByLevel(testCode, "diff", numDiff).siz
         return answers;
     }
 
+
     // 🔥 Lấy ID của đáp án đúng cho một câu hỏi
     public int getCorrectAnswerByQuestionID(int questionID) {
         String sql = "SELECT awID FROM answers WHERE qID = ? AND isRight = 1 LIMIT 1";
@@ -128,35 +128,34 @@ System.out.println("Khó: " + getQuestionsByLevel(testCode, "diff", numDiff).siz
     }
 
     public boolean saveQuizResult(int userID, String testCode, List<QuestionDTO> questions, List<Integer> userAnswers,
-            int correctCount, double score, LocalDate date) {
-        String sql = "INSERT INTO result (rs_num, userID, exCode, rs_anwsers, rs_mark, rs_date) VALUES (?, ?, ?, ?, ?, ?)";
+    double score, LocalDate date) {
+String sql = "INSERT INTO result (userID, exCode, rs_anwsers, rs_mark, rs_date) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = UtilsJDBC.getConnectDB();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+try (Connection conn = UtilsJDBC.getConnectDB();
+        PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // 🔥 Chuyển danh sách câu trả lời thành JSON {"q1":"A", "q2":"B", ...}
-            JSONObject answerJson = new JSONObject();
-            for (int i = 0; i < questions.size(); i++) {
-                String questionKey = "q" + (i + 1);
-                String userAnswer = getAnswerLetter(userAnswers.get(i)); // Chuyển ID thành A/B/C/D
-                answerJson.put(questionKey, userAnswer);
-            }
-            String answersStr = answerJson.toString(); // Chuyển thành chuỗi JSON
-
-            stmt.setInt(1, correctCount);
-            stmt.setInt(2, userID);
-            stmt.setString(3, testCode);
-            stmt.setString(4, answersStr);
-            stmt.setDouble(5, score);
-            stmt.setDate(6, java.sql.Date.valueOf(date));
-
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("❌ Lỗi khi lưu kết quả: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return false;
+    // 🔥 Chuyển danh sách câu trả lời thành JSON {"q1":"A", "q2":"B", ...}
+    JSONObject answerJson = new JSONObject();
+    for (int i = 0; i < questions.size(); i++) {
+        String questionKey = "q" + (i + 1);
+        String userAnswer = getAnswerLetter(userAnswers.get(i)); // Chuyển ID thành A/B/C/D
+        answerJson.put(questionKey, userAnswer);
     }
+    String answersStr = answerJson.toString(); // Chuyển thành chuỗi JSON
+
+    stmt.setInt(1, userID);
+    stmt.setString(2, testCode);
+    stmt.setString(3, answersStr);
+    stmt.setDouble(4, score);
+    stmt.setDate(5, java.sql.Date.valueOf(date));
+
+    return stmt.executeUpdate() > 0;
+} catch (SQLException e) {
+    System.err.println("❌ Lỗi khi lưu kết quả: " + e.getMessage());
+    e.printStackTrace();
+}
+return false;
+}
 
     // 🔥 Hàm chuyển đổi answerID thành A/B/C/D
     private String getAnswerLetter(int answerID) {

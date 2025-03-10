@@ -20,7 +20,9 @@ import org.example.DAO.QuizDAO;
 import org.example.DAO.TestDAO;
 import org.example.DTO.AnswersDTO;
 import org.example.DTO.QuestionDTO;
+import org.example.DTO.SessionManager;
 import org.example.DTO.TestDTO;
+import org.example.DTO.UsersDTO;
 
 public class QuizUI extends JPanel {
     private JLabel questionLabel, levelLabel;
@@ -34,18 +36,21 @@ public class QuizUI extends JPanel {
     private int totalQuestions = 0;
     private Timer countdownTimer;
     private int remainingTime;
-    private int userID;
     private String testCode;
     private List<Integer> userAnswers = new ArrayList<>();
-    private int correctCount = 0;
     private QuizBUS quizBUS;
+    private UsersDTO currentUser; // Lưu thông tin người dùng hiện tại
 
-
-    public QuizUI(int userID, String testCode) {
-        this.userID = userID;
+    public QuizUI(String testCode) {
         this.testCode = testCode;
         this.quizBUS = new QuizBUS();
-        questions = quizBUS.getQuestionsByTestCode(testCode);
+        this.currentUser = SessionManager.getCurrentUser(); // Lấy thông tin user từ SessionManager
+        System.out.println(currentUser);
+        if (currentUser == null) {
+            JOptionPane.showMessageDialog(this, "Lỗi: Không tìm thấy thông tin người dùng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         setLayout(null);
         setBackground(new Color(50, 50, 60));
 
@@ -118,9 +123,9 @@ public class QuizUI extends JPanel {
         QuestionDTO question = questions.get(index);
         questionLabel.setText("Câu " + (index + 1) + ": " + question.getQContent());
         levelLabel.setText("Mức độ: " + question.getQLevel());
-    
+
         answers = quizBUS.getAnswersByQuestionID(question.getQuestionID());
-    
+
         answerGroup.clearSelection();
         for (int i = 0; i < answerButtons.length; i++) {
             if (i < answers.size()) {
@@ -144,34 +149,51 @@ public class QuizUI extends JPanel {
     }
 
     private void saveUserAnswer() {
-        for (JRadioButton btn : answerButtons) {
-            if (btn.isSelected()) {
-                userAnswers.add(Integer.parseInt(btn.getActionCommand()));
-                return;
+        userAnswers.clear(); // Đảm bảo danh sách không bị lặp dữ liệu cũ
+    
+        for (int i = 0; i < questions.size(); i++) {
+            boolean answered = false;
+            for (JRadioButton btn : answerButtons) {
+                if (btn.isSelected() && Integer.parseInt(btn.getActionCommand()) == questions.get(i).getQuestionID()) {
+                    userAnswers.add(Integer.parseInt(btn.getActionCommand()));
+                    answered = true;
+                    break;
+                }
+            }
+            if (!answered) {
+                userAnswers.add(-1); // Nếu không chọn đáp án nào
             }
         }
-        userAnswers.add(-1); // Nếu không chọn đáp án nào
     }
+    
 
     private void submitQuiz() {
         if (countdownTimer != null) {
             countdownTimer.stop();
         }
     
-        saveUserAnswer();
+        saveUserAnswer(); // Đảm bảo danh sách userAnswers đầy đủ
     
-        correctCount = 0;
+        int correctCount = 0;
+    
+        // Kiểm tra kích thước userAnswers trước khi truy cập
+        if (userAnswers.size() < questions.size()) {
+            JOptionPane.showMessageDialog(this, "Lỗi: Dữ liệu câu trả lời không đủ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    
         for (int i = 0; i < questions.size(); i++) {
             int correctAnswerID = quizBUS.getCorrectAnswerByQuestionID(questions.get(i).getQuestionID());
+    
             if (userAnswers.get(i) == correctAnswerID) {
                 correctCount++;
             }
         }
-    
-        int score = ( correctCount / totalQuestions) * 10;
+
+        double score = ((double) correctCount / questions.size()) * 10.0;
         LocalDate today = LocalDate.now();
     
-        boolean success = quizBUS.saveQuizResult(userID, testCode, questions, userAnswers, correctCount, score, today);
+        boolean success = quizBUS.saveQuizResult(currentUser.getUserID(), testCode, questions, userAnswers, score, today);
     
         if (success) {
             JOptionPane.showMessageDialog(this, "Bài kiểm tra đã được nộp!\nĐiểm của bạn: " + score);
@@ -180,21 +202,20 @@ public class QuizUI extends JPanel {
         }
     }
     
-        // Hàm đếm ngược thời gian
-        private void startCountdown() {
-            countdownTimer = new Timer(1000, e -> {
-                if (remainingTime > 0) {
-                    remainingTime--;
-                    int minutes = remainingTime / 60;
-                    int seconds = remainingTime % 60;
-                    timeLabel.setText(String.format("Thời gian: %02d:%02d", minutes, seconds));
-                } else {
-                    ((Timer) e.getSource()).stop();
-                    JOptionPane.showMessageDialog(this, "Hết giờ! Bài kiểm tra sẽ tự động nộp.");
-                    submitQuiz(); // Tự động nộp bài
-                }
-            });
-    
-            countdownTimer.start();
-        }
+    private void startCountdown() {
+        countdownTimer = new Timer(1000, e -> {
+            if (remainingTime > 0) {
+                remainingTime--;
+                int minutes = remainingTime / 60;
+                int seconds = remainingTime % 60;
+                timeLabel.setText(String.format("Thời gian: %02d:%02d", minutes, seconds));
+            } else {
+                ((Timer) e.getSource()).stop();
+                JOptionPane.showMessageDialog(this, "Hết giờ! Bài kiểm tra sẽ tự động nộp.");
+                submitQuiz();
+            }
+        });
+
+        countdownTimer.start();
+    }
 }

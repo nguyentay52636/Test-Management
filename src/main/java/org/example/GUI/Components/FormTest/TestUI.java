@@ -124,7 +124,7 @@ public class TestUI extends JPanel {
             JOptionPane.showMessageDialog(this, "Bắt đầu bài kiểm tra: " + selectedTest.getTitle());
             // Chuyển sang giao diện làm bài kiểm tra nếu cần
             if (contentPanel != null) {
-                QuizUI quizUI = new QuizUI(1,testCode);                
+                QuizUI quizUI = new QuizUI(testCode);                
                 contentPanel.removeAll();
                 contentPanel.setLayout(new BorderLayout());
                 contentPanel.add(quizUI, BorderLayout.CENTER);

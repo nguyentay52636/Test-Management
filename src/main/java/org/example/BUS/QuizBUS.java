@@ -30,7 +30,8 @@ public class QuizBUS {
     }
 
     // Lưu kết quả bài kiểm tra
-    public boolean saveQuizResult(int userID, String testCode, List<QuestionDTO> questions, List<Integer> userAnswers, int correctCount, double score, LocalDate date) {
-        return quizDAO.saveQuizResult(userID, testCode, questions, userAnswers, correctCount, score, date);
+    public boolean saveQuizResult(int userID, String testCode, List<QuestionDTO> questions, List<Integer> userAnswers, double score, LocalDate date) {
+        return quizDAO.saveQuizResult(userID, testCode, questions, userAnswers, score, date);
     }
+    
 }
