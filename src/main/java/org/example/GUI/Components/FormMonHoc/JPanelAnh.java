@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -12,6 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -22,11 +25,13 @@ import javax.swing.RowFilter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import org.example.BUS.QuestionBUS;
+import org.example.DAO.AnswersDAO;
 import org.example.DAO.QuestionDAO;
 import org.example.DTO.QuestionDTO;
 import org.example.GUI.Application.other.FormInbox;
@@ -113,13 +118,27 @@ public class JPanelAnh extends JPanel {
         lblMaCH.setForeground(Color.WHITE);
         lblMaCH.setBounds(220, 140, 120, 25);
         add(lblMaCH);
+        JLabel lblCauHoi = new JLabel("Tìm Câu Hỏi:");
+        lblCauHoi.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        lblCauHoi.setForeground(Color.WHITE);
+        lblCauHoi.setBounds(390, 140, 120, 25);
+        add(lblCauHoi);
+        JTextField txtMaCH = new JTextField();
+        txtMaCH.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtMaCH.setBackground(new Color(60, 70, 90));
+        txtMaCH.setForeground(Color.WHITE);
+        txtMaCH.setBorder(BorderFactory.createLineBorder(new Color(100, 110, 130), 1));
+        txtMaCH.setBounds(220, 170, 150, 35);
+        add(txtMaCH);
+        
+        
 
         txtCauHoi = new JTextField();
         txtCauHoi.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtCauHoi.setBackground(new Color(60, 70, 90));
         txtCauHoi.setForeground(Color.WHITE);
         txtCauHoi.setBorder(BorderFactory.createLineBorder(new Color(100, 110, 130), 1));
-        txtCauHoi.setBounds(220, 170, 150, 35);
+        txtCauHoi.setBounds(390, 170, 250, 35);
         add(txtCauHoi);
         txtCauHoi.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
@@ -134,19 +153,6 @@ public class JPanelAnh extends JPanel {
                 findQuestion();
             }
         });
-        JLabel lblCauHoi = new JLabel("Tìm Câu Hỏi:");
-        lblCauHoi.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        lblCauHoi.setForeground(Color.WHITE);
-        lblCauHoi.setBounds(390, 140, 120, 25);
-        add(lblCauHoi);
-
-        JTextField txtCauHoi = new JTextField();
-        txtCauHoi.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        txtCauHoi.setBackground(new Color(60, 70, 90));
-        txtCauHoi.setForeground(Color.WHITE);
-        txtCauHoi.setBorder(BorderFactory.createLineBorder(new Color(100, 110, 130), 1));
-        txtCauHoi.setBounds(390, 170, 250, 35);
-        add(txtCauHoi);
 
         // View Details Button
         JButton btnViewDetails = new JButton("Xem chi tiết");
@@ -196,7 +202,7 @@ public class JPanelAnh extends JPanel {
         add(lblTableTitle);
 
         // Question Table
-        tableModel = new DefaultTableModel(new String[] { "ID", "Nội dung", "Hình ảnh", "Mức độ", "Trạng thái" }, 0);
+        tableModel = new DefaultTableModel(new String[] { "Mã Câu Hỏi", "Nội dung", "Mức độ", "Trạng thái" }, 0);
         table = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBounds(50, 260, 900, 300);
@@ -248,7 +254,6 @@ public class JPanelAnh extends JPanel {
             tableModel.addRow(new Object[] {
                     q.getQuestionID(),
                     q.getQContent(),
-                    q.getQPicture(),
                     q.getQLevel(),
                     q.getQStatus() ? "Hoạt động" : "Ẩn"
             });
@@ -256,20 +261,52 @@ public class JPanelAnh extends JPanel {
     }
 
     private void importDataFromExcel() {
-        String filePath = "D:/tracnghiemAnh.xlsx";
-        List<QuestionDTO> questions = importExcel.readExcel(filePath);
-        if (questions.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Không có dữ liệu trong file Excel!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
+    	   JFileChooser fileChooser = new JFileChooser();
+           fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+           fileChooser.setDialogTitle("Chọn file Excel");
+           fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel Files", "xlsx"));
+
+           int returnValue = fileChooser.showOpenDialog(null);
+           if (returnValue == JFileChooser.APPROVE_OPTION) {
+               File selectedFile = fileChooser.getSelectedFile();
+               List<QuestionDTO> questions  = importExcel.readExcel(selectedFile.getAbsolutePath());
+               for (QuestionDTO q : questions) {
+                   if (questionDAO.insertQuestion(q)) {
+                       System.out.println("Thêm thành công: " + q.getQContent());
+                   } else {
+                       System.out.println("Lỗi khi thêm: " + q.getQContent());
+                   }
+               }
+             setDataToTable(questions);
+           }
+    }
+    public void setDataToTable(List<QuestionDTO> questions) {
+        DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("Mã Câu Hỏi");
+        model.addColumn("Nội Dung");
+        model.addColumn("Cấp Độ");
+        model.addColumn("Trạng Thái");
+        
+
+        for (QuestionDTO question : questions) {
+            model.addRow(new Object[] {
+                question.getQuestionID(),
+                question.getQContent(),
+                question.getQLevel(),
+                question.getQStatus()
+            });
         }
-        for (QuestionDTO q : questions) {
-            if (questionDAO.insertQuestion(q)) {
-                System.out.println("Thêm thành công: " + q.getQContent());
-            } else {
-                System.out.println("Lỗi khi thêm: " + q.getQContent());
-            }
+
+        table.setModel(model);
+
+        // Căn giữa nội dung trong các cột
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER); // Căn giữa
+
+        // Áp dụng căn giữa cho tất cả các cột
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
-        loadDataFromDatabase();
     }
 
     private void returnToInbox() {
@@ -284,37 +321,41 @@ public class JPanelAnh extends JPanel {
     }
 
     private void openAddQuestionPanel() {
-        JDialog dialog = new JDialog(JOptionPane.getFrameForComponent(this), "Thêm Câu Hỏi Mới", true);
-        JPanelThemCauHoi panelThemCauHoi = new JPanelThemCauHoi(contentPanel, this);
-        dialog.setContentPane(panelThemCauHoi);
-        dialog.setSize(new Dimension(900, 550));
-        dialog.setLocationRelativeTo(this);
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialog.setVisible(true);
-    }
+    	  if (contentPanel != null) {
+              JPanel currentPanel = (JPanel) contentPanel.getComponent(0); // Lưu panel hiện tại
+              JPanelThemCauHoi panelThemCauHoi = new JPanelThemCauHoi(contentPanel, currentPanel, tableModel);
+
+              contentPanel.removeAll();
+              contentPanel.add(panelThemCauHoi);
+              contentPanel.revalidate();
+              contentPanel.repaint();
+          
+      }
+       
+      }
 
     private void openEditQuestionPanel() { // Line ~284 from stack trace
         int selectedRow = table.getSelectedRow();
+        JPanelAnh currentPanel = (JPanelAnh) contentPanel.getComponent(0);
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn một câu hỏi để sửa!", "Thông báo",
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
         int questionID = (int) tableModel.getValueAt(selectedRow, 0);
-        QuestionDTO question = questionBUS.getQuestionByID(questionID); // NPE here because questionBUS is null
+        QuestionDTO question = questionBUS.getQuestionByID(questionID);
+        JPanelSuaCauHoi suaCauHoiPanel = new JPanelSuaCauHoi(contentPanel, currentPanel, question, tableModel);
+        contentPanel.removeAll();
+        contentPanel.add(suaCauHoiPanel);
+        contentPanel.revalidate();
+        contentPanel.repaint();
+        System.out.println("Chuyển đến giao diện Sửa câu hỏi!");// NPE here because questionBUS is null
         if (question == null) {
             JOptionPane.showMessageDialog(this, "Không tìm thấy câu hỏi!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        JDialog dialog = new JDialog(JOptionPane.getFrameForComponent(this), "Sửa Câu Hỏi", true);
-        JPanelSuaCauHoi panelSuaCauHoi = new JPanelSuaCauHoi(contentPanel, this, question);
-        dialog.setContentPane(panelSuaCauHoi);
-        dialog.setSize(new Dimension(900, 550));
-        dialog.setLocationRelativeTo(this);
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialog.setVisible(true);
-        loadDataFromDatabase(); // Assuming this refreshes the table
+        // Assuming this refreshes the table
     }
 
     private void openViewDetailsPanel() {
@@ -348,9 +389,14 @@ public class JPanelAnh extends JPanel {
                 "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
+        	AnswersDAO answersDAO = new AnswersDAO();
+            answersDAO.deleteAllAnswersByQuestionID(questionID);
             boolean deleted = questionBUS.deleteQuestion(questionID);
             if (deleted) {
+            	QuestionDAO questionDAO = new QuestionDAO();
+            	questionDAO.deleteQuestion(questionID);
                 tableModel.removeRow(selectedRow);
+                
                 JOptionPane.showMessageDialog(this, "Xóa câu hỏi thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
@@ -361,24 +407,24 @@ public class JPanelAnh extends JPanel {
     }
 
     private void findQuestion() {
-        String keyword = txtCauHoi.getText().trim().toLowerCase();
-        TableRowSorter<TableModel> rowSorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
-        table.setRowSorter(rowSorter);
+    	String keyword = txtCauHoi.getText().trim().toLowerCase();
+		TableRowSorter<TableModel> rowSorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
+		table.setRowSorter(rowSorter);
 
-        if (!keyword.equals("")) {
-            rowSorter.setRowFilter(new RowFilter<TableModel, Integer>() {
-                @Override
-                public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
-                    for (int i = 0; i < entry.getValueCount(); i++) {
-                        if (entry.getStringValue(i).toLowerCase().contains(keyword)) {
-                            return true; // Có ít nhất một trường khớp với từ khóa
-                        }
-                    }
-                    return false; // Không có trường nào khớp
-                }
-            });
-        } else {
-            rowSorter.setRowFilter(null); // Nếu không nhập gì, hiển thị tất cả dữ liệu
-        }
+		if (!keyword.equals("")) {
+			rowSorter.setRowFilter(new RowFilter<TableModel, Integer>() {
+				@Override
+				public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
+					for (int i = 0; i < entry.getValueCount(); i++) {	
+						if (entry.getStringValue(i).toLowerCase().contains(keyword)) {
+							return true; // Có ít nhất một trường khớp với từ khóa
+						}
+					}
+					return false; // Không có trường nào khớp
+				}
+			});
+		} else {
+			rowSorter.setRowFilter(null); // Nếu không nhập gì, hiển thị tất cả dữ liệu
+		}
     }
 }

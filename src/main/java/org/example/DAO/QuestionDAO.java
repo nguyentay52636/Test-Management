@@ -22,7 +22,6 @@ public class QuestionDAO {
             e.printStackTrace();
         }
     }
-
     // Lấy danh sách tất cả câu hỏi
     public List<QuestionDTO> getAllQuestions() {
         List<QuestionDTO> list = new ArrayList<>();
@@ -89,7 +88,7 @@ public class QuestionDAO {
 
     // Cập nhật câu hỏi
     public boolean updateQuestion(QuestionDTO q) {
-        String sql = "UPDATE questions SET qTopicID = ?, qContent = ?, qLevel = ?, qPictures = ?, qStatus = ? WHERE questionID = ?";
+        String sql = "UPDATE questions SET qTopicID = ?, qContent = ?, qLevel = ?, qPictures = ?, qStatus = ? WHERE qID = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, q.getQTopicID());
             ps.setString(2, q.getQContent());
@@ -185,18 +184,17 @@ public class QuestionDAO {
 
     public List<AnswersDTO> getAnswersByQuestionId(int questionID) {
         List<AnswersDTO> answers = new ArrayList<>();
-        try (Connection conn = UtilsJDBC.getConnectDB();
-                PreparedStatement ps = conn.prepareStatement("SELECT * FROM answers WHERE question_id = ?")) {
+        try (   PreparedStatement ps = conn.prepareStatement("SELECT * FROM answers WHERE qID = ?")) {
             ps.setInt(1, questionID);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 answers.add(new AnswersDTO(
-                        rs.getInt("answer_id"),
-                        rs.getInt("question_id"),
-                        rs.getString("content"),
-                        rs.getString("picture"),
-                        rs.getBoolean("is_right"),
-                        rs.getBoolean("status")));
+                        rs.getInt("awID"),
+                        rs.getInt("qID"),
+                        rs.getString("awContent"),
+                        rs.getString("awPictures"),
+                        rs.getBoolean("isRight"),
+                        rs.getBoolean("awStatus")));
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -77,6 +77,15 @@ public class AnswersDAO {
         }
         return answers;
     }
+    public void deleteAllAnswersByQuestionID(int questionID) {
+    	String sql = "delete from answers where qID=?";
+    	try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, questionID);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     // Thêm mới đáp án
     public boolean insertAnswer(AnswersDTO answer) {
@@ -126,7 +135,7 @@ public class AnswersDAO {
 
     public List<AnswersDTO> getAnswersByQuestionID(int questionID) {
         List<AnswersDTO> answers = new ArrayList<>();
-        String query = "SELECT * FROM answers WHERE qID = ?";
+        String query = "SELECT * FROM answers WHERE qID = ? ";
 
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, questionID);

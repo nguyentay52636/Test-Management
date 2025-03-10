@@ -16,7 +16,6 @@ public class QuestionBUS {
     public List<QuestionDTO> getAllQuestions() {
         return questionDAO.getAllQuestions();
     }
-
     public List<QuestionDTO> getQuestionsByTopic(int topicID) {
         return questionDAO.getQuestionsByTopic(topicID);
     }

@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 import org.example.BUS.QuestionBUS;
 import org.example.DAO.AnswersDAO;
@@ -28,16 +29,18 @@ import org.example.DTO.TopicsDTO;
 public class JPanelThemCauHoi extends JPanel {
     private JPanel contentPanel;
     private JPanel previousPanel;
+    private DefaultTableModel tableModel;
     private JComboBox<String> cboTopic; // ComboBox for topics
     private List<Integer> topicIDs; // Store topic IDs
     private JComboBox<String> cboCorrectAnswer; // ComboBox for correct answer
 
-    public JPanelThemCauHoi(JPanel contentPanel, JPanel previousPanel) {
+    public JPanelThemCauHoi(JPanel contentPanel, JPanel previousPanel,DefaultTableModel tableModel) {
+    	this.tableModel = tableModel; 
         this.contentPanel = contentPanel;
         this.previousPanel = previousPanel;
         this.topicIDs = new ArrayList<>(); // Initialize topic IDs list
         initComponents();
-        loadTopics(); // Load topics into ComboBox
+ // Load topics into ComboBox
     }
 
     private void initComponents() {
@@ -189,12 +192,12 @@ public class JPanelThemCauHoi extends JPanel {
         btnThoat.setBounds(250, 470, 150, 45);
         btnThoat.addActionListener(e -> returnToMain());
         add(btnThoat);
-
         JButton btnChapNhan = createStyledButton("Xác Nhận", new Color(40, 167, 69), "Thêm câu hỏi vào hệ thống");
         btnChapNhan.setBounds(500, 470, 150, 45);
         btnChapNhan.addActionListener(
                 e -> addQuestion(txtID, cboTopic, cboLoai, txtCauHoi, txtA, txtB, txtC, txtD, cboCorrectAnswer));
         add(btnChapNhan);
+        loadTopics();
     }
 
     private JButton createStyledButton(String text, Color bgColor, String tooltip) {
@@ -241,7 +244,6 @@ public class JPanelThemCauHoi extends JPanel {
             topicIDs.add(topic.getTopicID()); // Store corresponding ID
         }
     }
-
     private int getSelectedTopicID() {
         int selectedIndex = cboTopic.getSelectedIndex();
         if (selectedIndex >= 0) {
@@ -276,6 +278,7 @@ public class JPanelThemCauHoi extends JPanel {
             QuestionBUS questionBUS = new QuestionBUS();
 
             if (questionBUS.insertQuestion(question)) {
+            	
                 AnswersDAO answersDAO = new AnswersDAO();
                 String defaultImage = "no_image.png"; // Default image path
 
@@ -291,6 +294,7 @@ public class JPanelThemCauHoi extends JPanel {
 
                 JOptionPane.showMessageDialog(this, "Thêm câu hỏi thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
+                loadDataFromDatabase();
                 returnToMain();
             } else {
                 JOptionPane.showMessageDialog(this, "Thêm câu hỏi thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
@@ -310,6 +314,15 @@ public class JPanelThemCauHoi extends JPanel {
             contentPanel.add(previousPanel);
             contentPanel.revalidate();
             contentPanel.repaint();
+        }
+    }
+    private void loadDataFromDatabase() {
+//    	int idTopic = Integer.parseInt(Topic);
+        tableModel.setRowCount(0);
+        QuestionDAO questionDAO = new QuestionDAO();
+        List<QuestionDTO> questions = questionDAO.getQuestionsByTopic(getSelectedTopicID());
+        for (QuestionDTO q : questions) {
+            tableModel.addRow(new Object[]{q.getQuestionID(), q.getQContent(), q.getQLevel(), q.getQStatus() ? "Hoạt động" : "Ẩn"});
         }
     }
 }

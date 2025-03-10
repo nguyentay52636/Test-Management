@@ -13,6 +13,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import org.example.BUS.AnswersBUS;
 import org.example.BUS.QuestionBUS;
@@ -232,13 +233,12 @@ public class JPanelViewDetails extends JPanel {
     }
 
     private void returnToMain() {
-        if (contentPanel != null && previousPanel != null) {
-            contentPanel.removeAll();
-            contentPanel.add(previousPanel);
-            contentPanel.revalidate();
-            contentPanel.repaint();
+        java.awt.Window window = SwingUtilities.getWindowAncestor(this);
+        if (window != null) {
+            window.dispose(); // Đóng cửa sổ chứa JPanel này
         }
     }
+
 
     private void loadQuestionDetails() {
         QuestionBUS questionBUS = new QuestionBUS();
@@ -262,28 +262,24 @@ public class JPanelViewDetails extends JPanel {
         // Map answers to A, B, C, D (assuming order is A, B, C, D)
         for (int i = 0; i < 4; i++) {
             AnswersDTO ans = answers.get(i);
-            switch (Character.toString('A' + i)) {
-                case "A":
-                    txtAnswerA.setText(ans.getAwContent());
-                    lblCorrectA.setText(ans.getIsStatus() ? "Đúng" : "Sai");
-                    lblCorrectA.setForeground(ans.getIsStatus() ? new Color(0, 153, 0) : new Color(153, 0, 0));
-                    break;
-                case "B":
-                    txtAnswerB.setText(ans.getAwContent());
-                    lblCorrectB.setText(ans.getIsStatus() ? "Đúng" : "Sai");
-                    lblCorrectB.setForeground(ans.getIsStatus() ? new Color(0, 153, 0) : new Color(153, 0, 0));
-                    break;
-                case "C":
-                    txtAnswerC.setText(ans.getAwContent());
-                    lblCorrectC.setText(ans.getIsStatus() ? "Đúng" : "Sai");
-                    lblCorrectC.setForeground(ans.getIsStatus() ? new Color(0, 153, 0) : new Color(153, 0, 0));
-                    break;
-                case "D":
-                    txtAnswerD.setText(ans.getAwContent());
-                    lblCorrectD.setText(ans.getIsStatus() ? "Đúng" : "Sai");
-                    lblCorrectD.setForeground(ans.getIsStatus() ? new Color(0, 153, 0) : new Color(153, 0, 0));
-                    break;
+            if (i == 0) {
+                txtAnswerA.setText(ans.getAwContent());
+                lblCorrectA.setText(ans.getIsRight()? "Đúng" : "Sai");
+                lblCorrectA.setForeground(ans.getIsStatus() ? new Color(0, 153, 0) : new Color(153, 0, 0));
+            } else if (i == 1) {
+                txtAnswerB.setText(ans.getAwContent());
+                lblCorrectB.setText(ans.getIsRight() ? "Đúng" : "Sai");
+                lblCorrectB.setForeground(ans.getIsStatus() ? new Color(0, 153, 0) : new Color(153, 0, 0));
+            } else if (i == 2) {
+                txtAnswerC.setText(ans.getAwContent());
+                lblCorrectC.setText(ans.getIsRight() ? "Đúng" : "Sai");
+                lblCorrectC.setForeground(ans.getIsStatus() ? new Color(0, 153, 0) : new Color(153, 0, 0));
+            } else if (i == 3) {
+                txtAnswerD.setText(ans.getAwContent());
+                lblCorrectD.setText(ans.getIsRight() ? "Đúng" : "Sai");
+                lblCorrectD.setForeground(ans.getIsStatus() ? new Color(0, 153, 0) : new Color(153, 0, 0));
             }
         }
+
     }
 }
