@@ -1,12 +1,16 @@
 package org.example.GUI.Components.FormMonHoc;
 
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -30,6 +34,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.example.BUS.QuestionBUS;
 import org.example.DAO.AnswersDAO;
 import org.example.DAO.QuestionDAO;
@@ -46,7 +54,7 @@ public class JPanelAnh extends JPanel {
     private DefaultTableModel tableModel;
     private QuestionDAO questionDAO;
     private QuestionBUS questionBUS;
-    private JButton btnNhapExcel;
+    private JButton btnNhapExcel, btnExportDocx;
     private JTextField txtCauHoi;
 
     public JPanelAnh(JPanel contentPanel) {
@@ -98,6 +106,12 @@ public class JPanelAnh extends JPanel {
         btnNhapExcel.addActionListener(e -> importDataFromExcel());
         add(btnNhapExcel);
 
+        btnExportDocx = createButton("Export DOCX", "/org/example/GUI/resources/imageTopic/word_icon.png",
+                "Xuất đề thi ra DOCX");
+        btnExportDocx.setBounds(670, 80, 120, 45);
+        btnExportDocx.addActionListener(e -> exportExamToDocx());
+        add(btnExportDocx);
+
         // Filters and Search
         JLabel lblLoc = new JLabel("Lọc Mức Độ:");
         lblLoc.setFont(new Font("Segoe UI", Font.PLAIN, 16));
@@ -111,6 +125,7 @@ public class JPanelAnh extends JPanel {
         cboLoc.setForeground(Color.WHITE);
         cboLoc.setBounds(50, 170, 150, 35);
         cboLoc.setBorder(BorderFactory.createLineBorder(new Color(100, 110, 130), 1));
+        cboLoc.addActionListener(e -> filterByLevel(cboLoc.getSelectedItem().toString()));
         add(cboLoc);
 
         JLabel lblMaCH = new JLabel("Tìm Mã CH:");
@@ -118,11 +133,13 @@ public class JPanelAnh extends JPanel {
         lblMaCH.setForeground(Color.WHITE);
         lblMaCH.setBounds(220, 140, 120, 25);
         add(lblMaCH);
+
         JLabel lblCauHoi = new JLabel("Tìm Câu Hỏi:");
         lblCauHoi.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         lblCauHoi.setForeground(Color.WHITE);
         lblCauHoi.setBounds(390, 140, 120, 25);
         add(lblCauHoi);
+
         JTextField txtMaCH = new JTextField();
         txtMaCH.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtMaCH.setBackground(new Color(60, 70, 90));
@@ -130,8 +147,6 @@ public class JPanelAnh extends JPanel {
         txtMaCH.setBorder(BorderFactory.createLineBorder(new Color(100, 110, 130), 1));
         txtMaCH.setBounds(220, 170, 150, 35);
         add(txtMaCH);
-        
-        
 
         txtCauHoi = new JTextField();
         txtCauHoi.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -139,7 +154,6 @@ public class JPanelAnh extends JPanel {
         txtCauHoi.setForeground(Color.WHITE);
         txtCauHoi.setBorder(BorderFactory.createLineBorder(new Color(100, 110, 130), 1));
         txtCauHoi.setBounds(390, 170, 250, 35);
-        add(txtCauHoi);
         txtCauHoi.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 findQuestion();
@@ -153,6 +167,7 @@ public class JPanelAnh extends JPanel {
                 findQuestion();
             }
         });
+        add(txtCauHoi);
 
         // View Details Button
         JButton btnViewDetails = new JButton("Xem chi tiết");
@@ -172,25 +187,6 @@ public class JPanelAnh extends JPanel {
                 btnViewDetails.setBackground(new Color(70, 90, 110));
             }
         });
-        // btnViewDetails.addActionListener(e -> {
-        // int selectedRow = table.getSelectedRow();
-        // if (selectedRow == -1) {
-        // JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
-        // "Vui lòng chọn một câu hỏi để xem chi tiết!", "Thông báo",
-        // JOptionPane.WARNING_MESSAGE);
-        // return;
-        // }
-
-        // int questionID = (int) tableModel.getValueAt(selectedRow, 0);
-        // JDialog dialog = new JDialog(JOptionPane.getFrameForComponent(this), "Chi
-        // tiết câu hỏi", true);
-        // JPanelViewDetails panelViewDetails = new JPanelViewDetails(contentPanel,
-        // this, questionID);
-        // dialog.setContentPane(panelViewDetails);
-        // dialog.setSize(new Dimension(900, 550));
-        // dialog.setLocationRelativeTo(SwingUtilities.getWindowAncestor(this));
-        // dialog.setVisible(true);
-        // });
         btnViewDetails.addActionListener(e -> openViewDetailsPanel());
         add(btnViewDetails);
 
@@ -202,7 +198,7 @@ public class JPanelAnh extends JPanel {
         add(lblTableTitle);
 
         // Question Table
-        tableModel = new DefaultTableModel(new String[] { "Mã Câu Hỏi", "Nội dung", "Mức độ", "Trạng thái" }, 0);
+        tableModel = new DefaultTableModel(new String[] { "Mã Câu Hỏi", "Nội Dung", "Mức độ", "Trạng Thái" }, 0);
         table = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBounds(50, 260, 900, 300);
@@ -260,52 +256,168 @@ public class JPanelAnh extends JPanel {
         }
     }
 
-    private void importDataFromExcel() {
-    	   JFileChooser fileChooser = new JFileChooser();
-           fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-           fileChooser.setDialogTitle("Chọn file Excel");
-           fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel Files", "xlsx"));
+    public void exportExamToDocx() {
+        List<QuestionDTO> questions = questionDAO.getQuestionsByTopic(1); // Assuming topic 1 is English
+        List<QuestionDTO> easyQs = new ArrayList<>();
+        List<QuestionDTO> mediumQs = new ArrayList<>();
+        List<QuestionDTO> difficultQs = new ArrayList<>();
 
-           int returnValue = fileChooser.showOpenDialog(null);
-           if (returnValue == JFileChooser.APPROVE_OPTION) {
-               File selectedFile = fileChooser.getSelectedFile();
-               List<QuestionDTO> questions  = importExcel.readExcel(selectedFile.getAbsolutePath());
-               for (QuestionDTO q : questions) {
-                   if (questionDAO.insertQuestion(q)) {
-                       System.out.println("Thêm thành công: " + q.getQContent());
-                   } else {
-                       System.out.println("Lỗi khi thêm: " + q.getQContent());
-                   }
-               }
-             setDataToTable(questions);
-           }
+        // Phân loại câu hỏi theo độ khó
+        for (QuestionDTO q : questions) {
+            switch (q.getQLevel()) {
+                case "Dễ":
+                    easyQs.add(q);
+                    break;
+                case "Trung bình":
+                    mediumQs.add(q);
+                    break;
+                case "Khó":
+                    difficultQs.add(q);
+                    break;
+            }
+        }
+
+        // Kiểm tra số lượng câu hỏi đủ hay không
+        if (easyQs.size() < 5 || mediumQs.size() < 3 || difficultQs.size() < 2) {
+            JOptionPane.showMessageDialog(this, "Không đủ câu hỏi cho mỗi mức độ (5 dễ, 3 trung bình, 2 khó)!");
+            return;
+        }
+
+        // Chọn ngẫu nhiên các câu hỏi
+        Collections.shuffle(easyQs);
+        Collections.shuffle(mediumQs);
+        Collections.shuffle(difficultQs);
+
+        List<QuestionDTO> selectedQuestions = new ArrayList<>();
+        selectedQuestions.addAll(easyQs.subList(0, 5));
+        selectedQuestions.addAll(mediumQs.subList(0, 3));
+        selectedQuestions.addAll(difficultQs.subList(0, 2));
+
+        // Xuất ra file DOCX
+        String filePath = "EnglishExam.docx";
+        try (XWPFDocument document = new XWPFDocument()) {
+            // Tiêu đề chính
+            XWPFParagraph title = document.createParagraph();
+            title.setAlignment(ParagraphAlignment.CENTER);
+            XWPFRun titleRun = title.createRun();
+            titleRun.setText("ĐỀ THI TRẮC NGHIỆM");
+            titleRun.setBold(true);
+            titleRun.setFontSize(16);
+            titleRun.addBreak(); // Xuống dòng
+
+            int questionNumber = 1;
+            for (QuestionDTO q : selectedQuestions) {
+                // Câu hỏi
+                XWPFParagraph questionPara = document.createParagraph();
+                XWPFRun questionRun = questionPara.createRun();
+                questionRun.setText(questionNumber + ". " + q.getQContent());
+                questionRun.setBold(true);
+                questionRun.addBreak();
+
+                // Kiểm tra và thêm ảnh nếu có
+                if (q.getQPicture() != null && !q.getQPicture().isEmpty()) {
+                    try (java.io.InputStream imageStream = new FileInputStream(q.getQPicture())) {
+                        XWPFParagraph imgPara = document.createParagraph();
+                        XWPFRun imgRun = imgPara.createRun();
+                        imgRun.addPicture(
+                                imageStream,
+                                XWPFDocument.PICTURE_TYPE_PNG,
+                                q.getQPicture(),
+                                300, 150);
+                    } catch (Exception e) {
+                        System.out
+                                .println("Không thể chèn ảnh cho câu hỏi " + q.getQuestionID() + ": " + e.getMessage());
+                        // Tiếp tục với các phần còn lại của tài liệu
+                    }
+                }
+
+                // Đáp án mẫu (hard-coded như trong ví dụ của bạn)
+                String[] options = {
+                        "A. tay la la toi.",
+                        "B. khong phai toi",
+                        "C. là traidep nhat.",
+                        "D. it gioi"
+                };
+
+                for (String option : options) {
+                    XWPFParagraph optionPara = document.createParagraph();
+                    optionPara.setIndentationLeft(400); // Thụt lề sang phải
+                    XWPFRun optionRun = optionPara.createRun();
+                    optionRun.setText(option);
+                }
+
+                questionNumber++;
+            }
+
+            // Ghi file
+            try (FileOutputStream out = new FileOutputStream(filePath)) {
+                document.write(out);
+            }
+
+            JOptionPane.showMessageDialog(this, "Đã xuất đề thi ra " + filePath + " thành công!");
+
+            // Mở file sau khi xuất thành công
+            File file = new File(filePath);
+            if (file.exists()) {
+                Desktop.getDesktop().open(file);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi xuất DOCX: " + ex.getMessage());
+        }
     }
+
+    private void importDataFromExcel() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setDialogTitle("Chọn file Excel");
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel Files", "xlsx"));
+
+        int returnValue = fileChooser.showOpenDialog(null);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            List<QuestionDTO> questions = importExcel.readExcel(selectedFile.getAbsolutePath());
+            for (QuestionDTO q : questions) {
+                if (questionDAO.insertQuestion(q)) {
+                    System.out.println("Thêm thành công: " + q.getQContent());
+                } else {
+                    System.out.println("Lỗi khi thêm: " + q.getQContent());
+                }
+            }
+            setDataToTable(questions);
+        }
+    }
+
     public void setDataToTable(List<QuestionDTO> questions) {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("Mã Câu Hỏi");
         model.addColumn("Nội Dung");
         model.addColumn("Cấp Độ");
         model.addColumn("Trạng Thái");
-        
 
         for (QuestionDTO question : questions) {
             model.addRow(new Object[] {
-                question.getQuestionID(),
-                question.getQContent(),
-                question.getQLevel(),
-                question.getQStatus()
+                    question.getQuestionID(),
+                    question.getQContent(),
+                    question.getQLevel(),
+                    question.getQStatus()
             });
         }
-
         table.setModel(model);
 
-        // Căn giữa nội dung trong các cột
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER); // Căn giữa
-
-        // Áp dụng căn giữa cho tất cả các cột
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+    }
+
+    private void filterByLevel(String level) {
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(tableModel);
+        table.setRowSorter(sorter);
+        if (!level.equals("Tất cả")) {
+            sorter.setRowFilter(RowFilter.regexFilter(level, 2)); // Filter by "Mức độ" column
+        } else {
+            sorter.setRowFilter(null);
         }
     }
 
@@ -316,27 +428,22 @@ public class JPanelAnh extends JPanel {
             contentPanel.add(formInbox);
             contentPanel.revalidate();
             contentPanel.repaint();
-            System.out.println("Quay lại FormInbox!");
         }
     }
 
     private void openAddQuestionPanel() {
-    	  if (contentPanel != null) {
-              JPanel currentPanel = (JPanel) contentPanel.getComponent(0); // Lưu panel hiện tại
-              JPanelThemCauHoi panelThemCauHoi = new JPanelThemCauHoi(contentPanel, currentPanel, tableModel);
+        if (contentPanel != null) {
+            JPanel currentPanel = (JPanel) contentPanel.getComponent(0);
+            JPanelThemCauHoi panelThemCauHoi = new JPanelThemCauHoi(contentPanel, currentPanel, tableModel);
+            contentPanel.removeAll();
+            contentPanel.add(panelThemCauHoi);
+            contentPanel.revalidate();
+            contentPanel.repaint();
+        }
+    }
 
-              contentPanel.removeAll();
-              contentPanel.add(panelThemCauHoi);
-              contentPanel.revalidate();
-              contentPanel.repaint();
-          
-      }
-       
-      }
-
-    private void openEditQuestionPanel() { // Line ~284 from stack trace
+    private void openEditQuestionPanel() {
         int selectedRow = table.getSelectedRow();
-        JPanelAnh currentPanel = (JPanelAnh) contentPanel.getComponent(0);
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn một câu hỏi để sửa!", "Thông báo",
                     JOptionPane.WARNING_MESSAGE);
@@ -344,18 +451,15 @@ public class JPanelAnh extends JPanel {
         }
         int questionID = (int) tableModel.getValueAt(selectedRow, 0);
         QuestionDTO question = questionBUS.getQuestionByID(questionID);
-        JPanelSuaCauHoi suaCauHoiPanel = new JPanelSuaCauHoi(contentPanel, currentPanel, question, tableModel);
-        contentPanel.removeAll();
-        contentPanel.add(suaCauHoiPanel);
-        contentPanel.revalidate();
-        contentPanel.repaint();
-        System.out.println("Chuyển đến giao diện Sửa câu hỏi!");// NPE here because questionBUS is null
         if (question == null) {
             JOptionPane.showMessageDialog(this, "Không tìm thấy câu hỏi!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        // Assuming this refreshes the table
+        JPanelSuaCauHoi suaCauHoiPanel = new JPanelSuaCauHoi(contentPanel, this, question, tableModel);
+        contentPanel.removeAll();
+        contentPanel.add(suaCauHoiPanel);
+        contentPanel.revalidate();
+        contentPanel.repaint();
     }
 
     private void openViewDetailsPanel() {
@@ -381,22 +485,17 @@ public class JPanelAnh extends JPanel {
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
-
         int questionID = (int) tableModel.getValueAt(selectedRow, 0);
-
         int confirm = JOptionPane.showConfirmDialog(this,
                 "Bạn có chắc chắn muốn xóa câu hỏi với ID " + questionID + " không?",
                 "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
-
         if (confirm == JOptionPane.YES_OPTION) {
-        	AnswersDAO answersDAO = new AnswersDAO();
+            AnswersDAO answersDAO = new AnswersDAO();
             answersDAO.deleteAllAnswersByQuestionID(questionID);
             boolean deleted = questionBUS.deleteQuestion(questionID);
             if (deleted) {
-            	QuestionDAO questionDAO = new QuestionDAO();
-            	questionDAO.deleteQuestion(questionID);
+                questionDAO.deleteQuestion(questionID);
                 tableModel.removeRow(selectedRow);
-                
                 JOptionPane.showMessageDialog(this, "Xóa câu hỏi thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
@@ -407,24 +506,13 @@ public class JPanelAnh extends JPanel {
     }
 
     private void findQuestion() {
-    	String keyword = txtCauHoi.getText().trim().toLowerCase();
-		TableRowSorter<TableModel> rowSorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
-		table.setRowSorter(rowSorter);
-
-		if (!keyword.equals("")) {
-			rowSorter.setRowFilter(new RowFilter<TableModel, Integer>() {
-				@Override
-				public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
-					for (int i = 0; i < entry.getValueCount(); i++) {	
-						if (entry.getStringValue(i).toLowerCase().contains(keyword)) {
-							return true; // Có ít nhất một trường khớp với từ khóa
-						}
-					}
-					return false; // Không có trường nào khớp
-				}
-			});
-		} else {
-			rowSorter.setRowFilter(null); // Nếu không nhập gì, hiển thị tất cả dữ liệu
-		}
+        String keyword = txtCauHoi.getText().trim().toLowerCase();
+        TableRowSorter<TableModel> rowSorter = new TableRowSorter<>(tableModel);
+        table.setRowSorter(rowSorter);
+        if (!keyword.isEmpty()) {
+            rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + keyword));
+        } else {
+            rowSorter.setRowFilter(null);
+        }
     }
 }

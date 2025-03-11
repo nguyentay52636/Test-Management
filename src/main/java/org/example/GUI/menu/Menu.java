@@ -27,7 +27,7 @@ public class Menu extends JPanel {
             { "~MAIN~" },
             { "Quản Lý tài khoản" },
             { "Email", "Inbox", "Read", "Compost" },
-            { "Ngân hàng câu hỏi" },
+            { "Quản lý đề thi" },
             { "Chủ đề/Môn học" },
             { "~COMPONENT~" },
             { "Đề thi", "Cropper", "Owl Carousel", "Sweet Alert" },

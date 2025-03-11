@@ -52,19 +52,21 @@ public class FormInbox extends JPanel {
                 add(lblTitle);
 
                 // Subject Buttons in Grid Layout
-                JButton btnAnh = createStyledButton("Tiếng Anh", "/org/example/GUI/resources/images/english_icon.png",
+                JButton btnAnh = createStyledButton("Tiếng Anh",
+                                "/org/example/GUI/resources/imageTopic/english_icon.png",
                                 "Quản lý câu hỏi môn Tiếng Anh");
                 btnAnh.setBounds(150, 200, 220, 120); // Larger for visual impact
                 btnAnh.addActionListener(e -> openJPanelAnh());
                 add(btnAnh);
 
-                JButton btnSu = createStyledButton("Lịch Sử", "/org/example/GUI/resources/images/history_icon.png",
+                JButton btnSu = createStyledButton("Lịch Sử", "/org/example/GUI/resources/imageTopic/history.sql.png",
                                 "Quản lý câu hỏi môn Lịch Sử");
                 btnSu.setBounds(390, 200, 220, 120);
                 btnSu.addActionListener(e -> openJPanelSu());
                 add(btnSu);
 
-                JButton btnDiffer = createStyledButton("Tổng Hợp", "/org/example/GUI/resources/images/general_icon.png",
+                JButton btnDiffer = createStyledButton("Tổng Hợp",
+                                "/org/example/GUI/resources/imageTopic/trangchu_icon.png",
                                 "Quản lý câu hỏi tổng hợp");
                 btnDiffer.setBounds(630, 200, 220, 120);
                 btnDiffer.addActionListener(e -> openJPanelGeneral());
@@ -72,7 +74,7 @@ public class FormInbox extends JPanel {
 
                 // Additional Feature Button
                 JButton btnDashboard = createStyledButton("Trang Chủ",
-                                "/org/example/GUI/resources/images/dashboard_icon.png",
+                                "/org/example/GUI/resources/imageTopic/home_icon.png",
                                 "Xem thống kê và thông tin tổng quan");
                 btnDashboard.setBounds(390, 340, 220, 120);
                 btnDashboard.addActionListener(e -> openDashboard());
