@@ -1,9 +1,9 @@
 package org.example.BUS;
 
 import java.util.List;
-
 import org.example.DAO.TestDAO;
 import org.example.DTO.TestDTO;
+import org.example.DTO.Test_structureDTO;
 
 public class TestBUS {
     private TestDAO testDAO;
@@ -12,18 +12,31 @@ public class TestBUS {
         testDAO = new TestDAO();
     }
 
-    // Lấy danh sách bài thi theo topicID
+
     public List<TestDTO> getTestsByTopicID(int topicID) {
-        return testDAO.getTestsByTopicID(topicID);
+        List<TestDTO> tests = testDAO.getTestsByTopicID(topicID);
+        return tests != null ? tests : List.of(); // Return empty list instead of null
     }
 
-    // Lấy thông tin bài thi theo testCode
     public TestDTO getTestByCode(String testCode) {
         return testDAO.getTestByCode(testCode);
     }
 
-    // // Lấy số lượng câu hỏi của một bài kiểm tra
-    // public int getTotalQuestions(TestDTO test) {
-    //     return test.getNumberEasy() + test.getNumberMedium() + test.getNumberDiff();
-    // }
+    public Test_structureDTO getTestStructureByTestCode(String testCode) {
+        return testDAO.getTestStructureByTestCode(testCode);
+    }
+
+ 
+    public boolean hasUserTakenTest(int userID, String testCode) {
+        if (userID <= 0 || testCode == null || testCode.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            return testDAO.hasUserTakenTest(userID, testCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+         
+            return false;
+        }
+    }
 }

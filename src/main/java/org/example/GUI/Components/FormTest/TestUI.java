@@ -25,18 +25,21 @@ import javax.swing.JPanel;
 import org.example.BUS.TestBUS;
 import org.example.DAO.TestDAO;
 import org.example.DTO.TestDTO;
+import org.example.DTO.Test_structureDTO;
 
 public class TestUI extends JPanel {
     private JPanel contentPanel;
     private JComboBox<String> testComboBox;
     private JLabel timeLabel, questionLabel;
     private List<TestDTO> testList;
+    private List<Test_structureDTO> testStructure ; 
     private TestBUS testBUS;
 
     public TestUI(JPanel contentPanel, int tpID) {
         this.contentPanel = contentPanel;
         this.testBUS = new TestBUS();
         testList = testBUS.getTestsByTopicID(tpID);
+
         initComponents(tpID);
     }
 
@@ -180,11 +183,24 @@ public class TestUI extends JPanel {
         int selectedIndex = testComboBox.getSelectedIndex();
         if (selectedIndex != -1) {
             TestDTO selectedTest = testList.get(selectedIndex);
+            Test_structureDTO testStructure = testBUS.getTestStructureByTestCode(selectedTest.getTestCode());
+    
             timeLabel.setText("Thời gian: " + selectedTest.getTestTime() + " phút");
-            int totalQuestions = selectedTest.getNumberEasy() + selectedTest.getNumberMedium() + selectedTest.getNumberDiff();
-            questionLabel.setText("Số lượng câu hỏi: " + totalQuestions);
+    
+            if (testStructure != null) {
+                int totalQuestions = testStructure.getNumberEasy() 
+                                   + testStructure.getNumberMedium() 
+                                   + testStructure.getNumberDiff();
+                questionLabel.setText("Số lượng câu hỏi: " + totalQuestions);
+            } else {
+                questionLabel.setText("Không có dữ liệu số câu hỏi!");
+            }
+        } else {
+            questionLabel.setText("Vui lòng chọn một bài kiểm tra!");
         }
     }
+    
+    
 
     private void backToTestForm() {
         if (contentPanel != null) {

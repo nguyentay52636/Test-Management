@@ -7,6 +7,7 @@ public class Test_structureDTO {
     private int numberMedium;
     private int numberDiff;
 
+public Test_structureDTO() {}
     public Test_structureDTO(String testCode, int tpID, int numberEasy, int numberMedium, int numberDiff) {
         this.testCode = testCode;
         this.tpID = tpID;

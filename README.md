@@ -7,4 +7,5 @@ initMenuEvent(MainForm.java) call Components Modules
   <img src="./bio.jpg" alt="Mô tả ảnh" width="500">
 </p>
 step 1 : mvm clean install 
-step2 : run Main : mvn exec:java -Dexec.mainClass="com.example.Main
+step2 : close visual studio code , after open visual studio code
+step3 : run Main : mvn exec:java -Dexec.mainClass="com.example.MainPfor

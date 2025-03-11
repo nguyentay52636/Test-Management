@@ -171,21 +171,17 @@ public class ResultForm extends JDialog {
 
         JButton backButton = createStyledButton("Trở lại", new Color(231, 76, 60), Color.WHITE);
         backButton.addActionListener(e -> {
-            if (contentPanel != null) {
-                contentPanel.removeAll();
-                contentPanel.setLayout(new BorderLayout());
-                TestForm examForm = new TestForm(contentPanel);
-                contentPanel.add(examForm, BorderLayout.CENTER);
-                contentPanel.revalidate();
-                contentPanel.repaint();
+            if (this.contentPanel != null) {
+                this.contentPanel.removeAll();
+                this.contentPanel.setLayout(new BorderLayout());
+                TestForm examForm = new TestForm(this.contentPanel); // Ensure TestForm is defined
+                this.contentPanel.add(examForm, BorderLayout.CENTER);
+                this.contentPanel.revalidate();
+                this.contentPanel.repaint();
             }
             dispose();
         });
         buttonPanel.add(backButton);
-
-        JButton closeButton = createStyledButton("Đóng", new Color(108, 117, 125), Color.WHITE);
-        closeButton.addActionListener(e -> dispose());
-        buttonPanel.add(closeButton);
     }
 
     private JButton createStyledButton(String text, Color bgColor, Color fgColor) {

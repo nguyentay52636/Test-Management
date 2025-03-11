@@ -215,11 +215,9 @@ public class DialogAddAccount extends JFrame {
             String fullName = txtFullName.getText();
             String pass = txPassword.getText();
             String maquyen = roleComboBox.getSelectedItem().toString();
+            System.out.println(maquyen);
 
             Boolean isAdmin = "Admin".equalsIgnoreCase(maquyen);
-            UserBUS accountBUS = new UserBUS();
-            boolean emailExists = false;
-            boolean usernameExists = false;
             int UserID = 0;
             if (tkSua != null) {
                 UserID = tkSua.getUserID();

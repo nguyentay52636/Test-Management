@@ -12,6 +12,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -41,7 +42,7 @@ import org.example.GUI.FormDialog.DialogUser.DialogAddAccount;
 import org.example.Utils.importExcel;
 
 /**
- * @author m1lt43
+ * @author TayDev
  */
 public class FormManagerAccount extends JPanel {
     UserBUS userBUS = new UserBUS();
@@ -498,22 +499,99 @@ public class FormManagerAccount extends JPanel {
         
     
 
- btnImport.addActionListener(new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent actionEvent) {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setDialogTitle("Chọn file Excel");
-        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel Files", "xlsx"));
-
-        int returnValue = fileChooser.showOpenDialog(null);
-        if (returnValue == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            ArrayList<UsersDTO> users  = importExcel.readUsersExcel(selectedFile.getAbsolutePath());
-          setDataToTable(users);
-        }
-    }
-});
+        btnImport.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fileChooser.setDialogTitle("Chọn file Excel");
+                fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel Files", "xlsx"));
+        
+                int returnValue = fileChooser.showOpenDialog(null);
+                if (returnValue == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    try {
+                        // Read users from Excel
+                        ArrayList<UsersDTO> importedUsers = importExcel.readUsersExcel(selectedFile.getAbsolutePath());
+                        if (importedUsers.isEmpty()) {
+                            JOptionPane.showMessageDialog(null, "Không có dữ liệu người dùng trong file Excel!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
+        
+                        UserBUS userBUS = new UserBUS();
+                        List<UsersDTO> existingUsers = userBUS.getListAccount();
+                        List<UsersDTO> usersToAdd = new ArrayList<>();
+                        StringBuilder duplicateMessage = new StringBuilder();
+                        StringBuilder successMessage = new StringBuilder();
+                        int duplicateCount = 0;
+                        int successCount = 0;
+        
+                        // Check for duplicates and prepare users to add
+                        for (UsersDTO importedUser : importedUsers) {
+                            boolean isDuplicate = false;
+                            for (UsersDTO existingUser : existingUsers) {
+                                if (existingUser.getUserName().equals(importedUser.getUserName()) ||
+                                    existingUser.getUserEmail().equals(importedUser.getUserEmail())) {
+                                    isDuplicate = true;
+                                    duplicateCount++;
+                                    duplicateMessage.append("Người dùng ").append(importedUser.getUserName())
+                                            .append(" (Email: ").append(importedUser.getUserEmail())
+                                            .append(") đã tồn tại.\n");
+                                    break;
+                                }
+                            }
+        
+                            if (!isDuplicate) {
+                                // Assign a new userID (find the max ID and increment)
+                                int maxId = existingUsers.stream()
+                                        .mapToInt(UsersDTO::getUserID)
+                                        .max()
+                                        .orElse(0);
+                                importedUser.setUserID(maxId + 1);
+                                usersToAdd.add(importedUser);
+                            }
+                        }
+        
+                        // Add non-duplicate users to the database
+                        for (UsersDTO userToAdd : usersToAdd) {
+                            if (userBUS.insertUser(userToAdd)) {
+                                successCount++;
+                                successMessage.append("Đã thêm người dùng ").append(userToAdd.getUserName())
+                                        .append(" (Email: ").append(userToAdd.getUserEmail()).append(").\n");
+                                existingUsers.add(userToAdd); // Update the in-memory list
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Lỗi khi thêm người dùng " + userToAdd.getUserName(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+        
+                        // Display results
+                        StringBuilder finalMessage = new StringBuilder();
+                        if (duplicateCount > 0) {
+                            finalMessage.append("Có ").append(duplicateCount).append(" người dùng đã tồn tại:\n")
+                                    .append(duplicateMessage.toString()).append("\n");
+                        }
+                        if (successCount > 0) {
+                            finalMessage.append("Đã thêm thành công ").append(successCount).append(" người dùng:\n")
+                                    .append(successMessage.toString());
+                        }
+                        if (duplicateCount == 0 && successCount == 0) {
+                            finalMessage.append("Không có người dùng nào được thêm!");
+                        }
+        
+                        JOptionPane.showMessageDialog(null, finalMessage.toString(), "Kết quả nhập dữ liệu", 
+                                (successCount > 0 ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.WARNING_MESSAGE));
+        
+                        // Update the table with the current data
+                        setDataToTable(new ArrayList<>(existingUsers));
+        
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(null, "Lỗi khi nhập dữ liệu từ file Excel: " + e.getMessage(), 
+                                "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
 
 
       

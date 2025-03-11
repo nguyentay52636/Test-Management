@@ -48,7 +48,7 @@ public class QuizUI extends JPanel {
     private Timer countdownTimer;
     private int remainingTime;
     private String testCode;
-    private List<Integer> userAnswers = new ArrayList<>();
+    private List<Integer> userAnswers;
     private QuizBUS quizBUS;
     private UsersDTO currentUser;
     private int initialTime;
@@ -59,7 +59,9 @@ public class QuizUI extends JPanel {
         this.contentPanel = contentPanel;
         this.quizBUS = new QuizBUS();
         this.currentUser = SessionManager.getCurrentUser();
-        System.out.println(currentUser);
+        this.userAnswers = new ArrayList<>(10);
+
+        System.out.println("Current User: " + currentUser);
         if (currentUser == null) {
             JOptionPane.showMessageDialog(this, "Lỗi: Không tìm thấy thông tin người dùng!", "Lỗi",
                     JOptionPane.ERROR_MESSAGE);
@@ -76,6 +78,10 @@ public class QuizUI extends JPanel {
         TestDTO testInfo = testDAO.getTestByCode(testCode);
         remainingTime = (testInfo != null) ? testInfo.getTestTime() * 60 : 600;
         initialTime = remainingTime;
+
+        for (int i = 0; i < totalQuestions; i++) {
+            userAnswers.add(-1);
+        }
 
         if (!questions.isEmpty()) {
             loadQuestion(currentIndex);
@@ -261,6 +267,9 @@ public class QuizUI extends JPanel {
                 answerButtons[i].setText(answers.get(i).getAwContent());
                 answerButtons[i].setVisible(true);
                 answerButtons[i].setActionCommand(String.valueOf(answers.get(i).getAwID()));
+                if (userAnswers.get(index) != -1 && userAnswers.get(index) == answers.get(i).getAwID()) {
+                    answerButtons[i].setSelected(true);
+                }
             } else {
                 answerButtons[i].setVisible(false);
             }
@@ -274,23 +283,47 @@ public class QuizUI extends JPanel {
             loadQuestion(currentIndex);
         } else {
             JOptionPane.showMessageDialog(this, "Bạn đã hoàn thành bài kiểm tra!");
+    
+            // Calculate results when quiz is completed
+            int correctCount = 0;
+            for (int i = 0; i < questions.size(); i++) {
+                int userAnswerID = userAnswers.get(i);
+                int correctAnswerID = quizBUS.getCorrectAnswerByQuestionID(questions.get(i).getQuestionID());
+                if (userAnswerID != -1 && userAnswerID == correctAnswerID) {
+                    correctCount++;
+                }
+            }
+            double score = ((double) correctCount / questions.size()) * 10.0;
+            LocalDate today = LocalDate.now();
+            boolean success = quizBUS.saveQuizResult(currentUser.getUserID(), testCode, questions, userAnswers, score, today);
+            int timeTakenSeconds = initialTime - remainingTime;
+            String timeTaken = String.format("%d:%02d", timeTakenSeconds / 60, timeTakenSeconds % 60);
+    
+            if (countdownTimer != null) {
+                countdownTimer.stop(); // Stop the timer when quiz ends
+            }
+    
+            if (contentPanel != null) {
+                ResultForm resultForm = new ResultForm(contentPanel, success, score, correctCount, totalQuestions, 
+                    currentUser, testCode, initialTime, remainingTime, timeTaken);
+                resultForm.setVisible(true); // Display the dialog
+            }
         }
     }
 
     private void saveUserAnswer() {
-        userAnswers.clear();
-        for (int i = 0; i < questions.size(); i++) {
-            boolean answered = false;
-            for (JRadioButton btn : answerButtons) {
-                if (btn.isSelected() && Integer.parseInt(btn.getActionCommand()) == questions.get(i).getQuestionID()) {
-                    userAnswers.add(Integer.parseInt(btn.getActionCommand()));
-                    answered = true;
-                    break;
-                }
+        JRadioButton selectedButton = null;
+        for (JRadioButton btn : answerButtons) {
+            if (btn.isSelected()) {
+                selectedButton = btn;
+                break;
             }
-            if (!answered) {
-                userAnswers.add(-1);
-            }
+        }
+        if (selectedButton != null) {
+            int selectedAnswerID = Integer.parseInt(selectedButton.getActionCommand());
+            userAnswers.set(currentIndex, selectedAnswerID);
+        } else {
+            userAnswers.set(currentIndex, -1);
         }
     }
 
@@ -298,33 +331,37 @@ public class QuizUI extends JPanel {
         if (countdownTimer != null) {
             countdownTimer.stop();
         }
-
+    
         saveUserAnswer();
-
+    
         int correctCount = 0;
-        if (userAnswers.size() < questions.size()) {
-            JOptionPane.showMessageDialog(this, "Lỗi: Dữ liệu câu trả lời không đủ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         for (int i = 0; i < questions.size(); i++) {
+            int userAnswerID = userAnswers.get(i);
             int correctAnswerID = quizBUS.getCorrectAnswerByQuestionID(questions.get(i).getQuestionID());
-            if (userAnswers.get(i) == correctAnswerID) {
+            System.out.println("Question " + (i + 1) + ": User Answer = " + userAnswerID + ", Correct Answer = " + correctAnswerID);
+            if (userAnswerID != -1 && userAnswerID == correctAnswerID) {
                 correctCount++;
             }
         }
-
+    
         double score = ((double) correctCount / questions.size()) * 10.0;
         LocalDate today = LocalDate.now();
-        boolean success = quizBUS.saveQuizResult(currentUser.getUserID(), testCode, questions, userAnswers, score,
-                today);
-
+        boolean success = quizBUS.saveQuizResult(currentUser.getUserID(), testCode, questions, userAnswers, score, today);
+    
         int timeTakenSeconds = initialTime - remainingTime;
         String timeTaken = String.format("%d:%02d", timeTakenSeconds / 60, timeTakenSeconds % 60);
-
-        ResultForm resultForm = new ResultForm(contentPanel, success, score, correctCount, totalQuestions, currentUser,
-                testCode, initialTime, remainingTime, timeTaken);
-        resultForm.setVisible(true);
+    
+        // JOptionPane.showMessageDialog(this, 
+        //     "Kết quả: " + correctCount + "/" + totalQuestions + "\nĐiểm: " + String.format("%.2f", score), 
+        //     "Kết quả bài kiểm tra", 
+        //     JOptionPane.INFORMATION_MESSAGE);
+    
+        if (contentPanel != null) {
+       
+            ResultForm resultForm = new ResultForm(contentPanel, success, score, correctCount, totalQuestions, 
+                currentUser, testCode, initialTime, remainingTime, timeTaken);
+            resultForm.setVisible(true); // Display the dialog
+        }
     }
 
     private void startCountdown() {
@@ -341,5 +378,20 @@ public class QuizUI extends JPanel {
             }
         });
         countdownTimer.start();
+    }
+
+    // Main method for testing
+    public static void main(String[] args) {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            javax.swing.JFrame frame = new javax.swing.JFrame("Quiz UI Test");
+            frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+            JPanel contentPanel = new JPanel();
+            frame.setContentPane(contentPanel);
+            contentPanel.setLayout(new BorderLayout());
+            contentPanel.add(new QuizUI("TEST001", contentPanel), BorderLayout.CENTER);
+            frame.setSize(800, 600);
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
     }
 }
