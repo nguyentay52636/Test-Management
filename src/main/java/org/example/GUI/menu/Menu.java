@@ -31,10 +31,10 @@ public class Menu extends JPanel {
             { "Chủ đề/Môn học" },
             { "~COMPONENT~" },
             { "Đề thi", "Cropper", "Owl Carousel", "Sweet Alert" },
-            { "Bài thi", "Basic Elements", "Advanced Elements", "Editors", "Wizard" },
+            { "Bài thi" },
             { "~OTHER~" },
-            { "Thống kê", "Apex", "Flot", "Peity", "Sparkline" },
-            { "Cài đặt tài khoản", "Đổi mật khẩu ", "Xem chi tiết tài khoản", "Mdi Icons" },
+            { "Thống kê" },
+            { "Cài đặt tài khoản", "Đổi mật khẩu ", "Xem chi tiết tài khoản" },
             { "Special Pages", "Blank page", "Faq", "Invoice", "Profile", "Pricing", "Timeline" },
             { "Đăng xuất" }
     };

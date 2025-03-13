@@ -18,6 +18,7 @@ import org.example.DTO.UsersDTO;
 import org.example.GUI.Application.Application;
 import org.example.GUI.Components.FormAccount.FormManagerAccount;
 import org.example.GUI.Components.FormAccount.UserDetailForm;
+import org.example.GUI.Components.FormDashBoard.FormDashboard;
 import org.example.GUI.Components.FormTest.TestForm;
 import org.example.GUI.Components.FormTest.TestManagementPanel;
 import org.example.GUI.FormDialog.DiaLogForgetPass.DiaLogChangePass;
@@ -35,7 +36,8 @@ public class MainForm extends JLayeredPane {
         this.currentUser = currentUser;
         FlatLightLaf.setup();
         init();
-        showForm(new BeginForm("Chào mừng đến với quản lý thi trắc nghiệm")); // Display BeginForm by default
+        showForm(new BeginForm("Chào mừng đến với quản lý thi trắc nghiệm"));
+        // Display BeginForm by default
 
     }
 
@@ -81,25 +83,23 @@ public class MainForm extends JLayeredPane {
     // goi thanh phan
     private void initMenuEvent() {
         menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
-
+            showForm(new BeginForm("Chào mừng đến với quản lý thi trắc nghiệm"));
             if (index == 0) {
                 if (!isAdmin()) {
                     Application.showForm(new FormManagerAccount());
                 }
 
             } else if (index == 1) {
-                if (subIndex == 1) {
 
-                } else if (subIndex == 2) {
-                    Application.showForm(new TestForm(panelBody));
-
-                } else {
-                    action.cancel();
-                }
             } else if (index == 2) {
                 Application.showForm(new FormInbox(panelBody));
             } else if (index == 3) {
                 Application.showForm(new TestManagementPanel());
+            } else if (index == 5) {
+                Application.showForm(new TestForm(panelBody));
+            } else if (index == 6) {
+                Application.showForm(new FormDashboard());
+
             } else if (index == 7) {
                 if (subIndex == 1) {
                     Application.showForm(new DiaLogChangePass("alo,"));
@@ -206,4 +206,5 @@ public class MainForm extends JLayeredPane {
             }
         }
     }
+
 }

@@ -8,8 +8,7 @@ import org.example.DTO.UsersDTO;
 public class UserBUS {
     private static ArrayList<UsersDTO> listAccount = new ArrayList<>();
     private UserDAO userDAO = new UserDAO();
-    private static String currentUserName; 
-    
+    private static String currentUserName;
 
     public UserBUS() {
         listAccount = userDAO.getAllUsers();
@@ -38,6 +37,7 @@ public class UserBUS {
     public boolean register(UsersDTO user) {
         return userDAO.signUp(user);
     }
+
     public UsersDTO getUser(String userName) {
         for (UsersDTO user : listAccount) {
             if (user.getUserName().equals(userName)) {
@@ -77,33 +77,32 @@ public class UserBUS {
         }
         return false;
     }
+
     public Boolean insertUsers(ArrayList<UsersDTO> users) {
         boolean allInserted = true;
-        
-       
+
         for (UsersDTO user : users) {
             if (userDAO.checkIfUserExists(user.getUserName(), user.getUserEmail())) {
-                allInserted = false; 
-                return false; 
+                allInserted = false;
+                return false;
             }
         }
         if (allInserted) {
             boolean inserted = userDAO.addUsersBatch(users);
             if (inserted) {
-                listAccount.addAll(users); 
+                listAccount.addAll(users);
             } else {
                 allInserted = false;
             }
         }
-        
+
         return allInserted;
     }
-    
-    
 
     public String[] getHeaders() {
         return new String[] { "Tên người dùng", "Email", "Mật khẩu", "Tên dầy đủ ", "Vai trò" };
     }
+
     public static ArrayList<UsersDTO> search(String keyword, String type) {
         ArrayList<UsersDTO> result = new ArrayList<>();
         listAccount.forEach((user) -> {
@@ -133,18 +132,19 @@ public class UserBUS {
                     }
                     break;
                 case "Mật khẩu":
-                    if ( user.getUserPassword().toLowerCase().contains(keyword.toLowerCase())) {
+                    if (user.getUserPassword().toLowerCase().contains(keyword.toLowerCase())) {
                         result.add(user);
                     }
                     break;
                 case "Họ và tên":
-                    if ( user.getUserFullName().toString().toLowerCase().contains(keyword.toLowerCase())) {
+                    if (user.getUserFullName().toString().toLowerCase().contains(keyword.toLowerCase())) {
                         result.add(user);
                     }
                     break;
             }
-           
+
         });
         return result;
     }
+
 }

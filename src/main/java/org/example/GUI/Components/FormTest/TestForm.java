@@ -75,7 +75,7 @@ public class TestForm extends JPanel {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
-
+        // display danh sach topic
         TopicBUS topicsBUS = new TopicBUS();
         List<TopicsDTO> topicsList = topicsBUS.getAllTopics();
 
@@ -179,76 +179,81 @@ public class TestForm extends JPanel {
         }
     }
     // private void openExamUI(int topicID) {
-    //     if (contentPanel == null) {
-    //         JOptionPane.showMessageDialog(this, "Không thể mở giao diện bài thi: contentPanel chưa được khởi tạo!", 
-    //                 "Lỗi", JOptionPane.ERROR_MESSAGE);
-    //         return;
-    //     }
-    
-    //     TestBUS testBUS = new TestBUS();
-    //     List<TestDTO> testList = testBUS.getTestsByTopicID(topicID);
-    
-    //     if (testList == null || testList.isEmpty()) {
-    //         JOptionPane.showMessageDialog(this, "Không có bài thi nào cho chủ đề này!", 
-    //                 "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-    //         return;
-    //     }
-    
-    //     // Check test structure
-    //     for (TestDTO test : testList) {
-    //         if (test.getTestStructure() == null) {
-    //             JOptionPane.showMessageDialog(this, "Cấu trúc bài thi '" + test.getTestCode() + "' chưa được khởi tạo!", 
-    //                     "Lỗi", JOptionPane.ERROR_MESSAGE);
-    //             return;
-    //         }
-    //     }
-    
-    //     int userID = getCurrentUserID();
-    //     if (userID <= 0) {
-    //         JOptionPane.showMessageDialog(this, "Không thể xác định người dùng hiện tại!", 
-    //                 "Lỗi", JOptionPane.ERROR_MESSAGE);
-    //         return;
-    //     }
-    
-    //     // Filter available tests
-    //     String[] testOptions = testList.stream()
-    //             .filter(test -> !testBUS.hasUserTakenTest(userID, test.getTestCode()))
-    //             .map(TestDTO::getTitle)
-    //             .toArray(String[]::new);
-    
-    //     if (testOptions.length == 0) {
-    //         JOptionPane.showMessageDialog(this, "Bạn đã hoàn thành tất cả bài thi!", 
-    //                 "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-    //         return;
-    //     }
-    
-    //     String selectedTitle = (String) JOptionPane.showInputDialog(this, "Chọn bài thi:", 
-    //             "Bài thi khả dụng", JOptionPane.QUESTION_MESSAGE, null, testOptions, testOptions[0]);
-    
-    //     if (selectedTitle == null) {
-    //         return; // User canceled
-    //     }
-    
-    //     TestDTO selectedTest = testList.stream()
-    //             .filter(test -> test.getTitle().equals(selectedTitle))
-    //             .findFirst()
-    //             .orElse(null);
-    
-    //     if (selectedTest == null) {
-    //         JOptionPane.showMessageDialog(this, "Không tìm thấy bài thi đã chọn!", 
-    //                 "Lỗi", JOptionPane.ERROR_MESSAGE);
-    //         return;
-    //     }
-    
-    //     TestUI examUI = new TestUI(contentPanel, topicID); // Updated constructor
-    //     contentPanel.removeAll();
-    //     contentPanel.setLayout(new BorderLayout());
-    //     contentPanel.add(examUI, BorderLayout.CENTER);
-    //     contentPanel.revalidate();
-    //     contentPanel.repaint();
+    // if (contentPanel == null) {
+    // JOptionPane.showMessageDialog(this, "Không thể mở giao diện bài thi:
+    // contentPanel chưa được khởi tạo!",
+    // "Lỗi", JOptionPane.ERROR_MESSAGE);
+    // return;
     // }
-   
-       private int getCurrentUserID() {
+
+    // TestBUS testBUS = new TestBUS();
+    // List<TestDTO> testList = testBUS.getTestsByTopicID(topicID);
+
+    // if (testList == null || testList.isEmpty()) {
+    // JOptionPane.showMessageDialog(this, "Không có bài thi nào cho chủ đề này!",
+    // "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+    // return;
+    // }
+
+    // // Check test structure
+    // for (TestDTO test : testList) {
+    // if (test.getTestStructure() == null) {
+    // JOptionPane.showMessageDialog(this, "Cấu trúc bài thi '" + test.getTestCode()
+    // + "' chưa được khởi tạo!",
+    // "Lỗi", JOptionPane.ERROR_MESSAGE);
+    // return;
+    // }
+    // }
+
+    // int userID = getCurrentUserID();
+    // if (userID <= 0) {
+    // JOptionPane.showMessageDialog(this, "Không thể xác định người dùng hiện
+    // tại!",
+    // "Lỗi", JOptionPane.ERROR_MESSAGE);
+    // return;
+    // }
+
+    // // Filter available tests
+    // String[] testOptions = testList.stream()
+    // .filter(test -> !testBUS.hasUserTakenTest(userID, test.getTestCode()))
+    // .map(TestDTO::getTitle)
+    // .toArray(String[]::new);
+
+    // if (testOptions.length == 0) {
+    // JOptionPane.showMessageDialog(this, "Bạn đã hoàn thành tất cả bài thi!",
+    // "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+    // return;
+    // }
+
+    // String selectedTitle = (String) JOptionPane.showInputDialog(this, "Chọn bài
+    // thi:",
+    // "Bài thi khả dụng", JOptionPane.QUESTION_MESSAGE, null, testOptions,
+    // testOptions[0]);
+
+    // if (selectedTitle == null) {
+    // return; // User canceled
+    // }
+
+    // TestDTO selectedTest = testList.stream()
+    // .filter(test -> test.getTitle().equals(selectedTitle))
+    // .findFirst()
+    // .orElse(null);
+
+    // if (selectedTest == null) {
+    // JOptionPane.showMessageDialog(this, "Không tìm thấy bài thi đã chọn!",
+    // "Lỗi", JOptionPane.ERROR_MESSAGE);
+    // return;
+    // }
+
+    // TestUI examUI = new TestUI(contentPanel, topicID); // Updated constructor
+    // contentPanel.removeAll();
+    // contentPanel.setLayout(new BorderLayout());
+    // contentPanel.add(examUI, BorderLayout.CENTER);
+    // contentPanel.revalidate();
+    // contentPanel.repaint();
+    // }
+
+    private int getCurrentUserID() {
         return SessionManager.getCurrentUser().getUserID();
     }
 }

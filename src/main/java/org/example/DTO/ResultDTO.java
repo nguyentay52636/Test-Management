@@ -3,30 +3,17 @@ package org.example.DTO;
 import java.util.Date;
 
 public class ResultDTO {
-    private Boolean rsNum;
+    private int rsNum;
     private int userID;
     private String exCode;
     private String rsAnswers;
     private float rsMark;
-    private Date dateTime;
 
-    public ResultDTO() {
-    }
-
-    public ResultDTO(Boolean rsNum, int userID, String exCode, String rsAnswers, float rsMark, Date dateTime) {
-        this.rsNum = rsNum;
-        this.userID = userID;
-        this.exCode = exCode;
-        this.rsAnswers = rsAnswers;
-        this.rsMark = rsMark;
-        this.dateTime = dateTime;
-    }
-
-    public Boolean getRsNum() {
+    public int getRsNum() {
         return rsNum;
     }
 
-    public void setRsNum(Boolean rsNum) {
+    public void setRsNum(int rsNum) {
         this.rsNum = rsNum;
     }
 
@@ -70,15 +57,23 @@ public class ResultDTO {
         this.dateTime = dateTime;
     }
 
-    @Override
-    public String toString() {
-        return "ResultDTO{" +
-                "rsNum=" + rsNum +
-                ", userID=" + userID +
-                ", exCode='" + exCode + '\'' +
-                ", rsAnswers='" + rsAnswers + '\'' +
-                ", rsMark=" + rsMark +
-                ", dateTime=" + dateTime +
-                '}';
+    private Date dateTime;
+
+    public ResultDTO(int rsNum, int userID, String exCode, String rsAnswers, float rsMark, Date dateTime) {
+        this.rsNum = rsNum;
+        this.userID = userID;
+        this.exCode = exCode;
+        this.rsAnswers = rsAnswers;
+        this.rsMark = rsMark;
+        this.dateTime = dateTime;
     }
+
+    public ResultDTO(int rsNum, int userID, String exCode, float rsMark, Date dateTime) {
+        this.rsNum = rsNum;
+        this.userID = userID;
+        this.exCode = exCode;
+        this.rsMark = rsMark;
+        this.dateTime = dateTime;
+    }
+
 }

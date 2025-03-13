@@ -202,34 +202,36 @@ public class UserDAO {
         return false;
 
     }
+
     public boolean addUsersBatch(ArrayList<UsersDTO> users) {
         String sql = "INSERT INTO users (userName, userEmail, userPassword, userFullName, isAdmin) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = UtilsJDBC.getConnectDB();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-    
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             for (UsersDTO user : users) {
                 stmt.setString(1, user.getUserName());
                 stmt.setString(2, user.getUserEmail());
                 stmt.setString(3, user.getUserPassword());
                 stmt.setString(4, user.getUserFullName());
                 stmt.setBoolean(5, user.getIsAdmin());
-                stmt.addBatch(); 
+                stmt.addBatch();
             }
-    
-            int[] affectedRows = stmt.executeBatch(); 
-            return affectedRows.length == users.size(); 
-    
+
+            int[] affectedRows = stmt.executeBatch();
+            return affectedRows.length == users.size();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
     }
+
     public boolean checkIfUserExists(String userName, String userEmail) {
         String sql = "SELECT COUNT(*) FROM users WHERE userName = ? OR userEmail = ?";
         try {
             Connection conn = UtilsJDBC.getConnectDB();
             PreparedStatement stmt = conn.prepareStatement(sql);
-               stmt.setString(1, userName);
+            stmt.setString(1, userName);
             stmt.setString(2, userEmail);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -240,5 +242,20 @@ public class UserDAO {
         }
         return false;
     }
-    
+
+    public String getUserFullName(int userID) {
+        String query = "SELECT userFullName FROM user WHERE userID = ?";
+        try (Connection conn = UtilsJDBC.getConnectDB();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, userID);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("userFullName");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "Unknown User";
+    }
 }
