@@ -41,7 +41,9 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.example.BUS.AnswersBUS;
 import org.example.BUS.ExamBUS;
+import org.example.BUS.QuestionBUS;
 import org.example.ConnectDB.UtilsJDBC;
 import org.example.DTO.ExamsDTO;
 import org.example.GUI.FormDialog.DialogTest.DialogAddTest;
@@ -54,16 +56,18 @@ public class TestManagementPanel extends JPanel {
     private JButton btnAddExam, btnAddTopic, btnViewDetails, btnDeleteExam, btnExportExcel, btnSearch;
     private List<Exam> examList;
     private ExamBUS examBUS;
+    private QuestionBUS questionBUS;
+    private AnswersBUS answersBUS;
 
     // Lớp Exam để hiển thị dữ liệu trong bảng
     public static class Exam {
-        private int id; // testID từ bảng test
-        private String title; // testTitle từ bảng test
-        private String topic; // tpTitle từ bảng topics
-        private String date; // testDate từ bảng test
-        private String testCode; // testCode từ bảng test
-        private int topicStatus; // tpStatus từ bảng topics
-        private String exCode; // exCode từ bảng exams
+        private int id;
+        private String title;
+        private String topic;
+        private String date;
+        private String testCode;
+        private int topicStatus;
+        private String exCode;
 
         public Exam(int id, String title, String topic, String date, String testCode, int topicStatus, String exCode) {
             this.id = id;
@@ -119,6 +123,8 @@ public class TestManagementPanel extends JPanel {
     public TestManagementPanel() {
         examList = new ArrayList<>();
         examBUS = new ExamBUS();
+        questionBUS = new QuestionBUS();
+        answersBUS = new AnswersBUS();
         setBackground(new Color(240, 242, 245));
         setLayout(new BorderLayout(10, 10));
         setBorder(new EmptyBorder(15, 15, 15, 15));
@@ -177,9 +183,9 @@ public class TestManagementPanel extends JPanel {
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
         btnAddExam.addActionListener(e -> addExam());
-        btnAddTopic.addActionListener(e -> addTopic());
+        // btnAddTopic.addActionListener(e -> addTopic());
         btnViewDetails.addActionListener(e -> viewExamDetails());
-        btnDeleteExam.addActionListener(e -> deleteExam());
+        // btnDeleteExam.addActionListener(e -> deleteExam());
         btnExportExcel.addActionListener(e -> exportToExcel());
         btnSearch.addActionListener(e -> searchExams());
 
@@ -202,9 +208,9 @@ public class TestManagementPanel extends JPanel {
 
         contentPanel.add(toolbarPanel, BorderLayout.NORTH);
 
-        // Tablesf
+        // Table
         tableModel = new DefaultTableModel(
-                new Object[] { "ID", "Tên đề thi", "Chủ Đề", "Ngày Thi", "Trạng Thái Chủ Đề", "Mã Đề" }, 0) {
+                new Object[] { "ID", "Tên Đề Thi", "Chủ Đề", "Ngày Thi", "Trạng Thái Chủ Đề", "Mã Đề" }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -313,10 +319,11 @@ public class TestManagementPanel extends JPanel {
         Exam newExam = dialog.getNewExam();
         if (newExam != null) {
             try (Connection conn = UtilsJDBC.getConnectDB()) {
-                String testCode = "TEST" + String.format("%03d", newExam.getId());
+                String testCode = "TEST" + String.format("%03d", examList.size() + 1);
                 PreparedStatement psTest = conn.prepareStatement(
                         "INSERT INTO test (testCode, testTitle, testTime, testLimit, testDate, testStatus) " +
-                                "VALUES (?, ?, ?, ?, ?, ?)");
+                                "VALUES (?, ?, ?, ?, ?, ?)",
+                        PreparedStatement.RETURN_GENERATED_KEYS);
                 psTest.setString(1, testCode);
                 psTest.setString(2, newExam.getTitle());
                 psTest.setInt(3, 10);
@@ -324,6 +331,12 @@ public class TestManagementPanel extends JPanel {
                 psTest.setString(5, newExam.getDate());
                 psTest.setInt(6, 1);
                 psTest.executeUpdate();
+
+                ResultSet generatedKeys = psTest.getGeneratedKeys();
+                int testId = 0;
+                if (generatedKeys.next()) {
+                    testId = generatedKeys.getInt(1);
+                }
 
                 PreparedStatement psStructure = conn.prepareStatement(
                         "INSERT INTO test_structure (testCode, tpID, numberEasy, numberMedium, numberDiff) " +
@@ -335,6 +348,12 @@ public class TestManagementPanel extends JPanel {
                 psStructure.setInt(5, 2);
                 psStructure.executeUpdate();
 
+                String exCode = testCode + "A";
+                ExamsDTO examDTO = new ExamsDTO(testCode, "1", exCode, "");
+                // examBUS.addExam(examDTO);
+
+                newExam = new Exam(testId, newExam.getTitle(), newExam.getTopic(), newExam.getDate(), testCode, 1,
+                        exCode);
                 examList.add(newExam);
                 refreshTable(examList);
                 JOptionPane.showMessageDialog(this, "Đã thêm kỳ thi mới!", "Thành Công",
@@ -346,77 +365,83 @@ public class TestManagementPanel extends JPanel {
         }
     }
 
-    private void addTopic() {
-        String topic = JOptionPane.showInputDialog(this, "Nhập tên chủ đề mới:");
-        if (topic != null && !topic.trim().isEmpty()) {
-            try (Connection conn = UtilsJDBC.getConnectDB();
-                    PreparedStatement ps = conn.prepareStatement(
-                            "INSERT INTO topics (tpTitle, tpParent, tpStatus) VALUES (?, 0, 1)")) {
-                ps.setString(1, topic);
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(this, "Đã thêm chủ đề '" + topic + "'", "Thành Công",
-                        JOptionPane.INFORMATION_MESSAGE);
-                loadExamDataFromDB();
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Lỗi thêm chủ đề: " + e.getMessage(), "Lỗi",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
+    // private void addTopic() {
+    // String topic = JOptionPane.showInputDialog(this, "Nhập tên chủ đề mới:");
+    // if (topic != null && !topic.trim().isEmpty()) {
+    // try (Connection conn = UtilsJDBC.getConnectDB();
+    // PreparedStatement ps = conn.prepareStatement(
+    // "INSERT INTO topics (tpTitle, tpParent, tpStatus) VALUES (?, 0, 1)")) {
+    // ps.setString(1, topic);
+    // ps.executeUpdate();
+    // JOptionPane.showMessageDialog(this, "Đã thêm chủ đề '" + topic + "'", "Thành
+    // Công",
+    // JOptionPane.INFORMATION_MESSAGE);
+    // loadExamDataFromDB();
+    // } catch (SQLException e) {
+    // JOptionPane.showMessageDialog(this, "Lỗi thêm chủ đề: " + e.getMessage(),
+    // "Lỗi",
+    // JOptionPane.ERROR_MESSAGE);
+    // }
+    // }
+    // }
 
     private void viewExamDetails() {
         int selectedRow = examTable.getSelectedRow();
         if (selectedRow >= 0) {
             Exam selectedExam = examList.get(selectedRow);
-            try {
-                ExamsDTO examDTO = examBUS.getExamByExCode(selectedExam.getTestCode() + "A");
-                if (examDTO != null) {
-                    new DialogViewDetailTest(this, selectedExam, examList).setVisible(true);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Chưa có chi tiết cho kỳ thi này!", "Thông Báo",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Lỗi khi truy vấn cơ sở dữ liệu: " + e.getMessage(), "Lỗi",
-                        JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
+            String exCode = selectedExam.getExCode();
+            System.out.println(exCode);
+            System.out.println(selectedExam.getId());
+            if (exCode.equals("Chưa có mã đề")) {
+                JOptionPane.showMessageDialog(this, "Chưa có mã đề cho kỳ thi này!", "Thông Báo",
+                        JOptionPane.INFORMATION_MESSAGE);
+                return;
             }
+
+            // Gọi DialogViewDetailTest
+            DialogViewDetailTest detailDialog = new DialogViewDetailTest(this, selectedExam, examList);
+            detailDialog.setVisible(true);
         } else {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn một kỳ thi để xem chi tiết!", "Lỗi",
                     JOptionPane.WARNING_MESSAGE);
         }
     }
 
-    private void deleteExam() {
-        int selectedRow = examTable.getSelectedRow();
-        if (selectedRow >= 0) {
-            Exam selectedExam = examList.get(selectedRow);
-            int confirm = JOptionPane.showConfirmDialog(this, "Xóa kỳ thi '" + selectedExam.getTitle() + "'?",
-                    "Xác Nhận", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                String exCode = selectedExam.getTestCode() + "A";
-                if (examBUS.deleteExam(exCode)) {
-                    try (Connection conn = UtilsJDBC.getConnectDB();
-                            PreparedStatement ps = conn.prepareStatement("DELETE FROM test WHERE testID = ?")) {
-                        ps.setInt(1, selectedExam.getId());
-                        ps.executeUpdate();
-                    } catch (SQLException e) {
-                        JOptionPane.showMessageDialog(this, "Lỗi xóa từ bảng test: " + e.getMessage(), "Lỗi",
-                                JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    examList.remove(selectedRow);
-                    refreshTable(examList);
-                    JOptionPane.showMessageDialog(this, "Đã xóa kỳ thi!", "Thành Công",
-                            JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Lỗi xóa kỳ thi từ exams!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn kỳ thi để xóa!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-        }
-    }
+    // private void deleteExam() {
+    // int selectedRow = examTable.getSelectedRow();
+    // if (selectedRow >= 0) {
+    // Exam selectedExam = examList.get(selectedRow);
+    // int confirm = JOptionPane.showConfirmDialog(this, "Xóa kỳ thi '" +
+    // selectedExam.getTitle() + "'?",
+    // "Xác Nhận", JOptionPane.YES_NO_OPTION);
+    // if (confirm == JOptionPane.YES_OPTION) {
+    // String exCode = selectedExam.getExCode();
+    // if (!exCode.equals("Chưa có mã đề") && examBUS.deleteExam(exCode)) {
+    // try (Connection conn = UtilsJDBC.getConnectDB();
+    // PreparedStatement ps = conn.prepareStatement("DELETE FROM test WHERE testID =
+    // ?")) {
+    // ps.setInt(1, selectedExam.getId());
+    // ps.executeUpdate();
+    // } catch (SQLException e) {
+    // JOptionPane.showMessageDialog(this, "Lỗi xóa từ bảng test: " +
+    // e.getMessage(), "Lỗi",
+    // JOptionPane.ERROR_MESSAGE);
+    // return;
+    // }
+    // examList.remove(selectedRow);
+    // refreshTable(examList);
+    // JOptionPane.showMessageDialog(this, "Đã xóa kỳ thi!", "Thành Công",
+    // JOptionPane.INFORMATION_MESSAGE);
+    // } else {
+    // JOptionPane.showMessageDialog(this, "Lỗi xóa kỳ thi từ exams!", "Lỗi",
+    // JOptionPane.ERROR_MESSAGE);
+    // }
+    // }
+    // } else {
+    // JOptionPane.showMessageDialog(this, "Vui lòng chọn kỳ thi để xóa!", "Lỗi",
+    // JOptionPane.WARNING_MESSAGE);
+    // }
+    // }
 
     private void exportToExcel() {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {

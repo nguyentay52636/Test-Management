@@ -70,6 +70,7 @@ public class ExamDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
         return null;
     }

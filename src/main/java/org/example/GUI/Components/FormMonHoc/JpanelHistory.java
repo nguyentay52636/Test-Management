@@ -67,8 +67,10 @@ public class JpanelHistory extends JPanel {
 
         setBackground(new Color(34, 45, 65)); // Màu nền tối hiện đại
         setLayout(null); // Giữ layout null để dễ tùy chỉnh
-        setBorder(new EmptyBorder(10, 10, 10, 10)); // Padding xung A Tiêu đề
-        JLabel lblTitle = new JLabel("Quản Lý môn sử");
+        setBorder(new EmptyBorder(10, 10, 10, 10)); // Padding xung quanh
+
+        // Tiêu đề
+        JLabel lblTitle = new JLabel("Quản Lý Câu Hỏi");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 30));
         lblTitle.setForeground(new Color(240, 248, 255)); // Màu trắng nhạt
         lblTitle.setBounds(300, 20, 400, 40);
@@ -149,7 +151,6 @@ public class JpanelHistory extends JPanel {
                 "Xuất danh sách câu hỏi ra Excel");
         btnXuatExcel.setBounds(660, 110, 120, 45);
         add(btnXuatExcel);
-
         JButton btnNhapExcel = createButton("Nhập Excel", "org/example/GUI/resources/images/icons8_ms_excel_30px.png",
                 "Nhập câu hỏi từ file Excel");
         btnNhapExcel.setBounds(790, 110, 120, 45);
@@ -189,7 +190,7 @@ public class JpanelHistory extends JPanel {
         lblCauHoi.setBounds(390, 170, 120, 25);
         add(lblCauHoi);
 
-        JTextField txtCauHoi = new JTextField();
+        txtCauHoi = new JTextField();
         txtCauHoi.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtCauHoi.setBackground(new Color(60, 70, 90));
         txtCauHoi.setForeground(Color.WHITE);
@@ -269,7 +270,7 @@ public class JpanelHistory extends JPanel {
     private void openAddQuestionPanel() {
         if (contentPanel != null) {
             JPanel currentPanel = (JPanel) contentPanel.getComponent(0);
-            JPanelThemCauHoi panelThemCauHoi = new JPanelThemCauHoi(contentPanel, currentPanel, null);
+            JPanelThemCauHoi panelThemCauHoi = new JPanelThemCauHoi(contentPanel, currentPanel, tableModel);
             contentPanel.removeAll();
             contentPanel.add(panelThemCauHoi);
             contentPanel.revalidate();
@@ -290,7 +291,7 @@ public class JpanelHistory extends JPanel {
 
     private void loadDataFromDatabase() {
         tableModel.setRowCount(0);
-        List<QuestionDTO> questions = questionDAO.getQuestionsByTopic(1);
+        List<QuestionDTO> questions = questionDAO.getAllQuestions();
         for (QuestionDTO q : questions) {
             tableModel.addRow(new Object[] {
                     q.getQuestionID(),
@@ -352,7 +353,7 @@ public class JpanelHistory extends JPanel {
 
     private void openEditQuestionPanel() { // Line ~284 from stack trace
         int selectedRow = table.getSelectedRow();
-        JpanelMath currentPanel = (JpanelMath) contentPanel.getComponent(0);
+        JpanelHistory currentPanel = (JpanelHistory) contentPanel.getComponent(0);
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn một câu hỏi để sửa!", "Thông báo",
                     JOptionPane.WARNING_MESSAGE);
