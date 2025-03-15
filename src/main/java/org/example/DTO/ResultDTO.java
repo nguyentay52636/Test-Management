@@ -3,14 +3,15 @@ package org.example.DTO;
 import java.util.Date;
 
 public class ResultDTO {
-    private int rsNum;
-    private int userID;
-    private String exCode;
-    private String rsAnswers;
-    private float rsMark;
-
     public int getRsNum() {
         return rsNum;
+    }
+
+    public ResultDTO(int rsNum, int userID, String exCode, float rsMark) {
+        this.rsNum = rsNum;
+        this.userID = userID;
+        this.exCode = exCode;
+        this.rsMark = rsMark;
     }
 
     public void setRsNum(int rsNum) {
@@ -23,6 +24,14 @@ public class ResultDTO {
 
     public void setUserID(int userID) {
         this.userID = userID;
+    }
+
+    public ResultDTO(int rsNum, int userID, String exCode, float rsMark, Date ds_date) {
+        this.rsNum = rsNum;
+        this.userID = userID;
+        this.exCode = exCode;
+        this.rsMark = rsMark;
+        this.ds_date = ds_date;
     }
 
     public String getExCode() {
@@ -49,31 +58,44 @@ public class ResultDTO {
         this.rsMark = rsMark;
     }
 
-    public Date getDateTime() {
-        return dateTime;
+    public Date getDs_date() {
+        return ds_date;
     }
 
-    public void setDateTime(Date dateTime) {
-        this.dateTime = dateTime;
+    public void setDs_date(Date ds_date) {
+        this.ds_date = ds_date;
     }
 
-    private Date dateTime;
+    private int rsNum;
+    private int userID;
+    private String exCode;
+    private String rsAnswers;
+    private float rsMark;
+    private Date ds_date;
+    private String userFullName;
 
-    public ResultDTO(int rsNum, int userID, String exCode, String rsAnswers, float rsMark, Date dateTime) {
+    public String getUserFullName() {
+        return userFullName;
+    }
+
+    public void setUserFullName(String userFullName) {
+        this.userFullName = userFullName;
+    }
+
+    public ResultDTO(int rsNum, int userID, String exCode, String rsAnswers, float rsMark, Date ds_date) {
         this.rsNum = rsNum;
         this.userID = userID;
         this.exCode = exCode;
         this.rsAnswers = rsAnswers;
         this.rsMark = rsMark;
-        this.dateTime = dateTime;
+        this.ds_date = ds_date;
     }
 
-    public ResultDTO(int rsNum, int userID, String exCode, float rsMark, Date dateTime) {
+    public ResultDTO(int rsNum, int userID, String exCode, float rsMark, String userFullName) {
         this.rsNum = rsNum;
         this.userID = userID;
         this.exCode = exCode;
         this.rsMark = rsMark;
-        this.dateTime = dateTime;
+        this.userFullName = userFullName;
     }
-
 }

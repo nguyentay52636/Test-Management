@@ -21,7 +21,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
-import javax.swing.RowFilter.Entry;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -40,16 +39,16 @@ import org.example.GUI.FormDialog.DialogMonHoc.JPanelThemCauHoi;
 import org.example.GUI.FormDialog.DialogMonHoc.JPanelViewDetails;
 import org.example.Utils.importExcel;
 
-public class JPanelSu extends JPanel {
-	 private JPanel contentPanel;
-	    private JTable table;
-	    private DefaultTableModel tableModel;
-	    private QuestionDAO questionDAO;
-	    private QuestionBUS questionBUS;
-	    private JButton btnNhapExcel;
-	    private JTextField txtCauHoi;
+public class JpanelEnglish extends JPanel {
+    private JPanel contentPanel;
+    private JTable table;
+    private DefaultTableModel tableModel;
+    private QuestionDAO questionDAO;
+    private QuestionBUS questionBUS;
+    private JButton btnNhapExcel;
+    private JTextField txtCauHoi;
 
-    public JPanelSu(JPanel contentPanel) {
+    public JpanelEnglish(JPanel contentPanel) {
         this.contentPanel = contentPanel;
         this.questionDAO = new QuestionDAO();
         this.questionBUS = new QuestionBUS();
@@ -63,7 +62,7 @@ public class JPanelSu extends JPanel {
         setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // Title
-        JLabel lblTitle = new JLabel("Quản Lý Môn Lịch Sử");
+        JLabel lblTitle = new JLabel("Quản Lý Môn Anh");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 30));
         lblTitle.setForeground(new Color(240, 248, 255));
         lblTitle.setBounds(350, 20, 400, 40);
@@ -130,8 +129,6 @@ public class JPanelSu extends JPanel {
         txtMaCH.setBorder(BorderFactory.createLineBorder(new Color(100, 110, 130), 1));
         txtMaCH.setBounds(220, 170, 150, 35);
         add(txtMaCH);
-        
-        
 
         txtCauHoi = new JTextField();
         txtCauHoi.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -216,6 +213,7 @@ public class JPanelSu extends JPanel {
         btnBack.addActionListener(e -> returnToInbox());
         add(btnBack);
     }
+
     private void openViewDetailsPanel() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
@@ -231,6 +229,7 @@ public class JPanelSu extends JPanel {
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
     }
+
     private JButton createButton(String text, String iconPath, String tooltip) {
         JButton button = new JButton(text);
         if (iconPath != null) {
@@ -268,12 +267,13 @@ public class JPanelSu extends JPanel {
             tableModel.addRow(new Object[] {
                     q.getQuestionID(),
                     q.getQContent(),
-                   
+
                     q.getQLevel(),
                     q.getQStatus() ? "Hoạt động" : "Ẩn"
             });
         }
     }
+
     private void deleteSelectedQuestion() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow == -1) {
@@ -289,12 +289,12 @@ public class JPanelSu extends JPanel {
                 "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
-        	AnswersDAO answersDAO = new AnswersDAO();
+            AnswersDAO answersDAO = new AnswersDAO();
             answersDAO.deleteAllAnswersByQuestionID(questionID);
             boolean deleted = questionBUS.deleteQuestion(questionID);
             if (deleted) {
-            	QuestionDAO questionDAO = new QuestionDAO();
-            	questionDAO.deleteQuestion(questionID);
+                QuestionDAO questionDAO = new QuestionDAO();
+                questionDAO.deleteQuestion(questionID);
                 tableModel.removeRow(selectedRow);
                 JOptionPane.showMessageDialog(this, "Xóa câu hỏi thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
@@ -304,8 +304,9 @@ public class JPanelSu extends JPanel {
             }
         }
     }
+
     private void importDataFromExcel() {
- 	   JFileChooser fileChooser = new JFileChooser();
+        JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setDialogTitle("Chọn file Excel");
         fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Excel Files", "xlsx"));
@@ -313,7 +314,7 @@ public class JPanelSu extends JPanel {
         int returnValue = fileChooser.showOpenDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
-            List<QuestionDTO> questions  = importExcel.readExcel(selectedFile.getAbsolutePath());
+            List<QuestionDTO> questions = importExcel.readExcel(selectedFile.getAbsolutePath());
             for (QuestionDTO q : questions) {
                 if (questionDAO.insertQuestion(q)) {
                     System.out.println("Thêm thành công: " + q.getQContent());
@@ -321,23 +322,23 @@ public class JPanelSu extends JPanel {
                     System.out.println("Lỗi khi thêm: " + q.getQContent());
                 }
             }
-          setDataToTable(questions);
+            setDataToTable(questions);
         }
- }
+    }
+
     public void setDataToTable(List<QuestionDTO> questions) {
         DefaultTableModel model = new DefaultTableModel();
         model.addColumn("Mã Câu Hỏi");
         model.addColumn("Nội Dung");
         model.addColumn("Cấp Độ");
         model.addColumn("Trạng Thái");
-        
 
         for (QuestionDTO question : questions) {
             model.addRow(new Object[] {
-                question.getQuestionID(),
-                question.getQContent(),
-                question.getQLevel(),
-                question.getQStatus()
+                    question.getQuestionID(),
+                    question.getQContent(),
+                    question.getQLevel(),
+                    question.getQStatus()
             });
         }
 
@@ -374,30 +375,32 @@ public class JPanelSu extends JPanel {
             contentPanel.repaint();
         }
     }
-    private void findQuestion() {
-    	String keyword = txtCauHoi.getText().trim().toLowerCase();
-		TableRowSorter<TableModel> rowSorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
-		table.setRowSorter(rowSorter);
 
-		if (!keyword.equals("")) {
-			rowSorter.setRowFilter(new RowFilter<TableModel, Integer>() {
-				@Override
-				public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
-					for (int i = 0; i < entry.getValueCount(); i++) {	
-						if (entry.getStringValue(i).toLowerCase().contains(keyword)) {
-							return true; // Có ít nhất một trường khớp với từ khóa
-						}
-					}
-					return false; // Không có trường nào khớp
-				}
-			});
-		} else {
-			rowSorter.setRowFilter(null); // Nếu không nhập gì, hiển thị tất cả dữ liệu
-		}
+    private void findQuestion() {
+        String keyword = txtCauHoi.getText().trim().toLowerCase();
+        TableRowSorter<TableModel> rowSorter = new TableRowSorter<>((DefaultTableModel) table.getModel());
+        table.setRowSorter(rowSorter);
+
+        if (!keyword.equals("")) {
+            rowSorter.setRowFilter(new RowFilter<TableModel, Integer>() {
+                @Override
+                public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
+                    for (int i = 0; i < entry.getValueCount(); i++) {
+                        if (entry.getStringValue(i).toLowerCase().contains(keyword)) {
+                            return true; // Có ít nhất một trường khớp với từ khóa
+                        }
+                    }
+                    return false; // Không có trường nào khớp
+                }
+            });
+        } else {
+            rowSorter.setRowFilter(null); // Nếu không nhập gì, hiển thị tất cả dữ liệu
+        }
     }
+
     private void openEditQuestionPanel() { // Line ~284 from stack trace
         int selectedRow = table.getSelectedRow();
-        JPanelSu currentPanel = (JPanelSu) contentPanel.getComponent(0);
+        JpanelEnglish currentPanel = (JpanelEnglish) contentPanel.getComponent(0);
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn một câu hỏi để sửa!", "Thông báo",
                     JOptionPane.WARNING_MESSAGE);

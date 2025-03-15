@@ -5,21 +5,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import org.example.ConnectDB.UtilsJDBC;
 import org.example.DTO.ExamsDTO;
-import org.example.DTO.ResultDTO;
 
 public class ExamDAO {
     public ExamDAO() {
     }
 
     public boolean createExam(ExamsDTO exam) {
+        String query = "INSERT INTO exams (testCode, exOrder, exCode, ex_quesIDs) VALUES (?, ?, ?, ?)";
         try (Connection conn = UtilsJDBC.getConnectDB();
-                PreparedStatement stmt = conn.prepareStatement(
-                        "INSERT INTO exams (testCode, exOrder, exCode, ex_quesIDs) VALUES (?, ?, ?, ?)")) {
+                PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, exam.getTestCode());
             stmt.setString(2, exam.getExOrder());
             stmt.setString(3, exam.getExCode());
@@ -32,8 +29,9 @@ public class ExamDAO {
     }
 
     public boolean deleteExam(String exCode) {
+        String query = "DELETE FROM exams WHERE exCode = ?";
         try (Connection conn = UtilsJDBC.getConnectDB();
-                PreparedStatement stmt = conn.prepareStatement("DELETE FROM exams WHERE exCode = ?")) {
+                PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, exCode);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -43,9 +41,9 @@ public class ExamDAO {
     }
 
     public boolean updateExam(ExamsDTO exam) {
+        String query = "UPDATE exams SET testCode = ?, exOrder = ?, ex_quesIDs = ? WHERE exCode = ?";
         try (Connection conn = UtilsJDBC.getConnectDB();
-                PreparedStatement stmt = conn.prepareStatement(
-                        "UPDATE exams SET testCode = ?, exOrder = ?, ex_quesIDs = ? WHERE exCode = ?")) {
+                PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, exam.getTestCode());
             stmt.setString(2, exam.getExOrder());
             stmt.setString(3, exam.getExQuestionIDs());
@@ -76,8 +74,8 @@ public class ExamDAO {
         return null;
     }
 
-    public List<ExamsDTO> getAllExams() {
-        List<ExamsDTO> exams = new ArrayList<>();
+    public ArrayList<ExamsDTO> getAllExams() {
+        ArrayList<ExamsDTO> exams = new ArrayList<>();
         String query = "SELECT * FROM exams";
         try (Connection conn = UtilsJDBC.getConnectDB();
                 PreparedStatement stmt = conn.prepareStatement(query);
@@ -93,33 +91,5 @@ public class ExamDAO {
             e.printStackTrace();
         }
         return exams;
-    }
-
-    public List<ResultDTO> getResultsByTopic(int topicID) {
-        List<ResultDTO> results = new ArrayList<>();
-        String query = "SELECT r.rs_num, r.userID, r.exCode, r.rs_Mark, r.rs_date " +
-                "FROM result r " +
-                "JOIN exams e ON r.exCode = e.exCode " +
-                "JOIN test t ON e.testCode = t.testCode " +
-                "JOIN topics tp ON t.tpID = tp.tpID " +
-                "WHERE tp.tpID = ?";
-        try (Connection conn = UtilsJDBC.getConnectDB();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, topicID);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    int rsNum = rs.getInt("rs_num"); // Matches ResultDTO constructor
-                    int userID = rs.getInt("userID");
-                    String exCode = rs.getString("exCode");
-                    float rsMark = rs.getFloat("rs_Mark");
-                    Date dateTime = rs.getTimestamp("rs_date"); // Use Timestamp for precision
-                    results.add(new ResultDTO(rsNum, userID, exCode, rsMark, dateTime));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-        return results;
     }
 }

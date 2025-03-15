@@ -83,7 +83,7 @@ public class MainForm extends JLayeredPane {
     // goi thanh phan
     private void initMenuEvent() {
         menu.addMenuEvent((int index, int subIndex, MenuAction action) -> {
-            showForm(new BeginForm("Chào mừng đến với quản lý thi trắc nghiệm"));
+
             if (index == 0) {
                 if (!isAdmin()) {
                     Application.showForm(new FormManagerAccount());
@@ -92,9 +92,10 @@ public class MainForm extends JLayeredPane {
             } else if (index == 1) {
 
             } else if (index == 2) {
-                Application.showForm(new FormInbox(panelBody));
-            } else if (index == 3) {
                 Application.showForm(new TestManagementPanel());
+            } else if (index == 3) {
+
+                Application.showForm(new FormInbox(panelBody));
             } else if (index == 5) {
                 Application.showForm(new TestForm(panelBody));
             } else if (index == 6) {

@@ -12,9 +12,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import org.example.GUI.Components.FormMonHoc.JPanelAnh;
-import org.example.GUI.Components.FormMonHoc.JPanelGeneral;
-import org.example.GUI.Components.FormMonHoc.JPanelSu;
+import org.example.GUI.Components.FormMonHoc.JpanelEnglish;
+import org.example.GUI.Components.FormMonHoc.JpanelHistory;
+import org.example.GUI.Components.FormMonHoc.JpanelMath;
 
 public class FormInbox extends JPanel {
         private JPanel contentPanel;
@@ -52,22 +52,23 @@ public class FormInbox extends JPanel {
                 add(lblTitle);
 
                 // Subject Buttons in Grid Layout
-                JButton btnAnh = createStyledButton("Tiếng Anh",
-                                "/org/example/GUI/resources/imageTopic/english_icon.png",
-                                "Quản lý câu hỏi môn Tiếng Anh");
+                JButton btnAnh = createStyledButton("Toán",
+                                "/org/example/GUI/resources/imageTopic/trangchu_icon.png",
+                                "Quản lý câu hỏi môn Toán");
                 btnAnh.setBounds(150, 200, 220, 120); // Larger for visual impact
                 btnAnh.addActionListener(e -> openJPanelAnh());
                 add(btnAnh);
 
-                JButton btnSu = createStyledButton("Lịch Sử", "/org/example/GUI/resources/imageTopic/history.sql.png",
-                                "Quản lý câu hỏi môn Lịch Sử");
+                JButton btnSu = createStyledButton("Tiếng anh",
+                                "/org/example/GUI/resources/imageTopic/english_icon.png",
+                                "Quản lý câu hỏi môn Tiếng Anh");
                 btnSu.setBounds(390, 200, 220, 120);
                 btnSu.addActionListener(e -> openJPanelSu());
                 add(btnSu);
 
-                JButton btnDiffer = createStyledButton("Tổng Hợp",
-                                "/org/example/GUI/resources/imageTopic/trangchu_icon.png",
-                                "Quản lý câu hỏi tổng hợp");
+                JButton btnDiffer = createStyledButton("Lịch sử",
+                                "/org/example/GUI/resources/imageTopic/history.sql.png",
+                                "Quản lý câu hỏi Lịch sử");
                 btnDiffer.setBounds(630, 200, 220, 120);
                 btnDiffer.addActionListener(e -> openJPanelGeneral());
                 add(btnDiffer);
@@ -146,7 +147,7 @@ public class FormInbox extends JPanel {
 
         private void openJPanelAnh() {
                 if (contentPanel != null) {
-                        JPanelAnh jPanelAnh = new JPanelAnh(contentPanel);
+                        JpanelMath jPanelAnh = new JpanelMath(contentPanel);
                         contentPanel.removeAll();
                         contentPanel.add(jPanelAnh);
                         contentPanel.revalidate();
@@ -157,7 +158,7 @@ public class FormInbox extends JPanel {
 
         private void openJPanelSu() {
                 if (contentPanel != null) {
-                        JPanelSu jPanelSu = new JPanelSu(contentPanel);
+                        JpanelEnglish jPanelSu = new JpanelEnglish(contentPanel);
                         contentPanel.removeAll();
                         contentPanel.add(jPanelSu);
                         contentPanel.revalidate();
@@ -168,7 +169,7 @@ public class FormInbox extends JPanel {
 
         private void openJPanelGeneral() {
                 if (contentPanel != null) {
-                        JPanelGeneral jPanelGeneral = new JPanelGeneral(contentPanel);
+                        JpanelHistory jPanelGeneral = new JpanelHistory(contentPanel);
                         contentPanel.removeAll();
                         contentPanel.add(jPanelGeneral);
                         contentPanel.revalidate();

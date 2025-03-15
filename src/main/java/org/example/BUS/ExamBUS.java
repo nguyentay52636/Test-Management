@@ -5,7 +5,6 @@ import java.util.List;
 import org.example.DAO.ExamDAO;
 import org.example.DAO.UserDAO;
 import org.example.DTO.ExamsDTO;
-import org.example.DTO.ResultDTO;
 
 public class ExamBUS {
     private ExamDAO examDAO;
@@ -37,11 +36,11 @@ public class ExamBUS {
         return examDAO.getAllExams();
     }
 
-    public List<ResultDTO> getResultsByTopic(int topicID) {
-        return examDAO.getResultsByTopic(topicID);
-    }
-
     public String getUserFullName(int userID) {
         return userDAO.getUserFullName(userID);
     }
+
+    // public List getResultsByTopic(int topicID) {
+    // return examDAO.getResultsByTopic(topicID);
+    // }
 }

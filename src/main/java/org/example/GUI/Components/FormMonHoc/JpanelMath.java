@@ -48,7 +48,7 @@ import org.example.GUI.FormDialog.DialogMonHoc.JPanelThemCauHoi;
 import org.example.GUI.FormDialog.DialogMonHoc.JPanelViewDetails;
 import org.example.Utils.importExcel;
 
-public class JPanelAnh extends JPanel {
+public class JpanelMath extends JPanel {
     private JPanel contentPanel;
     private JTable table;
     private DefaultTableModel tableModel;
@@ -57,7 +57,7 @@ public class JPanelAnh extends JPanel {
     private JButton btnNhapExcel, btnExportDocx;
     private JTextField txtCauHoi;
 
-    public JPanelAnh(JPanel contentPanel) {
+    public JpanelMath(JPanel contentPanel) {
         this.contentPanel = contentPanel;
         this.questionDAO = new QuestionDAO();
         this.questionBUS = new QuestionBUS();
@@ -71,7 +71,7 @@ public class JPanelAnh extends JPanel {
         setBorder(new EmptyBorder(10, 10, 10, 10));
 
         // Title
-        JLabel lblTitle = new JLabel("Quản Lý Môn Tiếng Anh");
+        JLabel lblTitle = new JLabel("Quản Lý Môn Toán");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 30));
         lblTitle.setForeground(new Color(240, 248, 255));
         lblTitle.setBounds(350, 20, 400, 40);

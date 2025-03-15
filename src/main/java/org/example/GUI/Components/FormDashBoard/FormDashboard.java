@@ -9,11 +9,10 @@ import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -28,11 +27,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-import org.example.BUS.ExamBUS;
-import org.example.BUS.TopicBUS;
+import org.example.BUS.ResultBUS;
+import org.example.BUS.TopicBUS; // Added for topic fetching
 import org.example.ConnectDB.UtilsJDBC;
 import org.example.DTO.ResultDTO;
-import org.example.DTO.TopicsDTO;
+import org.example.DTO.TopicsDTO; // Added for topic data
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -40,29 +39,25 @@ import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.DefaultPieDataset;
 
 public class FormDashboard extends JPanel {
-    private ExamBUS examBUS;
-    private TopicBUS topicsBUS;
+    private ResultBUS resultBUS;
+    private TopicBUS topicBUS; // Added TopicBUS instance
     private JLabel lblParticipants, lblPasses, lblFailures;
     private ChartPanel chartPanel;
     private JTable participantTable;
     private DefaultTableModel tableModel;
     private JButton btnShowAll, btnShowPassed, btnShowFailed;
-    private JComboBox<String> subjectComboBox;
     private List<ResultDTO> currentResults;
+    private JSplitPane splitPane;
+    private JComboBox<String> headerComboBox;
 
     public FormDashboard() {
-        examBUS = new ExamBUS();
-        topicsBUS = new TopicBUS();
+        resultBUS = new ResultBUS();
+        topicBUS = new TopicBUS(); // Initialize TopicBUS
         currentResults = new ArrayList<>();
         setBackground(new Color(245, 247, 250));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         initializeUI();
-
-        if (subjectComboBox.getItemCount() > 0) {
-            loadStatistics(subjectComboBox.getItemAt(0));
-        } else {
-            updateUIWithEmptyData();
-        }
+        loadStatisticsWithFilter("All");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> UtilsJDBC.closeConnection()));
     }
@@ -70,7 +65,6 @@ public class FormDashboard extends JPanel {
     private void initializeUI() {
         setLayout(new BorderLayout(0, 15));
 
-        // Header Panel
         JPanel headerPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -86,29 +80,24 @@ public class FormDashboard extends JPanel {
         headerPanel.setLayout(new BorderLayout(10, 10));
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
 
-        JLabel lblTitle = new JLabel("Thống Kê Kết Quả Thi Theo Chủ Đề");
+        JLabel lblTitle = new JLabel("Thống Kê Kết Quả Thi");
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
         lblTitle.setForeground(Color.WHITE);
-        headerPanel.add(lblTitle, BorderLayout.CENTER);
+        headerPanel.add(lblTitle, BorderLayout.WEST);
 
-        List<TopicsDTO> allTopics = topicsBUS.getAllTopics();
-        List<String> topicOptions = new ArrayList<>();
-        for (TopicsDTO topic : allTopics) {
-            int tpID = topic.getTopicID();
-            if (tpID == 1 || tpID == 2 || tpID == 3) {
-                topicOptions.add(tpID + " - " + topic.getTpTitle());
-            }
-        }
-        subjectComboBox = new JComboBox<>(topicOptions.toArray(new String[0]));
-        subjectComboBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        subjectComboBox.setBackground(new Color(60, 70, 90));
-        subjectComboBox.setForeground(Color.WHITE);
-        subjectComboBox.setBorder(BorderFactory.createLineBorder(new Color(100, 110, 130), 1));
-        subjectComboBox.addActionListener(e -> loadStatistics((String) subjectComboBox.getSelectedItem()));
-        headerPanel.add(subjectComboBox, BorderLayout.EAST);
+        headerComboBox = new JComboBox<>();
+        headerComboBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        headerComboBox.setPreferredSize(new Dimension(200, 30));
+        headerComboBox.setBackground(Color.WHITE);
+        headerComboBox.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(189, 195, 199), 1),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        loadTopicsIntoComboBox(); // Load topics into JComboBox
+        headerPanel.add(headerComboBox, BorderLayout.EAST);
+
         add(headerPanel, BorderLayout.NORTH);
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setResizeWeight(0.4);
         splitPane.setDividerSize(10);
         splitPane.setBorder(BorderFactory.createEmptyBorder());
@@ -117,28 +106,18 @@ public class FormDashboard extends JPanel {
         leftPanel.setOpaque(false);
         leftPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
-        JPanel statsPanel = new JPanel(new GridBagLayout());
+        JPanel statsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
         statsPanel.setBackground(Color.WHITE);
         statsPanel.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(new Color(189, 195, 199), 1), "Thống Kê"));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new java.awt.Insets(12, 15, 12, 15);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-
         lblParticipants = createStatLabel("Tổng số thí sinh: 0");
-        lblPasses = createStatLabel("Số thí sinh đạt (>=50%): 0");
+        lblPasses = createStatLabel("Số thí sinh đạt (>=5.00): 0");
         lblFailures = createStatLabel("Số thí sinh trượt: 0");
 
-        gbc.gridy = 0;
-        statsPanel.add(lblParticipants, gbc);
-        gbc.gridy = 1;
-        statsPanel.add(lblPasses, gbc);
-        gbc.gridy = 2;
-        statsPanel.add(lblFailures, gbc);
-
+        statsPanel.add(lblParticipants);
+        statsPanel.add(lblPasses);
+        statsPanel.add(lblFailures);
         leftPanel.add(statsPanel, BorderLayout.NORTH);
 
         chartPanel = createPieChart(0, 0);
@@ -161,18 +140,16 @@ public class FormDashboard extends JPanel {
         btnShowPassed = createStyledButton("Đạt", new Color(46, 204, 113), Color.WHITE);
         btnShowFailed = createStyledButton("Trượt", new Color(217, 83, 79), Color.WHITE);
 
-        btnShowAll.addActionListener(e -> loadStatisticsWithFilter((String) subjectComboBox.getSelectedItem(), "All"));
-        btnShowPassed
-                .addActionListener(e -> loadStatisticsWithFilter((String) subjectComboBox.getSelectedItem(), "Passed"));
-        btnShowFailed
-                .addActionListener(e -> loadStatisticsWithFilter((String) subjectComboBox.getSelectedItem(), "Failed"));
+        btnShowAll.addActionListener(e -> loadStatisticsWithFilter("All"));
+        btnShowPassed.addActionListener(e -> loadStatisticsWithFilter("Passed"));
+        btnShowFailed.addActionListener(e -> loadStatisticsWithFilter("Failed"));
 
         filterPanel.add(btnShowAll);
         filterPanel.add(btnShowPassed);
         filterPanel.add(btnShowFailed);
         rightPanel.add(filterPanel, BorderLayout.NORTH);
 
-        tableModel = new DefaultTableModel(new Object[] { "Tên Thí Sinh", "Điểm", "Kết Quả" }, 0) {
+        tableModel = new DefaultTableModel(new Object[] { "Tên Thí Sinh", "Điểm Cao Nhất", "Kết Quả" }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -201,7 +178,7 @@ public class FormDashboard extends JPanel {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         buttonPanel.setOpaque(false);
         JButton btnRefresh = createStyledButton("Làm mới", new Color(52, 152, 219), Color.WHITE);
-        btnRefresh.addActionListener(e -> loadStatistics((String) subjectComboBox.getSelectedItem()));
+        btnRefresh.addActionListener(e -> loadStatisticsWithFilter("All"));
         buttonPanel.add(btnRefresh);
         add(buttonPanel, BorderLayout.SOUTH);
     }
@@ -255,8 +232,8 @@ public class FormDashboard extends JPanel {
     private ChartPanel createPieChart(int passes, int failures) {
         DefaultPieDataset dataset = new DefaultPieDataset();
         int total = passes + failures;
-        dataset.setValue("Đạt (>=50%)", total > 0 ? passes : 1);
-        dataset.setValue("Trượt", total > 0 ? failures : 1);
+        dataset.setValue("Đạt (>=5.00)", total > 0 ? passes : 0);
+        dataset.setValue("Trượt", total > 0 ? failures : 0);
 
         JFreeChart chart = ChartFactory.createPieChart(
                 "Phân Bố Kết Quả",
@@ -264,7 +241,7 @@ public class FormDashboard extends JPanel {
                 true, true, false);
 
         PiePlot plot = (PiePlot) chart.getPlot();
-        plot.setSectionPaint("Đạt (>=50%)", new Color(46, 204, 113));
+        plot.setSectionPaint("Đạt (>=5.00)", new Color(46, 204, 113));
         plot.setSectionPaint("Trượt", new Color(217, 83, 79));
         plot.setBackgroundPaint(new Color(248, 249, 250));
         plot.setOutlinePaint(new Color(173, 181, 189));
@@ -272,59 +249,117 @@ public class FormDashboard extends JPanel {
         plot.setLabelBackgroundPaint(new Color(233, 236, 239));
         plot.setSimpleLabels(true);
         plot.setInteriorGap(0.02);
+        plot.setNoDataMessage("Không có dữ liệu");
 
         ChartPanel panel = new ChartPanel(chart);
         panel.setMouseWheelEnabled(true);
         return panel;
     }
 
-    private void loadStatistics(String topicSelection) {
-        loadStatisticsWithFilter(topicSelection, "All"); // Default to "All"
+    private void setDataToTable(Map<String, Float> highestScores, String filter) {
+        tableModel.setRowCount(0);
+
+        if (highestScores == null || highestScores.isEmpty()) {
+            tableModel.addRow(new Object[] { "Không có dữ liệu", "", "" });
+            System.out.println("No data in highestScores");
+            return;
+        }
+
+        for (Map.Entry<String, Float> entry : highestScores.entrySet()) {
+            String userName = entry.getKey() != null ? entry.getKey() : "Unknown";
+            float score = entry.getValue();
+            boolean passed = score >= 5.00;
+            String resultStatus = passed ? "Đạt" : "Trượt";
+
+            boolean shouldAdd = false;
+            switch (filter) {
+                case "All":
+                    shouldAdd = true;
+                    break;
+                case "Passed":
+                    shouldAdd = passed;
+                    break;
+                case "Failed":
+                    shouldAdd = !passed;
+                    break;
+            }
+
+            if (shouldAdd) {
+                tableModel.addRow(new Object[] { userName, String.format("%.2f", score), resultStatus });
+                System.out.println("Added to table: " + userName + ", " + score + ", " + resultStatus);
+            }
+        }
+        participantTable.revalidate();
+        participantTable.repaint();
     }
 
-    private void loadStatisticsWithFilter(String topicSelection, String filter) {
-        int topicID = Integer.parseInt(topicSelection.split(" - ")[0]);
-        currentResults = examBUS.getResultsByTopic(topicID);
+    private void loadTopicsIntoComboBox() {
+        headerComboBox.removeAllItems();
+        headerComboBox.addItem("All"); // Add "All" as the default option
+        List<TopicsDTO> topics = topicBUS.getAllTopics(); // Fetch topics from TopicBUS
+        if (topics != null && !topics.isEmpty()) {
+            for (TopicsDTO topic : topics) {
+                headerComboBox.addItem(topic.getTpTitle()); // Add each topic title
+            }
+        } else {
+            System.out.println("No topics loaded from TopicBUS");
+        }
+    }
 
-        // Sort results by rsMark in descending order
-        currentResults.sort(Comparator.comparing(ResultDTO::getRsMark).reversed());
+    private void loadStatisticsWithFilter(String filter) {
+        List<ResultDTO> allResults = resultBUS.getResult();
+        if (allResults == null) {
+            allResults = new ArrayList<>();
+            System.out.println("resultBUS.getResult() returned null");
+        }
+        System.out.println("Raw results size: " + allResults.size());
+        currentResults = new ArrayList<>(allResults);
 
-        int totalParticipants = currentResults.size();
+        Map<String, Float> highestScores = new HashMap<>();
+        for (ResultDTO result : currentResults) {
+            String userName = result.getUserFullName();
+            float score = result.getRsMark();
+            highestScores.merge(userName, score, Float::max);
+            System.out.println("Processing: " + userName + ", Score: " + score);
+        }
+        System.out.println("Highest scores: " + highestScores);
+
+        int totalParticipants = highestScores.size();
         int totalPasses = 0;
         int totalFailures = 0;
 
-        tableModel.setRowCount(0);
-        for (ResultDTO result : currentResults) {
-            String userName = examBUS.getUserFullName(result.getUserID());
-            float score = result.getRsMark();
-            boolean passed = score >= 50;
-            if (passed) {
+        for (float score : highestScores.values()) {
+            if (score >= 5.00) {
                 totalPasses++;
             } else {
                 totalFailures++;
             }
-
-            // Apply filter
-            if (filter.equals("All") || (filter.equals("Passed") && passed) || (filter.equals("Failed") && !passed)) {
-                tableModel.addRow(new Object[] { userName, score, passed ? "Đạt" : "Trượt" });
-            }
         }
 
         lblParticipants.setText("Tổng số thí sinh: " + totalParticipants);
-        lblPasses.setText("Số thí sinh đạt (>=50%): " + totalPasses);
+        lblPasses.setText("Số thí sinh đạt (>=5.00): " + totalPasses);
         lblFailures.setText("Số thí sinh trượt: " + totalFailures);
 
         chartPanel.setChart(createPieChart(totalPasses, totalFailures).getChart());
-        chartPanel.revalidate();
-        chartPanel.repaint();
+
+        setDataToTable(highestScores, filter);
+
+        int totalWidth = splitPane.getWidth();
+        if (totalWidth > 0) {
+            splitPane.setDividerLocation((int) (totalWidth * 0.4));
+        } else {
+            splitPane.addComponentListener(new java.awt.event.ComponentAdapter() {
+                @Override
+                public void componentResized(java.awt.event.ComponentEvent e) {
+                    splitPane.setDividerLocation((int) (splitPane.getWidth() * 0.4));
+                    splitPane.removeComponentListener(this);
+                }
+            });
+        }
     }
 
-    private void updateUIWithEmptyData() {
-        lblParticipants.setText("Tổng số thí sinh: 0");
-        lblPasses.setText("Số thí sinh đạt (>=50%): 0");
-        lblFailures.setText("Số thí sinh trượt: 0");
-        tableModel.setRowCount(0);
-        chartPanel.setChart(createPieChart(0, 0).getChart());
+    public List<ResultDTO> getCurrentResults() {
+        return new ArrayList<>(currentResults);
     }
 
     public static class Main {
