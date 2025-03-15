@@ -1,6 +1,7 @@
 package org.example.BUS;
 
 import java.util.List;
+
 import org.example.DAO.TestDAO;
 import org.example.DTO.TestDTO;
 import org.example.DTO.Test_structureDTO;
@@ -12,10 +13,8 @@ public class TestBUS {
         testDAO = new TestDAO();
     }
 
-
     public List<TestDTO> getTestsByTopicID(int topicID) {
-        List<TestDTO> tests = testDAO.getTestsByTopicID(topicID);
-        return tests != null ? tests : List.of(); // Return empty list instead of null
+        return testDAO.getTestsByTopicID(topicID);
     }
 
     public TestDTO getTestByCode(String testCode) {
@@ -26,7 +25,6 @@ public class TestBUS {
         return testDAO.getTestStructureByTestCode(testCode);
     }
 
- 
     public boolean hasUserTakenTest(int userID, String testCode) {
         if (userID <= 0 || testCode == null || testCode.trim().isEmpty()) {
             return false;
@@ -35,7 +33,7 @@ public class TestBUS {
             return testDAO.hasUserTakenTest(userID, testCode);
         } catch (Exception e) {
             e.printStackTrace();
-         
+
             return false;
         }
     }

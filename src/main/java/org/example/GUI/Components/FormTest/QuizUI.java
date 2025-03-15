@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.Timer;
+import javax.swing.border.EmptyBorder;
 
 import org.example.BUS.QuizBUS;
 import org.example.DAO.QuizDAO;
@@ -61,7 +62,6 @@ public class QuizUI extends JPanel {
         this.currentUser = SessionManager.getCurrentUser();
         this.userAnswers = new ArrayList<>(10);
 
-        System.out.println("Current User: " + currentUser);
         if (currentUser == null) {
             JOptionPane.showMessageDialog(this, "Lỗi: Không tìm thấy thông tin người dùng!", "Lỗi",
                     JOptionPane.ERROR_MESSAGE);
@@ -90,38 +90,47 @@ public class QuizUI extends JPanel {
     }
 
     private void initComponents() {
-        setLayout(new BorderLayout(0, 20));
-        setBackground(new Color(245, 247, 250));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setLayout(new BorderLayout(15, 15));
+        setBackground(new Color(240, 242, 245)); // Nền nhẹ nhàng, chuyên nghiệp
+        setBorder(new EmptyBorder(20, 20, 20, 20));
 
+        // Header Panel with Gradient
         JPanel headerPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
-                g2d.setPaint(new GradientPaint(0, 0, new Color(52, 152, 219), 0, getHeight(), new Color(41, 128, 185)));
+                GradientPaint gradient = new GradientPaint(0, 0, new Color(52, 152, 219), getWidth(), getHeight(),
+                        new Color(41, 128, 185)); // Gradient xéo
+                g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
             }
         };
-        headerPanel.setPreferredSize(new Dimension(0, 80));
-        headerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 25));
+        headerPanel.setPreferredSize(new Dimension(0, 100));
+        headerPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 30));
         add(headerPanel, BorderLayout.NORTH);
 
-        JLabel titleLabel = new JLabel("Làm Bài Kiểm Tra");
+        JLabel titleLabel = new JLabel("Bài Kiểm Tra");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel);
 
-        JPanel contentPanel = new JPanel();
+        timeLabel = new JLabel("Thời gian: 00:00");
+        timeLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        timeLabel.setForeground(Color.WHITE);
+        headerPanel.add(timeLabel);
+
+        // Content Panel
+        JPanel contentPanel = new JPanel(new BorderLayout(0, 15));
         contentPanel.setOpaque(false);
-        contentPanel.setLayout(new BorderLayout(0, 15));
+        contentPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         add(contentPanel, BorderLayout.CENTER);
 
-        JPanel quizPanel = new JPanel();
-        quizPanel.setOpaque(false);
-        quizPanel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        JPanel quizPanel = new JPanel(new GridBagLayout());
+        quizPanel.setBackground(Color.WHITE); // Nền trắng cho nội dung
+        quizPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(220, 223, 230), 1, true),
+                new EmptyBorder(20, 20, 20, 20)));
 
         JScrollPane scrollPane = new JScrollPane(quizPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -129,39 +138,40 @@ public class QuizUI extends JPanel {
         scrollPane.getViewport().setOpaque(false);
         contentPanel.add(scrollPane, BorderLayout.CENTER);
 
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(15, 15, 15, 15);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
         questionLabel = new JLabel("", JLabel.LEFT);
-        questionLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        questionLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
         questionLabel.setForeground(new Color(44, 62, 80));
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.WEST;
         quizPanel.add(questionLabel, gbc);
 
         levelLabel = new JLabel("", JLabel.RIGHT);
         levelLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        levelLabel.setForeground(new Color(44, 62, 80));
+        levelLabel.setForeground(new Color(108, 117, 125));
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.EAST;
         quizPanel.add(levelLabel, gbc);
 
         answerGroup = new ButtonGroup();
         answerButtons = new JRadioButton[4];
         for (int i = 0; i < 4; i++) {
             answerButtons[i] = new JRadioButton();
-            answerButtons[i].setFont(new Font("Segoe UI", Font.PLAIN, 16));
+            answerButtons[i].setFont(new Font("Segoe UI", Font.PLAIN, 18));
             answerButtons[i].setForeground(new Color(44, 62, 80));
             answerButtons[i].setBackground(Color.WHITE);
             answerButtons[i].setOpaque(true);
             answerButtons[i].setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(189, 195, 199), 1),
-                    BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+                    BorderFactory.createLineBorder(new Color(220, 223, 230), 1, true),
+                    new EmptyBorder(10, 15, 10, 15)));
             gbc.gridx = 0;
             gbc.gridy = i + 1;
             gbc.gridwidth = 3;
-            gbc.fill = GridBagConstraints.HORIZONTAL;
             answerGroup.add(answerButtons[i]);
             quizPanel.add(answerButtons[i], gbc);
 
@@ -169,7 +179,7 @@ public class QuizUI extends JPanel {
             answerButtons[i].addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    answerButtons[idx].setBackground(new Color(245, 248, 255));
+                    answerButtons[idx].setBackground(new Color(240, 248, 255));
                 }
 
                 @Override
@@ -179,38 +189,30 @@ public class QuizUI extends JPanel {
             });
         }
 
-        timeLabel = new JLabel("Thời gian: 00:00");
-        timeLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        timeLabel.setForeground(new Color(44, 62, 80));
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        gbc.gridwidth = 1;
-        gbc.fill = GridBagConstraints.NONE;
-        quizPanel.add(timeLabel, gbc);
-
-        totalQuestionLabel = new JLabel("Số lượng câu hỏi: " + totalQuestions);
+        totalQuestionLabel = new JLabel("Số câu hỏi: " + totalQuestions);
         totalQuestionLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
         totalQuestionLabel.setForeground(new Color(44, 62, 80));
-        gbc.gridx = 2;
+        gbc.gridx = 0;
         gbc.gridy = 5;
+        gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.EAST;
         quizPanel.add(totalQuestionLabel, gbc);
 
-        JPanel buttonPanel = new JPanel();
+        // Button Panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
         buttonPanel.setOpaque(false);
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));
         add(buttonPanel, BorderLayout.SOUTH);
 
-        submitButton = createStyledButton("Nộp bài", new Color(52, 152, 219), Color.WHITE);
+        submitButton = createStyledButton("Nộp Bài", new Color(52, 152, 219));
         submitButton.addActionListener(e -> submitQuiz());
         buttonPanel.add(submitButton);
 
-        nextButton = createStyledButton("Next", new Color(231, 76, 60), Color.WHITE);
+        nextButton = createStyledButton("Tiếp Theo", new Color(46, 204, 113));
         nextButton.addActionListener(e -> loadNextQuestion());
         buttonPanel.add(nextButton);
     }
 
-    private JButton createStyledButton(String text, Color bgColor, Color fgColor) {
+    private JButton createStyledButton(String text, Color bgColor) {
         JButton button = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -220,14 +222,15 @@ public class QuizUI extends JPanel {
                 super.paintComponent(g);
             }
         };
-        button.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        button.setFont(new Font("Segoe UI", Font.BOLD, 16));
         button.setBackground(bgColor);
-        button.setForeground(fgColor);
+        button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setContentAreaFilled(false);
         button.setOpaque(false);
-        button.setPreferredSize(new Dimension(120, 40));
-        button.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        button.setPreferredSize(new Dimension(140, 50));
+        button.setBorder(new EmptyBorder(10, 15, 10, 15));
+        button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         button.addMouseListener(new MouseAdapter() {
             @Override
@@ -247,10 +250,9 @@ public class QuizUI extends JPanel {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                button.setBackground(bgColor.brighter());
+                button.setBackground(bgColor);
             }
         });
-
         return button;
     }
 
@@ -282,32 +284,7 @@ public class QuizUI extends JPanel {
             currentIndex++;
             loadQuestion(currentIndex);
         } else {
-            JOptionPane.showMessageDialog(this, "Bạn đã hoàn thành bài kiểm tra!");
-    
-            // Calculate results when quiz is completed
-            int correctCount = 0;
-            for (int i = 0; i < questions.size(); i++) {
-                int userAnswerID = userAnswers.get(i);
-                int correctAnswerID = quizBUS.getCorrectAnswerByQuestionID(questions.get(i).getQuestionID());
-                if (userAnswerID != -1 && userAnswerID == correctAnswerID) {
-                    correctCount++;
-                }
-            }
-            double score = ((double) correctCount / questions.size()) * 10.0;
-            LocalDate today = LocalDate.now();
-            boolean success = quizBUS.saveQuizResult(currentUser.getUserID(), testCode, questions, userAnswers, score, today);
-            int timeTakenSeconds = initialTime - remainingTime;
-            String timeTaken = String.format("%d:%02d", timeTakenSeconds / 60, timeTakenSeconds % 60);
-    
-            if (countdownTimer != null) {
-                countdownTimer.stop(); // Stop the timer when quiz ends
-            }
-    
-            if (contentPanel != null) {
-                ResultForm resultForm = new ResultForm(contentPanel, success, score, correctCount, totalQuestions, 
-                    currentUser, testCode, initialTime, remainingTime, timeTaken);
-                resultForm.setVisible(true); // Display the dialog
-            }
+            finishQuiz();
         }
     }
 
@@ -327,40 +304,55 @@ public class QuizUI extends JPanel {
         }
     }
 
-    private void submitQuiz() {
+    private void finishQuiz() {
         if (countdownTimer != null) {
             countdownTimer.stop();
         }
-    
-        saveUserAnswer();
-    
+
         int correctCount = 0;
         for (int i = 0; i < questions.size(); i++) {
             int userAnswerID = userAnswers.get(i);
             int correctAnswerID = quizBUS.getCorrectAnswerByQuestionID(questions.get(i).getQuestionID());
-            System.out.println("Question " + (i + 1) + ": User Answer = " + userAnswerID + ", Correct Answer = " + correctAnswerID);
             if (userAnswerID != -1 && userAnswerID == correctAnswerID) {
                 correctCount++;
             }
         }
-    
+
         double score = ((double) correctCount / questions.size()) * 10.0;
         LocalDate today = LocalDate.now();
-        boolean success = quizBUS.saveQuizResult(currentUser.getUserID(), testCode, questions, userAnswers, score, today);
-    
+        boolean success = quizBUS.saveQuizResult(currentUser.getUserID(), testCode, questions, userAnswers, score,
+                today);
+
         int timeTakenSeconds = initialTime - remainingTime;
         String timeTaken = String.format("%d:%02d", timeTakenSeconds / 60, timeTakenSeconds % 60);
-    
-        // JOptionPane.showMessageDialog(this, 
-        //     "Kết quả: " + correctCount + "/" + totalQuestions + "\nĐiểm: " + String.format("%.2f", score), 
-        //     "Kết quả bài kiểm tra", 
-        //     JOptionPane.INFORMATION_MESSAGE);
-    
+
         if (contentPanel != null) {
-       
-            ResultForm resultForm = new ResultForm(contentPanel, success, score, correctCount, totalQuestions, 
-                currentUser, testCode, initialTime, remainingTime, timeTaken);
-            resultForm.setVisible(true); // Display the dialog
+            ResultForm resultForm = new ResultForm(contentPanel, success, score, correctCount, totalQuestions,
+                    currentUser, testCode, initialTime, remainingTime, timeTaken);
+            resultForm.setVisible(true);
+
+            // Quay lại FormSelectionTest sau khi đóng ResultForm
+            resultForm.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent e) {
+                    backToSelection();
+                }
+            });
+        }
+    }
+
+    private void submitQuiz() {
+        saveUserAnswer();
+        finishQuiz();
+    }
+
+    private void backToSelection() {
+        if (contentPanel != null) {
+            contentPanel.removeAll();
+            contentPanel.setLayout(new BorderLayout());
+            contentPanel.add(new FormSelectionTest(contentPanel), BorderLayout.CENTER);
+            contentPanel.revalidate();
+            contentPanel.repaint();
         }
     }
 
@@ -380,7 +372,6 @@ public class QuizUI extends JPanel {
         countdownTimer.start();
     }
 
-    // Main method for testing
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(() -> {
             javax.swing.JFrame frame = new javax.swing.JFrame("Quiz UI Test");

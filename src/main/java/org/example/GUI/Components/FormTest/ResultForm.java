@@ -174,8 +174,9 @@ public class ResultForm extends JDialog {
             if (this.contentPanel != null) {
                 this.contentPanel.removeAll();
                 this.contentPanel.setLayout(new BorderLayout());
-                TestForm examForm = new TestForm(this.contentPanel); // Ensure TestForm is defined
-                this.contentPanel.add(examForm, BorderLayout.CENTER);
+                // TestForm examForm = new TestForm(this.contentPanel); // Ensure TestForm is
+                // defined
+                // this.contentPanel.add(examForm, BorderLayout.CENTER);
                 this.contentPanel.revalidate();
                 this.contentPanel.repaint();
             }

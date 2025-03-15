@@ -19,6 +19,19 @@ public class TestDAO {
         conn = UtilsJDBC.getConnectDB();
     }
 
+    // Phương thức kiểm tra và lấy lại kết nối nếu bị đóng
+    private Connection getValidConnection() {
+        try {
+            if (conn == null || conn.isClosed()) {
+                conn = UtilsJDBC.getConnectDB();
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ Lỗi khi kiểm tra hoặc lấy kết nối: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return conn;
+    }
+
     /**
      * Lấy danh sách Test theo Topic ID
      */
@@ -32,20 +45,22 @@ public class TestDAO {
                 FROM test_structure
                 WHERE tpID = ?
                 """;
-        try (PreparedStatement stmt = conn.prepareStatement(structureQuery)) {
+        try (PreparedStatement stmt = getValidConnection().prepareStatement(structureQuery)) {
             stmt.setInt(1, tpID);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                String testCode = rs.getString("testCode");
-                Test_structureDTO structure = new Test_structureDTO(
-                        testCode,
-                        rs.getInt("tpID"),
-                        rs.getInt("numberEasy"),
-                        rs.getInt("numberMedium"),
-                        rs.getInt("numberDiff"));
-                structureMap.put(testCode, structure);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String testCode = rs.getString("testCode");
+                    Test_structureDTO structure = new Test_structureDTO(
+                            testCode,
+                            rs.getInt("tpID"),
+                            rs.getInt("numberEasy"),
+                            rs.getInt("numberMedium"),
+                            rs.getInt("numberDiff"));
+                    structureMap.put(testCode, structure);
+                }
             }
         } catch (SQLException e) {
+            System.err.println("❌ Lỗi khi lấy cấu trúc bài kiểm tra: " + e.getMessage());
             e.printStackTrace();
             return testList;
         }
@@ -56,24 +71,26 @@ public class TestDAO {
                 FROM test
                 WHERE testStatus = 1 AND testCode IN (SELECT testCode FROM test_structure WHERE tpID = ?)
                 """;
-        try (PreparedStatement stmt = conn.prepareStatement(testQuery)) {
+        try (PreparedStatement stmt = getValidConnection().prepareStatement(testQuery)) {
             stmt.setInt(1, tpID);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                String testCode = rs.getString("testCode");
-                Test_structureDTO structure = structureMap.get(testCode);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String testCode = rs.getString("testCode");
+                    Test_structureDTO structure = structureMap.get(testCode);
 
-                TestDTO test = new TestDTO(
-                        rs.getInt("testID"),
-                        testCode,
-                        rs.getString("testTitle"),
-                        rs.getInt("testTime"),
-                        rs.getDate("testDate"),
-                        rs.getInt("testStatus"),
-                        structure);
-                testList.add(test);
+                    TestDTO test = new TestDTO(
+                            rs.getInt("testID"),
+                            testCode,
+                            rs.getString("testTitle"),
+                            rs.getInt("testTime"),
+                            rs.getDate("testDate"),
+                            rs.getInt("testStatus"),
+                            structure);
+                    testList.add(test);
+                }
             }
         } catch (SQLException e) {
+            System.err.println("❌ Lỗi khi lấy danh sách bài kiểm tra: " + e.getMessage());
             e.printStackTrace();
         }
         return testList;
@@ -92,18 +109,20 @@ public class TestDAO {
                 FROM test_structure
                 WHERE testCode = ?
                 """;
-        try (PreparedStatement stmt = conn.prepareStatement(structureQuery)) {
+        try (PreparedStatement stmt = getValidConnection().prepareStatement(structureQuery)) {
             stmt.setString(1, testCode);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                structure = new Test_structureDTO(
-                        rs.getString("testCode"),
-                        rs.getInt("tpID"),
-                        rs.getInt("numberEasy"),
-                        rs.getInt("numberMedium"),
-                        rs.getInt("numberDiff"));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    structure = new Test_structureDTO(
+                            rs.getString("testCode"),
+                            rs.getInt("tpID"),
+                            rs.getInt("numberEasy"),
+                            rs.getInt("numberMedium"),
+                            rs.getInt("numberDiff"));
+                }
             }
         } catch (SQLException e) {
+            System.err.println("❌ Lỗi khi lấy cấu trúc bài kiểm tra: " + e.getMessage());
             e.printStackTrace();
             return null;
         }
@@ -114,46 +133,58 @@ public class TestDAO {
                 FROM test
                 WHERE testCode = ?
                 """;
-        try (PreparedStatement stmt = conn.prepareStatement(testQuery)) {
+        try (PreparedStatement stmt = getValidConnection().prepareStatement(testQuery)) {
             stmt.setString(1, testCode);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                test = new TestDTO(
-                        rs.getInt("testID"),
-                        testCode,
-                        rs.getString("testTitle"),
-                        rs.getInt("testTime"),
-                        rs.getDate("testDate"),
-                        rs.getInt("testStatus"),
-                        structure);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    test = new TestDTO(
+                            rs.getInt("testID"),
+                            testCode,
+                            rs.getString("testTitle"),
+                            rs.getInt("testTime"),
+                            rs.getDate("testDate"),
+                            rs.getInt("testStatus"),
+                            structure);
+                }
             }
         } catch (SQLException e) {
+            System.err.println("❌ Lỗi khi lấy bài kiểm tra: " + e.getMessage());
             e.printStackTrace();
         }
         return test;
     }
 
+    /**
+     * Lấy cấu trúc bài kiểm tra theo Test Code
+     */
     public Test_structureDTO getTestStructureByTestCode(String testCode) {
-        Test_structureDTO testStructure = null;
-        String query = "SELECT * FROM test_structure WHERE testCode = ?"; // Corrected table name
-
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        String query = """
+                SELECT testCode, tpID, numberEasy, numberMedium, numberDiff
+                FROM test_structure
+                WHERE testCode = ?
+                """;
+        try (PreparedStatement stmt = getValidConnection().prepareStatement(query)) {
             stmt.setString(1, testCode);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                testStructure = new Test_structureDTO();
-                testStructure.setTestCode(rs.getString("testCode"));
-                testStructure.setNumberEasy(rs.getInt("numberEasy"));
-                testStructure.setNumberMedium(rs.getInt("numberMedium"));
-                testStructure.setNumberDiff(rs.getInt("numberDiff"));
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Test_structureDTO(
+                            rs.getString("testCode"),
+                            rs.getInt("tpID"),
+                            rs.getInt("numberEasy"),
+                            rs.getInt("numberMedium"),
+                            rs.getInt("numberDiff"));
+                }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            System.err.println("❌ Lỗi khi lấy cấu trúc bài kiểm tra: " + e.getMessage());
             e.printStackTrace();
         }
-        return testStructure;
+        return null;
     }
 
+    /**
+     * Kiểm tra xem người dùng đã làm bài kiểm tra chưa
+     */
     public boolean hasUserTakenTest(int userID, String testCode) {
         if (userID <= 0 || testCode == null || testCode.trim().isEmpty()) {
             return false;
@@ -164,7 +195,7 @@ public class TestDAO {
                 FROM results
                 WHERE userID = ? AND exCode = ?
                 """;
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (PreparedStatement stmt = getValidConnection().prepareStatement(query)) {
             stmt.setInt(1, userID);
             stmt.setString(2, testCode);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -173,35 +204,9 @@ public class TestDAO {
                 }
             }
         } catch (SQLException e) {
+            System.err.println("❌ Lỗi khi kiểm tra bài kiểm tra của người dùng: " + e.getMessage());
             e.printStackTrace();
-
         }
         return false;
     }
-    // public ResultDTO getResultForUser(int userID, String testCode) {
-    // String query = """
-    // SELECT rsNum, userID, exCode, rsAnswers, rsMark, dateTime
-    // FROM results
-    // WHERE userID = ? AND exCode = ?
-    // """;
-    // try (PreparedStatement stmt = conn.prepareStatement(query)) {
-    // stmt.setInt(1, userID);
-    // stmt.setString(2, testCode);
-    // try (ResultSet rs = stmt.executeQuery()) {
-    // if (rs.next()) {
-    // return new ResultDTO(
-    // rs.getBoolean("rsNum"),
-    // rs.getInt("userID"),
-    // rs.getString("exCode"),
-    // rs.getString("rsAnswers"),
-    // rs.getFloat("rsMark"),
-    // rs.getTimestamp("dateTime")
-    // );
-    // }
-    // }
-    // } catch (SQLException e) {
-    // e.printStackTrace();
-    // }
-    // return null;
-    // }
 }

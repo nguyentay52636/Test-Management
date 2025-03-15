@@ -19,7 +19,7 @@ import org.example.GUI.Application.Application;
 import org.example.GUI.Components.FormAccount.FormManagerAccount;
 import org.example.GUI.Components.FormAccount.UserDetailForm;
 import org.example.GUI.Components.FormDashBoard.FormDashboard;
-import org.example.GUI.Components.FormTest.TestForm;
+import org.example.GUI.Components.FormTest.FormSelectionTest;
 import org.example.GUI.Components.FormTest.TestManagementPanel;
 import org.example.GUI.FormDialog.DiaLogForgetPass.DiaLogChangePass;
 import org.example.GUI.menu.Menu;
@@ -97,7 +97,8 @@ public class MainForm extends JLayeredPane {
 
                 Application.showForm(new FormInbox(panelBody));
             } else if (index == 5) {
-                Application.showForm(new TestForm(panelBody));
+                // Application.showForm(new TestForm(panelBody));
+                Application.showForm(new FormSelectionTest(panelBody));
             } else if (index == 6) {
                 Application.showForm(new FormDashboard());
 
