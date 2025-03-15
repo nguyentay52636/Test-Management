@@ -8,6 +8,8 @@ import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.sql.Connection;
@@ -31,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -60,14 +63,16 @@ public class TestManagementPanel extends JPanel {
         private String date; // testDate từ bảng test
         private String testCode; // testCode từ bảng test
         private int topicStatus; // tpStatus từ bảng topics
+        private String exCode; // exCode từ bảng exams
 
-        public Exam(int id, String title, String topic, String date, String testCode, int topicStatus) {
+        public Exam(int id, String title, String topic, String date, String testCode, int topicStatus, String exCode) {
             this.id = id;
             this.title = title;
             this.topic = topic;
             this.date = date;
             this.testCode = testCode;
             this.topicStatus = topicStatus;
+            this.exCode = exCode;
         }
 
         public int getId() {
@@ -94,6 +99,10 @@ public class TestManagementPanel extends JPanel {
             return topicStatus;
         }
 
+        public String getExCode() {
+            return exCode;
+        }
+
         public void setTitle(String title) {
             this.title = title;
         }
@@ -112,7 +121,7 @@ public class TestManagementPanel extends JPanel {
         examBUS = new ExamBUS();
         setBackground(new Color(240, 242, 245));
         setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        setBorder(new EmptyBorder(15, 15, 15, 15));
         initializeUI();
         loadExamDataFromDB();
     }
@@ -132,9 +141,9 @@ public class TestManagementPanel extends JPanel {
         };
         headerPanel.setPreferredSize(new Dimension(0, 60));
         headerPanel.setLayout(new BorderLayout(10, 10));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        headerPanel.setBorder(new EmptyBorder(10, 15, 10, 15));
 
-        JLabel lblTitle = new JLabel("Quản Lý Kỳ Thi");
+        JLabel lblTitle = new JLabel("Quản Lý Kỳ Thi", JLabel.LEFT);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 24));
         lblTitle.setForeground(Color.WHITE);
         headerPanel.add(lblTitle, BorderLayout.WEST);
@@ -148,23 +157,17 @@ public class TestManagementPanel extends JPanel {
         JPanel toolbarPanel = new JPanel();
         toolbarPanel.setLayout(new BoxLayout(toolbarPanel, BoxLayout.X_AXIS));
         toolbarPanel.setOpaque(false);
-        toolbarPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        toolbarPanel.setBorder(new EmptyBorder(5, 0, 5, 0));
 
-        // Icons
-        ImageIcon iconThem = new ImageIcon(
-                getClass().getResource("/org/example/GUI/resources/images/icons8_add_30px.png"));
-        ImageIcon exportIcon = new ImageIcon(
-                getClass().getResource("/org/example/GUI/resources/images/icons8_ms_excel_30px.png"));
-
-        // Buttons
-        btnAddExam = createStyledButton("Thêm Kỳ Thi", new Color(52, 152, 219), iconThem);
+        btnAddExam = createStyledButton("Thêm Kỳ Thi", new Color(52, 152, 219),
+                "/org/example/GUI/resources/images/icons8_add_30px.png");
         btnAddTopic = createStyledButton("Thêm Chủ Đề", new Color(46, 204, 113), null);
         btnViewDetails = createStyledButton("Xem Chi Tiết", new Color(241, 196, 15), null);
         btnDeleteExam = createStyledButton("Xóa Kỳ Thi", new Color(231, 76, 60), null);
-        btnExportExcel = createStyledButton("Xuất Excel", new Color(39, 174, 96), exportIcon);
+        btnExportExcel = createStyledButton("Xuất Excel", new Color(39, 174, 96),
+                "/org/example/GUI/resources/images/icons8_ms_excel_30px.png");
         btnSearch = createStyledButton("Tìm Kiếm", new Color(52, 152, 219), null);
 
-        // Search Field
         searchField = new JTextField(20);
         searchField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         searchField.setPreferredSize(new Dimension(200, 35));
@@ -173,7 +176,6 @@ public class TestManagementPanel extends JPanel {
                 BorderFactory.createLineBorder(new Color(189, 195, 199), 1),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
 
-        // Button Actions
         btnAddExam.addActionListener(e -> addExam());
         btnAddTopic.addActionListener(e -> addTopic());
         btnViewDetails.addActionListener(e -> viewExamDetails());
@@ -181,7 +183,6 @@ public class TestManagementPanel extends JPanel {
         btnExportExcel.addActionListener(e -> exportToExcel());
         btnSearch.addActionListener(e -> searchExams());
 
-        // Thêm các thành phần vào toolbarPanel với khoảng cách
         toolbarPanel.add(btnAddExam);
         toolbarPanel.add(Box.createHorizontalStrut(10));
         toolbarPanel.add(btnAddTopic);
@@ -201,9 +202,9 @@ public class TestManagementPanel extends JPanel {
 
         contentPanel.add(toolbarPanel, BorderLayout.NORTH);
 
-        // Table
+        // Tablesf
         tableModel = new DefaultTableModel(
-                new Object[] { "ID", "Tên Kỳ Thi", "Chủ Đề", "Ngày Thi", "Trạng Thái Chủ Đề" }, 0) {
+                new Object[] { "ID", "Tên đề thi", "Chủ Đề", "Ngày Thi", "Trạng Thái Chủ Đề", "Mã Đề" }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -220,9 +221,9 @@ public class TestManagementPanel extends JPanel {
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        examTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-        examTable.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
-        examTable.getColumnModel().getColumn(4).setCellRenderer(centerRenderer); // Căn giữa cột Trạng Thái
+        for (int i = 0; i < 6; i++) {
+            examTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
 
         JScrollPane tableScrollPane = new JScrollPane(examTable);
         tableScrollPane.setBorder(BorderFactory.createTitledBorder(
@@ -232,8 +233,8 @@ public class TestManagementPanel extends JPanel {
         add(contentPanel, BorderLayout.CENTER);
     }
 
-    private JButton createStyledButton(String text, Color bgColor, ImageIcon icon) {
-        JButton button = new JButton(text, icon) {
+    private JButton createStyledButton(String text, Color bgColor, String iconPath) {
+        JButton button = new JButton(text, iconPath != null ? new ImageIcon(getClass().getResource(iconPath)) : null) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
@@ -248,22 +249,22 @@ public class TestManagementPanel extends JPanel {
         button.setFocusPainted(false);
         button.setContentAreaFilled(false);
         button.setOpaque(false);
-        button.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        button.setBorder(new EmptyBorder(8, 15, 8, 15));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
+        button.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent evt) {
                 button.setBackground(bgColor.brighter());
             }
 
-            public void mouseExited(java.awt.event.MouseEvent evt) {
+            public void mouseExited(MouseEvent evt) {
                 button.setBackground(bgColor);
             }
 
-            public void mousePressed(java.awt.event.MouseEvent evt) {
+            public void mousePressed(MouseEvent evt) {
                 button.setBackground(bgColor.darker());
             }
 
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
+            public void mouseReleased(MouseEvent evt) {
                 button.setBackground(bgColor);
             }
         });
@@ -274,10 +275,11 @@ public class TestManagementPanel extends JPanel {
         examList.clear();
         try (Connection conn = UtilsJDBC.getConnectDB();
                 PreparedStatement ps = conn.prepareStatement(
-                        "SELECT t.testID, t.testTitle, t.testDate, tp.tpTitle, t.testCode, tp.tpStatus " +
+                        "SELECT t.testID, t.testTitle, t.testDate, tp.tpTitle, t.testCode, tp.tpStatus, e.exCode " +
                                 "FROM test t " +
                                 "LEFT JOIN test_structure ts ON t.testCode = ts.testCode " +
-                                "LEFT JOIN topics tp ON ts.tpID = tp.tpID")) {
+                                "LEFT JOIN topics tp ON ts.tpID = tp.tpID " +
+                                "LEFT JOIN exams e ON t.testCode = e.testCode")) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("testID");
@@ -285,8 +287,9 @@ public class TestManagementPanel extends JPanel {
                 String topic = rs.getString("tpTitle") != null ? rs.getString("tpTitle") : "Chưa xác định";
                 String date = rs.getString("testDate");
                 String testCode = rs.getString("testCode");
-                int topicStatus = rs.getInt("tpStatus"); // Lấy tpStatus từ bảng topics
-                examList.add(new Exam(id, title, topic, date, testCode, topicStatus));
+                int topicStatus = rs.getInt("tpStatus");
+                String exCode = rs.getString("exCode") != null ? rs.getString("exCode") : "Chưa có mã đề";
+                examList.add(new Exam(id, title, topic, date, testCode, topicStatus, exCode));
             }
             refreshTable(examList);
         } catch (SQLException e) {
@@ -298,12 +301,8 @@ public class TestManagementPanel extends JPanel {
         tableModel.setRowCount(0);
         for (Exam exam : exams) {
             tableModel.addRow(new Object[] {
-                    exam.getId(),
-                    exam.getTitle(),
-                    exam.getTopic(),
-                    exam.getDate(),
-                    exam.getTopicStatus() == 1 ? "Hoạt động" : "Không hoạt động" // Hiển thị trạng thái dưới dạng văn
-                                                                                 // bản
+                    exam.getId(), exam.getTitle(), exam.getTopic(), exam.getDate(),
+                    exam.getTopicStatus() == 1 ? "Hoạt động" : "Không hoạt động", exam.getExCode()
             });
         }
     }
@@ -357,7 +356,7 @@ public class TestManagementPanel extends JPanel {
                 ps.executeUpdate();
                 JOptionPane.showMessageDialog(this, "Đã thêm chủ đề '" + topic + "'", "Thành Công",
                         JOptionPane.INFORMATION_MESSAGE);
-                loadExamDataFromDB(); // Tải lại dữ liệu để cập nhật chủ đề mới
+                loadExamDataFromDB();
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Lỗi thêm chủ đề: " + e.getMessage(), "Lỗi",
                         JOptionPane.ERROR_MESSAGE);
@@ -423,7 +422,7 @@ public class TestManagementPanel extends JPanel {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Exam List");
             Row headerRow = sheet.createRow(0);
-            String[] headers = { "ID", "Tên Kỳ Thi", "Chủ Đề", "Ngày Thi", "Trạng Thái Chủ Đề" };
+            String[] headers = { "ID", "Tên Kỳ Thi", "Chủ Đề", "Ngày Thi", "Trạng Thái Chủ Đề", "Mã Đề" };
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
@@ -437,6 +436,7 @@ public class TestManagementPanel extends JPanel {
                 row.createCell(2).setCellValue(exam.getTopic());
                 row.createCell(3).setCellValue(exam.getDate());
                 row.createCell(4).setCellValue(exam.getTopicStatus() == 1 ? "Hoạt động" : "Không hoạt động");
+                row.createCell(5).setCellValue(exam.getExCode());
             }
 
             JFileChooser fileChooser = new JFileChooser();
@@ -463,7 +463,8 @@ public class TestManagementPanel extends JPanel {
         } else {
             List<Exam> filteredList = new ArrayList<>();
             for (Exam exam : examList) {
-                if (exam.getTitle().toLowerCase().contains(query) || exam.getTopic().toLowerCase().contains(query)) {
+                if (exam.getTitle().toLowerCase().contains(query) || exam.getTopic().toLowerCase().contains(query) ||
+                        exam.getExCode().toLowerCase().contains(query)) {
                     filteredList.add(exam);
                 }
             }
@@ -475,7 +476,7 @@ public class TestManagementPanel extends JPanel {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Quản Lý Kỳ Thi");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1200, 700); // Tăng kích thước để hiển thị cột mới
+            frame.setSize(1200, 700);
             frame.setLocationRelativeTo(null);
             frame.setContentPane(new TestManagementPanel());
             frame.setVisible(true);

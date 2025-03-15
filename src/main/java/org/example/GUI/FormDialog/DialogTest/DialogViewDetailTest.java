@@ -10,6 +10,8 @@ import java.awt.Frame;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -17,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -28,12 +32,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.example.BUS.AnswersBUS;
 import org.example.BUS.ExamBUS;
 import org.example.BUS.QuestionBUS;
@@ -49,11 +53,36 @@ public class DialogViewDetailTest extends JDialog {
     private JTable questionTable;
     private DefaultTableModel tableModel;
     private JTextField searchField;
-    private JButton btnImport, btnExport, btnSearch;
-    private List<String> questionIDs;
+    private JButton btnImport, btnExport, btnSearch, btnClose;
+    private List<QuestionDetail> questionDetails; // Danh sách câu hỏi và đáp án
     private ExamBUS examBUS;
     private QuestionBUS questionBUS;
     private AnswersBUS answersBUS;
+
+    // Lớp nội bộ để lưu thông tin câu hỏi và đáp án
+    private static class QuestionDetail {
+        private int qid;
+        private String content;
+        private String answers; // Chuỗi chứa tất cả đáp án và trạng thái đúng/sai
+
+        public QuestionDetail(int qid, String content, String answers) {
+            this.qid = qid;
+            this.content = content;
+            this.answers = answers;
+        }
+
+        public int getQid() {
+            return qid;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public String getAnswers() {
+            return answers;
+        }
+    }
 
     public DialogViewDetailTest(TestManagementPanel parentPanel, TestManagementPanel.Exam exam,
             List<TestManagementPanel.Exam> examList) {
@@ -64,9 +93,9 @@ public class DialogViewDetailTest extends JDialog {
         this.examBUS = new ExamBUS();
         this.questionBUS = new QuestionBUS();
         this.answersBUS = new AnswersBUS();
-        this.questionIDs = new ArrayList<>();
+        this.questionDetails = new ArrayList<>();
         setLayout(new BorderLayout(10, 10));
-        setSize(600, 400);
+        setSize(800, 600); // Tăng kích thước để hiển thị nội dung đầy đủ
         setLocationRelativeTo(parentPanel);
         loadQuestionData();
         initializeUI();
@@ -76,15 +105,36 @@ public class DialogViewDetailTest extends JDialog {
         try {
             ExamsDTO examDTO = examBUS.getExamByExCode(exam.getTestCode() + "A");
             if (examDTO != null && examDTO.getExQuestionIDs() != null && !examDTO.getExQuestionIDs().isEmpty()) {
-                questionIDs = Arrays.asList(examDTO.getExQuestionIDs().split(","));
+                List<String> questionIDs = Arrays.asList(examDTO.getExQuestionIDs().split(","));
+                for (String qidStr : questionIDs) {
+                    try {
+                        int qid = Integer.parseInt(qidStr.trim());
+                        QuestionDTO question = questionBUS.getQuestionByID(qid);
+                        if (question != null) {
+                            List<AnswersDTO> answers = answersBUS.getAnswersByQuestionID(qid);
+                            StringBuilder answerText = new StringBuilder();
+                            for (AnswersDTO answer : answers) {
+                                answerText.append(answer.getAwContent())
+                                        .append(answer.getIsRight() ? " (Đúng)" : " (Sai)")
+                                        .append("; ");
+                            }
+                            if (answerText.length() > 2) {
+                                answerText.setLength(answerText.length() - 2); // Xóa dấu "; " cuối
+                            }
+                            questionDetails.add(new QuestionDetail(qid, question.getQContent(), answerText.toString()));
+                        }
+                    } catch (NumberFormatException e) {
+                        questionDetails.add(new QuestionDetail(-1, "ID không hợp lệ: " + qidStr, "N/A"));
+                    }
+                }
             } else {
-                questionIDs.add("Chưa có câu hỏi nào");
+                questionDetails.add(new QuestionDetail(-1, "Chưa có câu hỏi nào", "N/A"));
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu câu hỏi: " + e.getMessage(), "Lỗi",
                     JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
-            questionIDs.add("Lỗi tải dữ liệu");
+            questionDetails.add(new QuestionDetail(-1, "Lỗi tải dữ liệu", "N/A"));
         }
     }
 
@@ -93,7 +143,6 @@ public class DialogViewDetailTest extends JDialog {
         JPanel headerPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 GradientPaint gradient = new GradientPaint(0, 0, new Color(66, 139, 202), 0, getHeight(),
                         new Color(52, 110, 158));
@@ -102,32 +151,30 @@ public class DialogViewDetailTest extends JDialog {
             }
         };
         headerPanel.setPreferredSize(new Dimension(0, 50));
-        headerPanel.setLayout(new BorderLayout(10, 10));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
-
+        headerPanel.setLayout(new BorderLayout());
         JLabel lblTitle = new JLabel("Danh Sách Câu Hỏi - " + exam.getTitle());
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitle.setForeground(Color.WHITE);
+        lblTitle.setBorder(new EmptyBorder(0, 15, 0, 0));
         headerPanel.add(lblTitle, BorderLayout.WEST);
         add(headerPanel, BorderLayout.NORTH);
 
         // Toolbar Panel
-        JPanel toolbarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        JPanel toolbarPanel = new JPanel();
+        toolbarPanel.setLayout(new BoxLayout(toolbarPanel, BoxLayout.X_AXIS));
         toolbarPanel.setOpaque(false);
-        toolbarPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        toolbarPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-        ImageIcon importIcon = new ImageIcon(
-                getClass().getResource("/org/example/GUI/resources/images/icons8_import_30px.png"));
-        ImageIcon exportIcon = new ImageIcon(
-                getClass().getResource("/org/example/GUI/resources/images/icons8_ms_excel_30px.png"));
-
-        btnImport = createStyledButton("Import", new Color(52, 152, 219), importIcon);
-        btnExport = createStyledButton("Export", new Color(39, 174, 96), exportIcon);
+        btnImport = createStyledButton("Import", new Color(52, 152, 219),
+                "/org/example/GUI/resources/images/icons8_import_30px.png");
+        btnExport = createStyledButton("Export", new Color(39, 174, 96),
+                "/org/example/GUI/resources/images/icons8_ms_excel_30px.png");
         btnSearch = createStyledButton("Tìm Kiếm", new Color(241, 196, 15), null);
 
-        searchField = new JTextField(15);
+        searchField = new JTextField(20);
         searchField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        searchField.setPreferredSize(new Dimension(150, 30));
+        searchField.setPreferredSize(new Dimension(200, 35));
+        searchField.setMaximumSize(new Dimension(200, 35));
         searchField.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(189, 195, 199), 1),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
@@ -137,13 +184,20 @@ public class DialogViewDetailTest extends JDialog {
         btnSearch.addActionListener(e -> searchQuestions());
 
         toolbarPanel.add(btnImport);
+        toolbarPanel.add(Box.createHorizontalStrut(10));
         toolbarPanel.add(btnExport);
+        toolbarPanel.add(Box.createHorizontalStrut(10));
         toolbarPanel.add(new JLabel("Tìm kiếm:"));
+        toolbarPanel.add(Box.createHorizontalStrut(5));
         toolbarPanel.add(searchField);
+        toolbarPanel.add(Box.createHorizontalStrut(5));
         toolbarPanel.add(btnSearch);
+        toolbarPanel.add(Box.createHorizontalGlue());
+
+        add(toolbarPanel, BorderLayout.CENTER);
 
         // Table Panel
-        tableModel = new DefaultTableModel(new Object[] { "STT", "ID Câu Hỏi" }, 0) {
+        tableModel = new DefaultTableModel(new Object[] { "STT", "ID Câu Hỏi", "Nội Dung Câu Hỏi", "Đáp Án" }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -152,7 +206,7 @@ public class DialogViewDetailTest extends JDialog {
         questionTable = new JTable(tableModel);
         questionTable.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         questionTable.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
-        questionTable.setRowHeight(25);
+        questionTable.setRowHeight(30);
         questionTable.setGridColor(new Color(220, 220, 220));
         questionTable.setShowGrid(true);
         questionTable.setSelectionBackground(new Color(52, 152, 219));
@@ -160,49 +214,29 @@ public class DialogViewDetailTest extends JDialog {
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        questionTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
-        questionTable.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+        questionTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer); // STT
+        questionTable.getColumnModel().getColumn(1).setCellRenderer(centerRenderer); // ID
+        questionTable.getColumnModel().getColumn(2).setPreferredWidth(300); // Nội dung rộng hơn
+        questionTable.getColumnModel().getColumn(3).setPreferredWidth(400); // Đáp án rộng hơn
 
-        // Thêm sự kiện nhấp đúp để xem chi tiết câu hỏi
-        questionTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                if (e.getClickCount() == 2) { // Nhấp đúp
-                    int selectedRow = questionTable.getSelectedRow();
-                    if (selectedRow >= 0) {
-                        String qidStr = (String) tableModel.getValueAt(selectedRow, 1);
-                        try {
-                            int qid = Integer.parseInt(qidStr);
-                            showQuestionDetails(qid);
-                        } catch (NumberFormatException ex) {
-                            JOptionPane.showMessageDialog(DialogViewDetailTest.this, "ID câu hỏi không hợp lệ!", "Lỗi",
-                                    JOptionPane.ERROR_MESSAGE);
-                        }
-                    }
-                }
-            }
-        });
-
-        refreshTable(questionIDs);
+        refreshTable(questionDetails);
 
         JScrollPane tableScrollPane = new JScrollPane(questionTable);
         tableScrollPane.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createLineBorder(new Color(189, 195, 199), 1), "Danh Sách Câu Hỏi"));
+                BorderFactory.createLineBorder(new Color(189, 195, 199), 1), "Danh Sách Câu Hỏi và Đáp Án"));
+        add(tableScrollPane, BorderLayout.SOUTH);
 
-        // Add components to dialog
-        add(toolbarPanel, BorderLayout.NORTH);
-        add(tableScrollPane, BorderLayout.CENTER);
-
+        // Button Panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        JButton btnClose = createStyledButton("Đóng", new Color(231, 76, 60), null);
+        buttonPanel.setOpaque(false);
+        btnClose = createStyledButton("Đóng", new Color(231, 76, 60), null);
         btnClose.addActionListener(e -> dispose());
         buttonPanel.add(btnClose);
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    private JButton createStyledButton(String text, Color bgColor, ImageIcon icon) {
-        JButton button = new JButton(text, icon) {
+    private JButton createStyledButton(String text, Color bgColor, String iconPath) {
+        JButton button = new JButton(text, iconPath != null ? new ImageIcon(getClass().getResource(iconPath)) : null) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g;
@@ -217,40 +251,63 @@ public class DialogViewDetailTest extends JDialog {
         button.setFocusPainted(false);
         button.setContentAreaFilled(false);
         button.setOpaque(false);
-        button.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        button.setBorder(new EmptyBorder(8, 15, 8, 15));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
+        button.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent evt) {
                 button.setBackground(bgColor.brighter());
             }
 
-            public void mouseExited(java.awt.event.MouseEvent evt) {
+            public void mouseExited(MouseEvent evt) {
                 button.setBackground(bgColor);
             }
 
-            public void mousePressed(java.awt.event.MouseEvent evt) {
+            public void mousePressed(MouseEvent evt) {
                 button.setBackground(bgColor.darker());
             }
 
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
+            public void mouseReleased(MouseEvent evt) {
                 button.setBackground(bgColor);
             }
         });
         return button;
     }
 
-    private void refreshTable(List<String> questions) {
+    private void refreshTable(List<QuestionDetail> questions) {
         tableModel.setRowCount(0);
         for (int i = 0; i < questions.size(); i++) {
-            tableModel.addRow(new Object[] { i + 1, questions.get(i) });
+            QuestionDetail q = questions.get(i);
+            tableModel.addRow(new Object[] { i + 1, q.getQid(), q.getContent(), q.getAnswers() });
         }
     }
 
     private void importQuestions() {
         String newQuestions = JOptionPane.showInputDialog(this, "Nhập danh sách ID câu hỏi (cách nhau bởi dấu phẩy):");
         if (newQuestions != null && !newQuestions.trim().isEmpty()) {
-            questionIDs = Arrays.asList(newQuestions.split(","));
-            refreshTable(questionIDs);
+            questionDetails.clear();
+            List<String> questionIDs = Arrays.asList(newQuestions.split(","));
+            for (String qidStr : questionIDs) {
+                try {
+                    int qid = Integer.parseInt(qidStr.trim());
+                    QuestionDTO question = questionBUS.getQuestionByID(qid);
+                    if (question != null) {
+                        List<AnswersDTO> answers = answersBUS.getAnswersByQuestionID(qid);
+                        StringBuilder answerText = new StringBuilder();
+                        for (AnswersDTO answer : answers) {
+                            answerText.append(answer.getAwContent())
+                                    .append(answer.getIsRight() ? " (Đúng)" : " (Sai)")
+                                    .append("; ");
+                        }
+                        if (answerText.length() > 2) {
+                            answerText.setLength(answerText.length() - 2);
+                        }
+                        questionDetails.add(new QuestionDetail(qid, question.getQContent(), answerText.toString()));
+                    }
+                } catch (NumberFormatException e) {
+                    questionDetails.add(new QuestionDetail(-1, "ID không hợp lệ: " + qidStr, "N/A"));
+                }
+            }
+            refreshTable(questionDetails);
             updateExamQuestions();
             JOptionPane.showMessageDialog(this, "Đã import danh sách câu hỏi!", "Thành Công",
                     JOptionPane.INFORMATION_MESSAGE);
@@ -258,18 +315,21 @@ public class DialogViewDetailTest extends JDialog {
     }
 
     private void exportToExcel() {
-        try (XSSFWorkbook workbook = new XSSFWorkbook()) {
+        try (org.apache.poi.xssf.usermodel.XSSFWorkbook workbook = new org.apache.poi.xssf.usermodel.XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Question List");
             Row headerRow = sheet.createRow(0);
-            String[] headers = { "STT", "ID Câu Hỏi" };
+            String[] headers = { "STT", "ID Câu Hỏi", "Nội Dung Câu Hỏi", "Đáp Án" };
             for (int i = 0; i < headers.length; i++) {
                 headerRow.createCell(i).setCellValue(headers[i]);
             }
 
-            for (int i = 0; i < questionIDs.size(); i++) {
+            for (int i = 0; i < questionDetails.size(); i++) {
                 Row row = sheet.createRow(i + 1);
+                QuestionDetail q = questionDetails.get(i);
                 row.createCell(0).setCellValue(i + 1);
-                row.createCell(1).setCellValue(questionIDs.get(i));
+                row.createCell(1).setCellValue(q.getQid());
+                row.createCell(2).setCellValue(q.getContent());
+                row.createCell(3).setCellValue(q.getAnswers());
             }
 
             JFileChooser fileChooser = new JFileChooser();
@@ -292,12 +352,13 @@ public class DialogViewDetailTest extends JDialog {
     private void searchQuestions() {
         String query = searchField.getText().trim().toLowerCase();
         if (query.isEmpty()) {
-            refreshTable(questionIDs);
+            refreshTable(questionDetails);
         } else {
-            List<String> filteredQuestions = new ArrayList<>();
-            for (String qid : questionIDs) {
-                if (qid.toLowerCase().contains(query)) {
-                    filteredQuestions.add(qid);
+            List<QuestionDetail> filteredQuestions = new ArrayList<>();
+            for (QuestionDetail q : questionDetails) {
+                if (String.valueOf(q.getQid()).contains(query) || q.getContent().toLowerCase().contains(query) ||
+                        q.getAnswers().toLowerCase().contains(query)) {
+                    filteredQuestions.add(q);
                 }
             }
             refreshTable(filteredQuestions);
@@ -309,7 +370,11 @@ public class DialogViewDetailTest extends JDialog {
         try {
             ExamsDTO examDTO = examBUS.getExamByExCode(exCode);
             if (examDTO != null) {
-                examDTO.setExQuestionIDs(String.join(",", questionIDs));
+                String questionIDs = questionDetails.stream()
+                        .filter(q -> q.getQid() != -1)
+                        .map(q -> String.valueOf(q.getQid()))
+                        .collect(java.util.stream.Collectors.joining(","));
+                examDTO.setExQuestionIDs(questionIDs);
                 examBUS.updateExam(examDTO);
             }
         } catch (Exception e) {
@@ -318,68 +383,4 @@ public class DialogViewDetailTest extends JDialog {
             e.printStackTrace();
         }
     }
-
-    private void showQuestionDetails(int qid) {
-        JDialog detailDialog = new JDialog(this, "Chi Tiết Câu Hỏi: " + qid, true);
-        detailDialog.setLayout(new BorderLayout(10, 10));
-        detailDialog.setSize(500, 400);
-        detailDialog.setLocationRelativeTo(this);
-
-        try {
-            QuestionDTO question = questionBUS.getQuestionByID(qid);
-            if (question != null) {
-                JLabel contentLabel = new JLabel("<html><b>Câu hỏi:</b> " + question.getQContent() + "</html>");
-                contentLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-                contentLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-                JPanel answersPanel = new JPanel(new java.awt.GridLayout(0, 1, 5, 5));
-                answersPanel.setBorder(BorderFactory.createTitledBorder("Đáp án"));
-                List<AnswersDTO> answers = answersBUS.getAnswersByQuestionID(qid);
-                for (AnswersDTO answer : answers) {
-                    JPanel answerPanel = new JPanel(new BorderLayout());
-                    JLabel answerLabel = new JLabel(answer.getAwContent() + (answer.getIsRight() ? " (Đúng)" : ""));
-                    answerLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-                    answerPanel.add(answerLabel, BorderLayout.CENTER);
-                    // Chỉ hiển thị hình ảnh nếu awPicture tồn tại và không rỗng
-                    if (answer.getAwPicture() != null && !answer.getAwPicture().isEmpty()) {
-                        try {
-                            ImageIcon image = new ImageIcon(answer.getAwPicture());
-                            JLabel imageLabel = new JLabel(image);
-                            answerPanel.add(imageLabel, BorderLayout.EAST);
-                        } catch (Exception e) {
-                            answerPanel.add(new JLabel("(Hình ảnh: " + answer.getAwPicture() + ")"), BorderLayout.EAST);
-                        }
-                    }
-                    answersPanel.add(answerPanel);
-                }
-
-                JButton btnClose = createStyledButton("Đóng", new Color(231, 76, 60), null);
-                btnClose.addActionListener(e -> detailDialog.dispose());
-
-                detailDialog.add(contentLabel, BorderLayout.NORTH);
-                detailDialog.add(new JScrollPane(answersPanel), BorderLayout.CENTER);
-                detailDialog.add(btnClose, BorderLayout.SOUTH);
-                detailDialog.setVisible(true);
-            } else {
-                JOptionPane.showMessageDialog(this, "Không tìm thấy câu hỏi với ID: " + qid, "Lỗi",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Lỗi khi tải chi tiết câu hỏi: " + e.getMessage(), "Lỗi",
-                    JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
-    }
-
-    // public static void main(String[] args) {
-    // SwingUtilities.invokeLater(() -> {
-    // TestManagementPanel panel = new TestManagementPanel();
-    // List<TestManagementPanel.Exam> examList = new ArrayList<>();
-    // examList.add(new TestManagementPanel.Exam(1, "Kỳ Thi Toán", "Toán Học",
-    // "2025-03-15", "MATH01"));
-    // DialogViewDetailTest dialog = new DialogViewDetailTest(panel,
-    // examList.get(0), examList);
-    // dialog.setVisible(true);
-    // });
-    // }
 }
