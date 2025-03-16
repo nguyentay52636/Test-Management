@@ -1,7 +1,26 @@
 package org.example.GUI.Components.FormAuth;
 
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import org.example.BUS.UserBUS;
@@ -11,195 +30,174 @@ import org.example.GUI.Application.Application;
 import net.miginfocom.swing.MigLayout;
 
 public class SignUpForm extends JPanel {
-
-    private JPanel jPanel1;
-    UserBUS userBUS = new UserBUS();
-
-    // Component declarations
-    private javax.swing.JButton signUp;
-    private javax.swing.JButton backLogin;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPasswordField txtPassword;
-    private javax.swing.JTextField txtUsername;
-    private javax.swing.JTextField txtEmail;
-    private javax.swing.JLabel labelFullName;
-    private javax.swing.JTextField txtFullName;
+    private JPanel container;
+    private JPanel leftPanel;
+    private JPanel rightPanel;
+    private JButton signUpButton;
+    private JButton backLoginButton;
+    private JLabel lblTitle;
+    private JLabel lblUsername;
+    private JLabel lblFullName;
+    private JLabel lblEmail;
+    private JLabel lblPassword;
+    private JLabel lblLogo;
+    private JLabel lblAppName;
+    private JLabel lblFooter;
+    private JTextField txtUsername;
+    private JTextField txtFullName;
+    private JTextField txtEmail;
+    private JPasswordField txtPassword;
+    private UserBUS userBUS = new UserBUS();
 
     public SignUpForm() {
         initComponents();
     }
 
-    @SuppressWarnings("unchecked")
     private void initComponents() {
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        signUp = new javax.swing.JButton();
-        backLogin = new javax.swing.JButton();
-        txtUsername = new javax.swing.JTextField();
-        labelFullName = new javax.swing.JLabel();
-        txtFullName = new javax.swing.JTextField();
-        txtEmail = new javax.swing.JTextField();
-        txtPassword = new javax.swing.JPasswordField();
+        setBackground(new Color(240, 242, 245));
+        setLayout(new MigLayout("fill, al center center", "[grow]", "[grow]"));
+        setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(200, 200, 200), 1, true),
+                BorderFactory.createEmptyBorder(20, 20, 20, 20)));
 
-        setLayout(new MigLayout("al center center", "[grow]", "[grow]"));
-        setPreferredSize(new java.awt.Dimension(800, 500));
+        container = new JPanel(new MigLayout("ins 0", "[400px][400px]", "[500px]"));
+        container.setBackground(Color.WHITE);
+        container.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220), 1, true));
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setLayout(new MigLayout("ins 0", "[pref][grow]", "[500px]"));
+        // Left Panel (Logo and Text) với Gradient
+        leftPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                GradientPaint gp = new GradientPaint(0, 0, new Color(0, 102, 102), 0, getHeight(),
+                        new Color(0, 153, 153));
+                g2d.setPaint(gp);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
+        };
+        leftPanel.setLayout(new MigLayout("fill, al center center", "[grow]", "push[]50[]30[]push"));
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        // Left Panel (Logo and Text)
-        jPanel2.setBackground(new java.awt.Color(0, 102, 102));
-        jLabel1.setIcon(
-                new javax.swing.ImageIcon(getClass().getResource("/org/example/GUI/menu/logo/logojavawing.png")));
-        jLabel2.setFont(new java.awt.Font("Showcard Gothic", 0, 20));
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setText("QUẢN LÝ THI TRẮC NGHIỆM");
-        jLabel3.setFont(new java.awt.Font("Segoe UI Light", 0, 14));
-        jLabel3.setForeground(new java.awt.Color(204, 204, 204));
-        jLabel3.setText("copyright © company name All rights reserved");
+        lblLogo = new JLabel(new ImageIcon(getClass().getResource("/org/example/GUI/menu/logo/logojavawing.png")));
+        lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
+        leftPanel.add(lblLogo, "center, wrap");
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(50, 50, 50)
-                                .addComponent(jLabel2))
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(145, 145, 145)
-                                .addComponent(jLabel1))
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(40, 40, 40)
-                                .addComponent(jLabel3)));
-        jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(129, 129, 129)
-                                .addComponent(jLabel1)
-                                .addGap(30, 30, 30)
-                                .addComponent(jLabel2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
-                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel3)
-                                .addGap(64, 64, 64)));
+        lblAppName = new JLabel("QUẢN LÝ THI TRẮC NGHIỆM");
+        lblAppName.setFont(new Font("Showcard Gothic", Font.BOLD, 24));
+        lblAppName.setForeground(Color.WHITE);
+        lblAppName.setHorizontalAlignment(SwingConstants.CENTER);
+        leftPanel.add(lblAppName, "center, wrap");
+
+        lblFooter = new JLabel("© 2025 All rights reserved");
+        lblFooter.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblFooter.setForeground(new Color(204, 204, 204));
+        lblFooter.setHorizontalAlignment(SwingConstants.CENTER);
+        leftPanel.add(lblFooter, "center");
 
         // Right Panel (Sign Up Form)
-        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel3.setLayout(new MigLayout("al center, wrap 1", "[grow]", "[grow]"));
+        rightPanel = new JPanel(
+                new MigLayout("fill, al center center, wrap 1", "[grow]", "[]20[]10[]10[]10[]10[]20[]10[]"));
+        rightPanel.setBackground(Color.WHITE);
 
-        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 36));
-        jLabel4.setForeground(new java.awt.Color(0, 102, 102));
-        jLabel4.setText("SIGN UP");
+        lblTitle = new JLabel("ĐĂNG KÝ");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 32));
+        lblTitle.setForeground(new Color(0, 102, 102));
+        lblTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        rightPanel.add(lblTitle, "center");
 
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 14));
-        jLabel5.setText("User name");
-        txtUsername.setFont(new java.awt.Font("Segoe UI", 0, 14));
-        txtUsername.setForeground(new java.awt.Color(102, 102, 102));
+        // Username Field
+        JPanel usernamePanel = new JPanel(new MigLayout("fill", "[]10[grow]", "[]"));
+        usernamePanel.setBackground(Color.WHITE);
+        lblUsername = new JLabel("Tên đăng nhập:");
+        lblUsername.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblUsername.setForeground(new Color(66, 80, 102));
+        usernamePanel.add(lblUsername);
+        txtUsername = new JTextField();
+        txtUsername.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtUsername.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(200, 200, 200)));
+        txtUsername.setBackground(Color.WHITE);
+        usernamePanel.add(txtUsername, "growx");
+        rightPanel.add(usernamePanel, "width 300px, center");
 
-        labelFullName.setFont(new java.awt.Font("Segoe UI", 0, 14));
-        labelFullName.setText("Full name");
-        txtFullName.setFont(new java.awt.Font("Segoe UI", 0, 14));
-        txtFullName.setForeground(new java.awt.Color(102, 102, 102));
+        // Full Name Field
+        JPanel fullNamePanel = new JPanel(new MigLayout("fill", "[]10[grow]", "[]"));
+        fullNamePanel.setBackground(Color.WHITE);
+        lblFullName = new JLabel("Họ và tên:");
+        lblFullName.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblFullName.setForeground(new Color(66, 80, 102));
+        fullNamePanel.add(lblFullName);
+        txtFullName = new JTextField();
+        txtFullName.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtFullName.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(200, 200, 200)));
+        txtFullName.setBackground(Color.WHITE);
+        fullNamePanel.add(txtFullName, "growx");
+        rightPanel.add(fullNamePanel, "width 300px, center");
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14));
-        jLabel6.setText("Email");
-        txtEmail.setFont(new java.awt.Font("Segoe UI", 0, 14));
-        txtEmail.setForeground(new java.awt.Color(102, 102, 102));
+        // Email Field
+        JPanel emailPanel = new JPanel(new MigLayout("fill", "[]10[grow]", "[]"));
+        emailPanel.setBackground(Color.WHITE);
+        lblEmail = new JLabel("Email:");
+        lblEmail.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblEmail.setForeground(new Color(66, 80, 102));
+        emailPanel.add(lblEmail);
+        txtEmail = new JTextField();
+        txtEmail.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtEmail.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(200, 200, 200)));
+        txtEmail.setBackground(Color.WHITE);
+        emailPanel.add(txtEmail, "growx");
+        rightPanel.add(emailPanel, "width 300px, center");
 
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 14));
-        jLabel7.setText("Password");
-        txtPassword.setFont(new java.awt.Font("Segoe UI", 0, 14));
-        txtPassword.setForeground(new java.awt.Color(102, 102, 102));
+        // Password Field
+        JPanel passwordPanel = new JPanel(new MigLayout("fill", "[]10[grow]", "[]"));
+        passwordPanel.setBackground(Color.WHITE);
+        lblPassword = new JLabel("Mật khẩu:");
+        lblPassword.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblPassword.setForeground(new Color(66, 80, 102));
+        passwordPanel.add(lblPassword);
+        txtPassword = new JPasswordField();
+        txtPassword.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        txtPassword.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(200, 200, 200)));
+        txtPassword.setBackground(Color.WHITE);
+        passwordPanel.add(txtPassword, "growx");
+        rightPanel.add(passwordPanel, "width 300px, center");
 
-        jLabel8.setText("I've an account");
-
-        signUp.setBackground(new java.awt.Color(0, 102, 102));
-        signUp.setFont(new java.awt.Font("Segoe UI", 0, 14));
-        signUp.setForeground(new java.awt.Color(255, 255, 255));
-        signUp.setText("Sign Up");
-        signUp.setOpaque(true);
-        signUp.setContentAreaFilled(true);
-        signUp.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.BLACK, 1));
-        signUp.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        signUp.addActionListener(e -> {
-            String username = txtUsername.getText().trim();
-            String fullName = txtFullName.getText().trim();
-            String email = txtEmail.getText().trim();
-            String password = new String(txtPassword.getPassword()).trim();
-
-            for (UsersDTO user : userBUS.getListAccount()) {
-                if (user.getUserName().equalsIgnoreCase(username) || user.getUserEmail().equalsIgnoreCase(email)) {
-                    JOptionPane.showMessageDialog(null,
-                            "Tên đăng nhập hoặc Email đã tồn tại! Vui lòng chọn tên khác.",
-                            "Lỗi", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
+        // Sign Up Button
+        signUpButton = new JButton("Đăng ký");
+        signUpButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        signUpButton.setBackground(new Color(0, 102, 102));
+        signUpButton.setForeground(Color.WHITE);
+        signUpButton.setFocusPainted(false);
+        signUpButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        signUpButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        signUpButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                signUpButton.setBackground(new Color(0, 153, 153));
             }
 
-            if (username.isEmpty() || fullName.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Vui lòng điền đầy đủ thông tin!", "Lỗi",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-                JOptionPane.showMessageDialog(null, "Email không hợp lệ! Vui lòng nhập lại.",
-                        "Lỗi", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            if (password.length() < 6) {
-                JOptionPane.showMessageDialog(null, "Mật khẩu phải có ít nhất 6 ký tự!", "Lỗi",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            UsersDTO newUser = new UsersDTO();
-            newUser.setUserName(username);
-            newUser.setUserFullName(fullName);
-            newUser.setUserEmail(email);
-            newUser.setUserPassword(password);
-            newUser.setIsAdmin(false);
-
-            boolean success = userBUS.insertUser(newUser);
-            if (success) {
-                JOptionPane.showMessageDialog(null, "Đăng ký thành công! 🎉", "Thành công",
-                        JOptionPane.INFORMATION_MESSAGE);
-                SwingUtilities.invokeLater(() -> {
-                    LoginForm loginForm = new LoginForm();
-                    Application.getInstance().setContentPane(loginForm);
-                    Application.getInstance().revalidate();
-                    Application.getInstance().repaint();
-                });
-            } else {
-                JOptionPane.showMessageDialog(null, "Đăng ký thất bại! Vui lòng thử lại.",
-                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+            @Override
+            public void mouseExited(MouseEvent e) {
+                signUpButton.setBackground(new Color(0, 102, 102));
             }
         });
+        signUpButton.addActionListener(e -> performSignUp());
+        rightPanel.add(signUpButton, "center");
 
-        backLogin.setFont(new java.awt.Font("Segoe UI", 0, 14));
-        backLogin.setForeground(new java.awt.Color(255, 51, 51));
-        backLogin.setText("Login");
-        backLogin.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        backLogin.addActionListener(e -> {
+        // Back to Login
+        JPanel backPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        backPanel.setBackground(Color.WHITE);
+        JLabel lblBack = new JLabel("Đã có tài khoản?");
+        lblBack.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblBack.setForeground(new Color(66, 80, 102));
+        backLoginButton = new JButton("Đăng nhập");
+        backLoginButton.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        backLoginButton.setForeground(new Color(255, 51, 51));
+        backLoginButton.setBorderPainted(false);
+        backLoginButton.setContentAreaFilled(false);
+        backLoginButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        backLoginButton.addActionListener(e -> {
             SwingUtilities.invokeLater(() -> {
                 LoginForm loginForm = new LoginForm();
                 Application.getInstance().setContentPane(loginForm);
@@ -207,31 +205,75 @@ public class SignUpForm extends JPanel {
                 Application.getInstance().repaint();
             });
         });
+        backPanel.add(lblBack);
+        backPanel.add(backLoginButton);
+        rightPanel.add(backPanel, "center");
 
-        jPanel3.add(jLabel4, "center, wrap");
-        jPanel3.add(jLabel5, "center, wrap");
-        jPanel3.add(txtUsername, "width 332px, center, wrap");
-        jPanel3.add(labelFullName, "center, wrap");
-        jPanel3.add(txtFullName, "width 332px, center, wrap");
-        jPanel3.add(jLabel6, "center, wrap");
-        jPanel3.add(txtEmail, "width 332px, center, wrap");
-        jPanel3.add(jLabel7, "center, wrap");
-        jPanel3.add(txtPassword, "width 332px, center, wrap");
-        jPanel3.add(signUp, "width 91px, center, wrap");
-        jPanel3.add(jLabel8, "split 2, center");
-        jPanel3.add(backLogin, "wrap");
-
-        jPanel1.add(jPanel2, "width pref, height 500px");
-        jPanel1.add(jPanel3, "width pref, height 500px");
-
-        add(jPanel1, "center");
+        container.add(leftPanel, "grow");
+        container.add(rightPanel, "grow");
+        add(container, "center");
     }
 
-    // Test the panel standalone
+    private void performSignUp() {
+        String username = txtUsername.getText().trim();
+        String fullName = txtFullName.getText().trim();
+        String email = txtEmail.getText().trim();
+        String password = new String(txtPassword.getPassword()).trim();
+
+        for (UsersDTO user : userBUS.getListAccount()) {
+            if (user.getUserName().equalsIgnoreCase(username) || user.getUserEmail().equalsIgnoreCase(email)) {
+                JOptionPane.showMessageDialog(null,
+                        "Tên đăng nhập hoặc Email đã tồn tại! Vui lòng chọn tên khác.",
+                        "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
+        if (username.isEmpty() || fullName.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Vui lòng điền đầy đủ thông tin!", "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            JOptionPane.showMessageDialog(null, "Email không hợp lệ! Vui lòng nhập lại.",
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (password.length() < 6) {
+            JOptionPane.showMessageDialog(null, "Mật khẩu phải có ít nhất 6 ký tự!", "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        UsersDTO newUser = new UsersDTO();
+        newUser.setUserName(username);
+        newUser.setUserFullName(fullName);
+        newUser.setUserEmail(email);
+        newUser.setUserPassword(password);
+        newUser.setIsAdmin(false);
+
+        boolean success = userBUS.insertUser(newUser);
+        if (success) {
+            JOptionPane.showMessageDialog(null, "Đăng ký thành công! 🎉", "Thành công",
+                    JOptionPane.INFORMATION_MESSAGE);
+            SwingUtilities.invokeLater(() -> {
+                LoginForm loginForm = new LoginForm();
+                Application.getInstance().setContentPane(loginForm);
+                Application.getInstance().revalidate();
+                Application.getInstance().repaint();
+            });
+        } else {
+            JOptionPane.showMessageDialog(null, "Đăng ký thất bại! Vui lòng thử lại.",
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            javax.swing.JFrame frame = new javax.swing.JFrame("Sign Up Form Test");
-            frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+            JFrame frame = new JFrame("Sign Up Form Test");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.add(new SignUpForm());
             frame.pack();
             frame.setLocationRelativeTo(null);
