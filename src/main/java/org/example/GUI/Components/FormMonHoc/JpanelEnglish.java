@@ -45,7 +45,7 @@ import org.example.BUS.QuestionBUS;
 import org.example.DAO.AnswersDAO;
 import org.example.DAO.QuestionDAO;
 import org.example.DTO.QuestionDTO;
-import org.example.GUI.Application.other.FormInbox;
+import org.example.GUI.Application.other.FormManagerTopic;
 import org.example.GUI.FormDialog.DialogMonHoc.JPanelSuaCauHoi;
 import org.example.GUI.FormDialog.DialogMonHoc.JPanelThemCauHoi;
 import org.example.GUI.FormDialog.DialogMonHoc.JPanelViewDetails;
@@ -410,7 +410,7 @@ public class JpanelEnglish extends JPanel {
 
     private void returnToInbox() {
         if (contentPanel != null) {
-            FormInbox formInbox = new FormInbox(contentPanel);
+            FormManagerTopic formInbox = new FormManagerTopic(contentPanel);
             contentPanel.removeAll();
             contentPanel.add(formInbox);
             contentPanel.revalidate();

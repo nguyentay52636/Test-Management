@@ -95,7 +95,7 @@ public class MainForm extends JLayeredPane {
                 Application.showForm(new TestManagementPanel());
             } else if (index == 3) {
 
-                Application.showForm(new FormInbox(panelBody));
+                Application.showForm(new FormManagerTopic(panelBody));
             } else if (index == 5) {
                 // Application.showForm(new TestForm(panelBody));
                 Application.showForm(new FormSelectionTest(panelBody));
