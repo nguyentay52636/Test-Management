@@ -3,7 +3,11 @@ package org.example.GUI.Components.FormMonHoc;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -26,7 +30,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -66,154 +69,158 @@ public class JpanelMath extends JPanel {
     }
 
     private void initComponents() {
-        setBackground(new Color(34, 45, 65));
-        setLayout(null);
-        setBorder(new EmptyBorder(10, 10, 10, 10));
+        setBackground(new Color(245, 248, 252));
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
 
         // Title
         JLabel lblTitle = new JLabel("Quản Lý Môn Toán");
-        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 30));
-        lblTitle.setForeground(new Color(240, 248, 255));
-        lblTitle.setBounds(350, 20, 400, 40);
-        add(lblTitle);
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        lblTitle.setForeground(new Color(33, 37, 41));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 6;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(lblTitle, gbc);
 
         // Function Buttons
-        JButton btnThem = createButton("Thêm", "/org/example/GUI/resources/images/plus.png", "Thêm câu hỏi mới");
-        btnThem.setBounds(50, 80, 110, 45);
-        btnThem.addActionListener(e -> openAddQuestionPanel());
-        add(btnThem);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        buttonPanel.setBackground(new Color(245, 248, 252));
+
+        // Đảm bảo tất cả nút có kích thước đồng nhất bằng cách set preferred size
+        Dimension buttonSize = new Dimension(120, 40); // Kích thước cố định cho tất cả nút
+
+        JButton btnThem = createButton("Thêm", "/org/example/GUI/resources/images/plus.png", "Thêm câu hỏi mới",
+                e -> openAddQuestionPanel());
+        btnThem.setPreferredSize(buttonSize);
+        buttonPanel.add(btnThem);
 
         JButton btnXoa = createButton("Xóa", "/org/example/GUI/resources/images/icons8_delete_forever_30px_1.png",
-                "Xóa câu hỏi đã chọn");
-        btnXoa.setBounds(170, 80, 110, 45);
-        btnXoa.addActionListener(e -> deleteSelectedQuestion());
-        add(btnXoa);
+                "Xóa câu hỏi đã chọn", e -> deleteSelectedQuestion());
+        btnXoa.setPreferredSize(buttonSize);
+        buttonPanel.add(btnXoa);
 
         JButton btnSua = createButton("Sửa", "/org/example/GUI/resources/images/icons8_wrench_30px.png",
-                "Sửa câu hỏi hiện tại");
-        btnSua.setBounds(290, 80, 110, 45);
-        btnSua.addActionListener(e -> openEditQuestionPanel());
-        add(btnSua);
+                "Sửa câu hỏi hiện tại", e -> openEditQuestionPanel());
+        btnSua.setPreferredSize(buttonSize);
+        buttonPanel.add(btnSua);
 
         JButton btnXuatExcel = createButton("Xuất Excel", "/org/example/GUI/resources/images/icons8_ms_excel_30px.png",
-                "Xuất danh sách câu hỏi ra Excel");
-        btnXuatExcel.setBounds(410, 80, 120, 45);
-        add(btnXuatExcel);
+                "Xuất danh sách câu hỏi ra Excel", null);
+        btnXuatExcel.setPreferredSize(buttonSize);
+        buttonPanel.add(btnXuatExcel);
 
         btnNhapExcel = createButton("Nhập Excel", "/org/example/GUI/resources/images/icons8_ms_excel_30px.png",
-                "Nhập câu hỏi từ file Excel");
-        btnNhapExcel.setBounds(540, 80, 120, 45);
-        btnNhapExcel.addActionListener(e -> importDataFromExcel());
-        add(btnNhapExcel);
+                "Nhập câu hỏi từ file Excel", e -> importDataFromExcel());
+        btnNhapExcel.setPreferredSize(buttonSize);
+        buttonPanel.add(btnNhapExcel);
 
         btnExportDocx = createButton("Export DOCX", "/org/example/GUI/resources/imageTopic/word_icon.png",
-                "Xuất đề thi ra DOCX");
-        btnExportDocx.setBounds(670, 80, 120, 45);
-        btnExportDocx.addActionListener(e -> exportExamToDocx());
-        add(btnExportDocx);
+                "Xuất đề thi ra DOCX", e -> exportExamToDocx());
+        btnExportDocx.setPreferredSize(buttonSize); // Đảm bảo kích thước đồng nhất
+        buttonPanel.add(btnExportDocx);
+
+        gbc.gridy = 1;
+        gbc.gridwidth = 6;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(buttonPanel, gbc);
 
         // Filters and Search
+        JPanel filterPanel = new JPanel(new GridBagLayout());
+        filterPanel.setBackground(new Color(245, 248, 252));
+        GridBagConstraints filterGbc = new GridBagConstraints();
+        filterGbc.insets = new Insets(5, 10, 5, 10);
+
         JLabel lblLoc = new JLabel("Lọc Mức Độ:");
-        lblLoc.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        lblLoc.setForeground(Color.WHITE);
-        lblLoc.setBounds(50, 140, 120, 25);
-        add(lblLoc);
+        lblLoc.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblLoc.setForeground(new Color(66, 80, 102));
+        filterGbc.gridx = 0;
+        filterGbc.gridy = 0;
+        filterPanel.add(lblLoc, filterGbc);
 
         JComboBox<String> cboLoc = new JComboBox<>(new String[] { "Tất cả", "Dễ", "Trung bình", "Khó" });
         cboLoc.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        cboLoc.setBackground(new Color(60, 70, 90));
-        cboLoc.setForeground(Color.WHITE);
-        cboLoc.setBounds(50, 170, 150, 35);
-        cboLoc.setBorder(BorderFactory.createLineBorder(new Color(100, 110, 130), 1));
+        cboLoc.setBackground(Color.WHITE);
+        cboLoc.setPreferredSize(new Dimension(150, 35));
         cboLoc.addActionListener(e -> filterByLevel(cboLoc.getSelectedItem().toString()));
-        add(cboLoc);
+        filterGbc.gridy = 1;
+        filterPanel.add(cboLoc, filterGbc);
 
         JLabel lblMaCH = new JLabel("Tìm Mã CH:");
-        lblMaCH.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        lblMaCH.setForeground(Color.WHITE);
-        lblMaCH.setBounds(220, 140, 120, 25);
-        add(lblMaCH);
-
-        JLabel lblCauHoi = new JLabel("Tìm Câu Hỏi:");
-        lblCauHoi.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        lblCauHoi.setForeground(Color.WHITE);
-        lblCauHoi.setBounds(390, 140, 120, 25);
-        add(lblCauHoi);
+        lblMaCH.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblMaCH.setForeground(new Color(66, 80, 102));
+        filterGbc.gridx = 1;
+        filterGbc.gridy = 0;
+        filterPanel.add(lblMaCH, filterGbc);
 
         JTextField txtMaCH = new JTextField();
         txtMaCH.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        txtMaCH.setBackground(new Color(60, 70, 90));
-        txtMaCH.setForeground(Color.WHITE);
-        txtMaCH.setBorder(BorderFactory.createLineBorder(new Color(100, 110, 130), 1));
-        txtMaCH.setBounds(220, 170, 150, 35);
-        add(txtMaCH);
+        txtMaCH.setPreferredSize(new Dimension(150, 35));
+        filterGbc.gridy = 1;
+        filterPanel.add(txtMaCH, filterGbc);
+
+        JLabel lblCauHoi = new JLabel("Tìm Câu Hỏi:");
+        lblCauHoi.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblCauHoi.setForeground(new Color(66, 80, 102));
+        filterGbc.gridx = 2;
+        filterGbc.gridy = 0;
+        filterPanel.add(lblCauHoi, filterGbc);
 
         txtCauHoi = new JTextField();
         txtCauHoi.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        txtCauHoi.setBackground(new Color(60, 70, 90));
-        txtCauHoi.setForeground(Color.WHITE);
-        txtCauHoi.setBorder(BorderFactory.createLineBorder(new Color(100, 110, 130), 1));
-        txtCauHoi.setBounds(390, 170, 250, 35);
-        txtCauHoi.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) {
-                findQuestion();
-            }
+        txtCauHoi.setPreferredSize(new Dimension(250, 35));
+        txtCauHoi.getDocument().addDocumentListener(new SimpleDocumentListener(this::findQuestion));
+        filterGbc.gridy = 1;
+        filterPanel.add(txtCauHoi, filterGbc);
 
-            public void removeUpdate(DocumentEvent e) {
-                findQuestion();
-            }
+        JButton btnViewDetails = createButton("Xem chi tiết", null, "Xem chi tiết câu hỏi",
+                e -> openViewDetailsPanel());
+        btnViewDetails.setPreferredSize(new Dimension(120, 35)); // Kích thước đồng bộ với các nút khác
+        filterGbc.gridx = 3;
+        filterGbc.gridy = 1;
+        filterPanel.add(btnViewDetails, filterGbc);
 
-            public void changedUpdate(DocumentEvent e) {
-                findQuestion();
-            }
-        });
-        add(txtCauHoi);
-
-        // View Details Button
-        JButton btnViewDetails = new JButton("Xem chi tiết");
-        btnViewDetails.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-        btnViewDetails.setBounds(650, 170, 150, 35);
-        btnViewDetails.setBackground(new Color(70, 90, 110));
-        btnViewDetails.setForeground(Color.WHITE);
-        btnViewDetails.setBorder(BorderFactory.createLineBorder(new Color(100, 110, 130), 1));
-        btnViewDetails.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                btnViewDetails.setBackground(new Color(90, 110, 130));
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                btnViewDetails.setBackground(new Color(70, 90, 110));
-            }
-        });
-        btnViewDetails.addActionListener(e -> openViewDetailsPanel());
-        add(btnViewDetails);
+        gbc.gridy = 2;
+        gbc.gridwidth = 6;
+        add(filterPanel, gbc);
 
         // Table Title
         JLabel lblTableTitle = new JLabel("Danh Sách Câu Hỏi");
-        lblTableTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        lblTableTitle.setForeground(Color.WHITE);
-        lblTableTitle.setBounds(400, 220, 200, 30);
-        add(lblTableTitle);
+        lblTableTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblTableTitle.setForeground(new Color(33, 37, 41));
+        gbc.gridy = 3;
+        gbc.gridwidth = 6;
+        gbc.anchor = GridBagConstraints.WEST;
+        add(lblTableTitle, gbc);
 
         // Question Table
         tableModel = new DefaultTableModel(new String[] { "Mã Câu Hỏi", "Nội Dung", "Mức độ", "Trạng Thái" }, 0);
         table = new JTable(tableModel);
+        table.setRowHeight(30);
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 14));
+        table.getTableHeader().setBackground(new Color(52, 108, 176));
+        table.getTableHeader().setForeground(Color.WHITE);
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(50, 260, 900, 300);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(100, 110, 130), 1));
-        add(scrollPane);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        gbc.gridy = 4;
+        gbc.gridwidth = 6;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        add(scrollPane, gbc);
 
         // Back Button
-        JButton btnBack = createButton("Quay Lại", null, "Trở về màn hình chính");
-        btnBack.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btnBack.setBounds(810, 570, 140, 45);
-        btnBack.addActionListener(e -> returnToInbox());
-        add(btnBack);
+        JButton btnBack = createButton("Quay Lại", null, "Trở về màn hình chính", e -> returnToInbox());
+        btnBack.setPreferredSize(new Dimension(120, 40)); // Kích thước đồng bộ
+        gbc.gridy = 5;
+        gbc.gridwidth = 1;
+        gbc.weighty = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        add(btnBack, gbc);
     }
 
-    private JButton createButton(String text, String iconPath, String tooltip) {
+    private JButton createButton(String text, String iconPath, String tooltip, java.awt.event.ActionListener action) {
         JButton button = new JButton(text);
         if (iconPath != null) {
             java.net.URL imgURL = getClass().getResource(iconPath);
@@ -224,22 +231,27 @@ public class JpanelMath extends JPanel {
             }
         }
         button.setFocusPainted(false);
-        button.setBackground(new Color(70, 90, 110));
+        button.setBackground(new Color(52, 108, 176));
         button.setForeground(Color.WHITE);
         button.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        button.setBorder(BorderFactory.createLineBorder(new Color(100, 120, 140), 1));
+        button.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(40, 86, 140), 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
         button.setToolTipText(tooltip);
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(new Color(90, 110, 130));
+                button.setBackground(new Color(72, 128, 196));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setBackground(new Color(70, 90, 110));
+                button.setBackground(new Color(52, 108, 176));
             }
         });
+        if (action != null) {
+            button.addActionListener(action);
+        }
         return button;
     }
 
@@ -257,12 +269,11 @@ public class JpanelMath extends JPanel {
     }
 
     public void exportExamToDocx() {
-        List<QuestionDTO> questions = questionDAO.getQuestionsByTopic(1); // Assuming topic 1 is English
+        List<QuestionDTO> questions = questionDAO.getQuestionsByTopic(1);
         List<QuestionDTO> easyQs = new ArrayList<>();
         List<QuestionDTO> mediumQs = new ArrayList<>();
         List<QuestionDTO> difficultQs = new ArrayList<>();
 
-        // Phân loại câu hỏi theo độ khó
         for (QuestionDTO q : questions) {
             switch (q.getQLevel()) {
                 case "Dễ":
@@ -277,13 +288,11 @@ public class JpanelMath extends JPanel {
             }
         }
 
-        // Kiểm tra số lượng câu hỏi đủ hay không
         if (easyQs.size() < 5 || mediumQs.size() < 3 || difficultQs.size() < 2) {
             JOptionPane.showMessageDialog(this, "Không đủ câu hỏi cho mỗi mức độ (5 dễ, 3 trung bình, 2 khó)!");
             return;
         }
 
-        // Chọn ngẫu nhiên các câu hỏi
         Collections.shuffle(easyQs);
         Collections.shuffle(mediumQs);
         Collections.shuffle(difficultQs);
@@ -293,70 +302,50 @@ public class JpanelMath extends JPanel {
         selectedQuestions.addAll(mediumQs.subList(0, 3));
         selectedQuestions.addAll(difficultQs.subList(0, 2));
 
-        // Xuất ra file DOCX
-        String filePath = "EnglishExam.docx";
+        String filePath = "MathExam.docx";
         try (XWPFDocument document = new XWPFDocument()) {
-            // Tiêu đề chính
             XWPFParagraph title = document.createParagraph();
             title.setAlignment(ParagraphAlignment.CENTER);
             XWPFRun titleRun = title.createRun();
-            titleRun.setText("ĐỀ THI TRẮC NGHIỆM");
+            titleRun.setText("ĐỀ THI TRẮC NGHIỆM MÔN TOÁN");
             titleRun.setBold(true);
             titleRun.setFontSize(16);
-            titleRun.addBreak(); // Xuống dòng
+            titleRun.addBreak();
 
             int questionNumber = 1;
             for (QuestionDTO q : selectedQuestions) {
-                // Câu hỏi
                 XWPFParagraph questionPara = document.createParagraph();
                 XWPFRun questionRun = questionPara.createRun();
                 questionRun.setText(questionNumber + ". " + q.getQContent());
                 questionRun.setBold(true);
                 questionRun.addBreak();
 
-                // Kiểm tra và thêm ảnh nếu có
                 if (q.getQPicture() != null && !q.getQPicture().isEmpty()) {
-                    try (java.io.InputStream imageStream = new FileInputStream(q.getQPicture())) {
+                    try (FileInputStream imageStream = new FileInputStream(q.getQPicture())) {
                         XWPFParagraph imgPara = document.createParagraph();
                         XWPFRun imgRun = imgPara.createRun();
-                        imgRun.addPicture(
-                                imageStream,
-                                XWPFDocument.PICTURE_TYPE_PNG,
-                                q.getQPicture(),
-                                300, 150);
+                        imgRun.addPicture(imageStream, XWPFDocument.PICTURE_TYPE_PNG, q.getQPicture(), 300, 150);
                     } catch (Exception e) {
                         System.out
                                 .println("Không thể chèn ảnh cho câu hỏi " + q.getQuestionID() + ": " + e.getMessage());
-                        // Tiếp tục với các phần còn lại của tài liệu
                     }
                 }
 
-                // Đáp án mẫu (hard-coded như trong ví dụ của bạn)
-                String[] options = {
-                        "A. tay la la toi.",
-                        "B. khong phai toi",
-                        "C. là traidep nhat.",
-                        "D. it gioi"
-                };
-
+                String[] options = { "A. tay la la toi.", "B. khong phai toi", "C. là traidep nhat.", "D. it gioi" };
                 for (String option : options) {
                     XWPFParagraph optionPara = document.createParagraph();
-                    optionPara.setIndentationLeft(400); // Thụt lề sang phải
+                    optionPara.setIndentationLeft(400);
                     XWPFRun optionRun = optionPara.createRun();
                     optionRun.setText(option);
                 }
-
                 questionNumber++;
             }
 
-            // Ghi file
             try (FileOutputStream out = new FileOutputStream(filePath)) {
                 document.write(out);
             }
 
             JOptionPane.showMessageDialog(this, "Đã xuất đề thi ra " + filePath + " thành công!");
-
-            // Mở file sau khi xuất thành công
             File file = new File(filePath);
             if (file.exists()) {
                 Desktop.getDesktop().open(file);
@@ -415,7 +404,7 @@ public class JpanelMath extends JPanel {
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(tableModel);
         table.setRowSorter(sorter);
         if (!level.equals("Tất cả")) {
-            sorter.setRowFilter(RowFilter.regexFilter(level, 2)); // Filter by "Mức độ" column
+            sorter.setRowFilter(RowFilter.regexFilter(level, 2));
         } else {
             sorter.setRowFilter(null);
         }
@@ -499,8 +488,7 @@ public class JpanelMath extends JPanel {
                 JOptionPane.showMessageDialog(this, "Xóa câu hỏi thành công!", "Thành công",
                         JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(this, "Xóa câu hỏi thất bại!", "Lỗi",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Xóa câu hỏi thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -513,6 +501,29 @@ public class JpanelMath extends JPanel {
             rowSorter.setRowFilter(RowFilter.regexFilter("(?i)" + keyword));
         } else {
             rowSorter.setRowFilter(null);
+        }
+    }
+
+    private static class SimpleDocumentListener implements DocumentListener {
+        private final Runnable action;
+
+        public SimpleDocumentListener(Runnable action) {
+            this.action = action;
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            action.run();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            action.run();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            action.run();
         }
     }
 }
