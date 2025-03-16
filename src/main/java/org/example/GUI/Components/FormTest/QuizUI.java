@@ -72,6 +72,8 @@ public class QuizUI extends JPanel {
 
         QuizDAO quizDAO = new QuizDAO();
         questions = quizDAO.getQuestionsByTestCode(testCode);
+        System.out.println("Tay" +questions.size());
+        
         totalQuestions = questions.size();
 
         TestDAO testDAO = new TestDAO();
@@ -84,6 +86,7 @@ public class QuizUI extends JPanel {
         }
 
         if (!questions.isEmpty()) {
+    
             loadQuestion(currentIndex);
         }
         startCountdown();
@@ -260,9 +263,9 @@ public class QuizUI extends JPanel {
         QuestionDTO question = questions.get(index);
         questionLabel.setText("Câu " + (index + 1) + ": " + question.getQContent());
         levelLabel.setText("Mức độ: " + question.getQLevel());
-
+    
         answers = quizBUS.getAnswersByQuestionID(question.getQuestionID());
-
+    
         answerGroup.clearSelection();
         for (int i = 0; i < answerButtons.length; i++) {
             if (i < answers.size()) {
@@ -276,6 +279,8 @@ public class QuizUI extends JPanel {
                 answerButtons[i].setVisible(false);
             }
         }
+        // Cập nhật totalQuestionLabel với số câu hỏi hiện tại
+        totalQuestionLabel.setText("Số câu hỏi: " + (index + 1));
     }
 
     private void loadNextQuestion() {
@@ -287,6 +292,7 @@ public class QuizUI extends JPanel {
             finishQuiz();
         }
     }
+    
 
     private void saveUserAnswer() {
         JRadioButton selectedButton = null;
