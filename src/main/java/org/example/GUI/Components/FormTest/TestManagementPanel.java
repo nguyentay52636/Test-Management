@@ -32,10 +32,15 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -45,7 +50,7 @@ import org.example.BUS.AnswersBUS;
 import org.example.BUS.ExamBUS;
 import org.example.BUS.QuestionBUS;
 import org.example.ConnectDB.UtilsJDBC;
-import org.example.DTO.ExamsDTO;
+import org.example.DAO.ExamDAO;
 import org.example.GUI.FormDialog.DialogTest.DialogAddTest;
 import org.example.GUI.FormDialog.DialogTest.DialogViewDetailTest;
 
@@ -170,6 +175,7 @@ public class TestManagementPanel extends JPanel {
         btnAddTopic = createStyledButton("Thêm Chủ Đề", new Color(46, 204, 113), null);
         btnViewDetails = createStyledButton("Xem Chi Tiết", new Color(241, 196, 15), null);
         btnDeleteExam = createStyledButton("Xóa Kỳ Thi", new Color(231, 76, 60), null);
+        btnDeleteExam.addActionListener(e -> deleteExam());
         btnExportExcel = createStyledButton("Xuất Excel", new Color(39, 174, 96),
                 "/org/example/GUI/resources/images/icons8_ms_excel_30px.png");
         btnSearch = createStyledButton("Tìm Kiếm", new Color(52, 152, 219), null);
@@ -181,7 +187,19 @@ public class TestManagementPanel extends JPanel {
         searchField.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(189, 195, 199), 1),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        searchField.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) {
+                findExam();
+            }
 
+            public void removeUpdate(DocumentEvent e) {
+                findExam();
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+                findExam();
+            }
+        });
         btnAddExam.addActionListener(e -> addExam());
         // btnAddTopic.addActionListener(e -> addTopic());
         btnViewDetails.addActionListener(e -> viewExamDetails());
@@ -277,9 +295,10 @@ public class TestManagementPanel extends JPanel {
         return button;
     }
 
-    private void loadExamDataFromDB() {
+    public void loadExamDataFromDB() {
         examList.clear();
-        try (Connection conn = UtilsJDBC.getConnectDB();
+        Connection conn = UtilsJDBC.getConnectDB();
+        try (
                 PreparedStatement ps = conn.prepareStatement(
                         "SELECT t.testID, t.testTitle, t.testDate, tp.tpTitle, t.testCode, tp.tpStatus, e.exCode " +
                                 "FROM test t " +
@@ -314,55 +333,60 @@ public class TestManagementPanel extends JPanel {
     }
 
     private void addExam() {
-        DialogAddTest dialog = new DialogAddTest(this, null, examList);
+        DialogAddTest dialog = new DialogAddTest(this, null);
         dialog.setVisible(true);
         Exam newExam = dialog.getNewExam();
-        if (newExam != null) {
-            try (Connection conn = UtilsJDBC.getConnectDB()) {
-                String testCode = "TEST" + String.format("%03d", examList.size() + 1);
-                PreparedStatement psTest = conn.prepareStatement(
-                        "INSERT INTO test (testCode, testTitle, testTime, testLimit, testDate, testStatus) " +
-                                "VALUES (?, ?, ?, ?, ?, ?)",
-                        PreparedStatement.RETURN_GENERATED_KEYS);
-                psTest.setString(1, testCode);
-                psTest.setString(2, newExam.getTitle());
-                psTest.setInt(3, 10);
-                psTest.setInt(4, 1);
-                psTest.setString(5, newExam.getDate());
-                psTest.setInt(6, 1);
-                psTest.executeUpdate();
-
-                ResultSet generatedKeys = psTest.getGeneratedKeys();
-                int testId = 0;
-                if (generatedKeys.next()) {
-                    testId = generatedKeys.getInt(1);
-                }
-
-                PreparedStatement psStructure = conn.prepareStatement(
-                        "INSERT INTO test_structure (testCode, tpID, numberEasy, numberMedium, numberDiff) " +
-                                "VALUES (?, (SELECT tpID FROM topics WHERE tpTitle = ?), ?, ?, ?)");
-                psStructure.setString(1, testCode);
-                psStructure.setString(2, newExam.getTopic());
-                psStructure.setInt(3, 5);
-                psStructure.setInt(4, 3);
-                psStructure.setInt(5, 2);
-                psStructure.executeUpdate();
-
-                String exCode = testCode + "A";
-                ExamsDTO examDTO = new ExamsDTO(testCode, "1", exCode, "");
-                // examBUS.addExam(examDTO);
-
-                newExam = new Exam(testId, newExam.getTitle(), newExam.getTopic(), newExam.getDate(), testCode, 1,
-                        exCode);
-                examList.add(newExam);
-                refreshTable(examList);
-                JOptionPane.showMessageDialog(this, "Đã thêm kỳ thi mới!", "Thành Công",
-                        JOptionPane.INFORMATION_MESSAGE);
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Lỗi thêm kỳ thi: " + e.getMessage(), "Lỗi",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        // if (newExam != null) {
+        // Connection conn = UtilsJDBC.getConnectDB();
+        // try {
+        // String testCode = "TEST" + String.format("%03d", examList.size() + 1);
+        // PreparedStatement psTest = conn.prepareStatement(
+        // "INSERT INTO test (testCode, testTitle, testTime, testLimit, testDate,
+        // testStatus) " +
+        // "VALUES (?, ?, ?, ?, ?, ?)",
+        // PreparedStatement.RETURN_GENERATED_KEYS);
+        // psTest.setString(1, testCode);
+        // psTest.setString(2, newExam.getTitle());
+        // psTest.setInt(3, 10);
+        // psTest.setInt(4, 1);
+        // psTest.setString(5, newExam.getDate());
+        // psTest.setInt(6, 1);
+        // psTest.executeUpdate();
+        //
+        // ResultSet generatedKeys = psTest.getGeneratedKeys();
+        // int testId = 0;
+        // if (generatedKeys.next()) {
+        // testId = generatedKeys.getInt(1);
+        // }
+        //
+        // PreparedStatement psStructure = conn.prepareStatement(
+        // "INSERT INTO test_structure (testCode, tpID, numberEasy, numberMedium,
+        // numberDiff) " +
+        // "VALUES (?, (SELECT tpID FROM topics WHERE tpTitle = ?), ?, ?, ?)");
+        // psStructure.setString(1, testCode);
+        // psStructure.setString(2, newExam.getTopic());
+        // psStructure.setInt(3, 5);
+        // psStructure.setInt(4, 3);
+        // psStructure.setInt(5, 2);
+        // psStructure.executeUpdate();
+        //
+        // String exCode = testCode + "A";
+        // ExamsDTO examDTO = new ExamsDTO(testCode, "1", exCode, "");
+        // // examBUS.addExam(examDTO);
+        //
+        // newExam = new Exam(testId, newExam.getTitle(), newExam.getTopic(),
+        // newExam.getDate(), testCode, 1,
+        // exCode);
+        // examList.add(newExam);
+        refreshTable(examList);
+        // JOptionPane.showMessageDialog(this, "Đã thêm kỳ thi mới!", "Thành Công",
+        // JOptionPane.INFORMATION_MESSAGE);
+        // } catch (SQLException e) {
+        // JOptionPane.showMessageDialog(this, "Lỗi thêm kỳ thi: " + e.getMessage(),
+        // "Lỗi",
+        // JOptionPane.ERROR_MESSAGE);
+        // }
+        // }
     }
 
     // private void addTopic() {
@@ -442,6 +466,46 @@ public class TestManagementPanel extends JPanel {
     // JOptionPane.WARNING_MESSAGE);
     // }
     // }
+    private void deleteExam() {
+        int selectedRow = examTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một kỳ thi để xóa!", "Thông báo",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa kỳ thi này?", "Xác nhận",
+                JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        // Kiểm tra danh sách có dữ liệu không trước khi truy xuất
+        if (selectedRow >= examList.size()) {
+            JOptionPane.showMessageDialog(this, "Dữ liệu không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Exam selectedExam = examList.get(selectedRow);
+        String exCode = selectedExam.exCode; // Lấy mã kỳ thi để xóa
+        ExamDAO examDAO = new ExamDAO();
+
+        try {
+            if (examDAO.deleteExam(exCode)) {
+                // Xóa khỏi danh sách examList và cập nhật bảng
+                examList.remove(selectedRow);
+                refreshTable(examList);
+                JOptionPane.showMessageDialog(this, "Xóa kỳ thi thành công!", "Thành công",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Không thể xóa kỳ thi! Vui lòng thử lại.", "Lỗi",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi xóa kỳ thi: " + e.getMessage(), "Lỗi",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     private void exportToExcel() {
         try (XSSFWorkbook workbook = new XSSFWorkbook()) {
@@ -494,6 +558,28 @@ public class TestManagementPanel extends JPanel {
                 }
             }
             refreshTable(filteredList);
+        }
+    }
+
+    private void findExam() {
+        String keyword = searchField.getText().trim().toLowerCase();
+        TableRowSorter<TableModel> rowSorter = new TableRowSorter<>((DefaultTableModel) examTable.getModel());
+        examTable.setRowSorter(rowSorter);
+
+        if (!keyword.equals("")) {
+            rowSorter.setRowFilter(new RowFilter<TableModel, Integer>() {
+                @Override
+                public boolean include(Entry<? extends TableModel, ? extends Integer> entry) {
+                    for (int i = 0; i < entry.getValueCount(); i++) {
+                        if (entry.getStringValue(i).toLowerCase().contains(keyword)) {
+                            return true; // Có ít nhất một trường khớp với từ khóa
+                        }
+                    }
+                    return false; // Không có trường nào khớp
+                }
+            });
+        } else {
+            rowSorter.setRowFilter(null); // Nếu không nhập gì, hiển thị tất cả dữ liệu
         }
     }
 

@@ -52,7 +52,7 @@ public class QuizDAO {
         return questions;
     }
 
-    private List<QuestionDTO> getQuestionsByLevel(String testCode, String level, int limit) {
+    public List<QuestionDTO> getQuestionsByLevel(String testCode, String level, int limit) {
         List<QuestionDTO> questions = new ArrayList<>();
 
         if (limit <= 0)
@@ -87,6 +87,38 @@ public class QuizDAO {
         }
 
         return questions;
+    }
+
+    // Lấy
+    public List<Integer> getQuestionIdsByLevel(String testCode, String level, int limit) {
+        List<Integer> questionIds = new ArrayList<>();
+
+        if (limit <= 0)
+            return questionIds; // Nếu limit <= 0 thì return danh sách rỗng
+
+        String sql = """
+                SELECT q.qID
+                FROM questions q
+                JOIN test_structure ts ON q.qTopicID = ts.tpID
+                WHERE ts.testCode = ? AND q.qLevel = ?
+                ORDER BY RAND()
+                LIMIT ?
+                """;
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, testCode);
+            stmt.setString(2, level);
+            stmt.setInt(3, limit);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                questionIds.add(rs.getInt("qID"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return questionIds;
     }
 
     // Lấy danh sách đáp án theo questionID
@@ -129,8 +161,7 @@ public class QuizDAO {
     public boolean saveQuizResult(int userID, String testCode, List<QuestionDTO> questions, List<Integer> userAnswers,
             double score, LocalDate date) {
         String sql = "INSERT INTO result (userID, exCode, rs_anwsers, rs_mark, rs_date) VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection conn = UtilsJDBC.getConnectDB();
+        try (
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             // 🔥 Chuyển danh sách câu trả lời thành JSON {"q1":"A", "q2":"B", ...}

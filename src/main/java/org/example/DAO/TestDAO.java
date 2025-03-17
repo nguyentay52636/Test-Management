@@ -1,6 +1,7 @@
 package org.example.DAO;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,7 +17,11 @@ public class TestDAO {
     private Connection conn;
 
     public TestDAO() {
-        conn = UtilsJDBC.getConnectDB();
+        try {
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/tracnghiem", "root", "");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     // Phương thức kiểm tra và lấy lại kết nối nếu bị đóng
@@ -209,4 +214,49 @@ public class TestDAO {
         }
         return false;
     }
+
+    public boolean insertTest(TestDTO test) {
+        String sql = "INSERT INTO test (testCode, testTitle, testTime, testLimit, testDate, testStatus) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, test.getTestCode());
+            ps.setString(2, test.getTitle());
+            ps.setInt(3, test.getTestTime());
+            ps.setInt(4, test.getTestLimit());
+
+            // Chuyển đổi java.util.Date sang java.sql.Date trước khi set vào
+            // PreparedStatement
+            if (test.getDate() != null) {
+                ps.setDate(5, new java.sql.Date(test.getDate().getTime()));
+            } else {
+                ps.setNull(5, java.sql.Types.DATE);
+            }
+
+            ps.setInt(6, test.getTestStatus());
+
+            // Thực thi truy vấn
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+        return false;
+    }
+
+    public boolean insertTestStructure(Test_structureDTO testT) {
+        String sql = "INSERT INTO test_structure (testCode, tpID, numberEasy, numberMedium, numberDiff) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, testT.getTestCode());
+            ps.setInt(2, testT.getTpID());
+            ps.setInt(3, testT.getNumberEasy());
+            ps.setInt(4, testT.getNumberMedium());
+            ps.setInt(5, testT.getNumberDiff());
+
+            int rowsInserted = ps.executeUpdate(); // Thực thi truy vấn
+            return rowsInserted > 0; // Nếu có ít nhất một dòng được chèn, trả về true
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }

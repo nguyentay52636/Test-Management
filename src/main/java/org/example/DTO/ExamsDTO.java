@@ -13,6 +13,10 @@ public class ExamsDTO {
         this.exQuestionIDs = exQuestionIDs;
     }
 
+    public ExamsDTO() {
+
+    }
+
     public String getTestCode() {
         return testCode;
     }

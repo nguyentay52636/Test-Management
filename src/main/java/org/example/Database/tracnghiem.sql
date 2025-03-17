@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Máy chủ: localhost
--- Thời gian đã tạo: Th3 16, 2025 lúc 03:54 AM
--- Phiên bản máy phục vụ: 10.4.28-MariaDB
--- Phiên bản PHP: 8.0.28
+-- Máy chủ: 127.0.0.1
+-- Thời gian đã tạo: Th3 17, 2025 lúc 05:23 AM
+-- Phiên bản máy phục vụ: 10.4.32-MariaDB
+-- Phiên bản PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -536,9 +536,8 @@ CREATE TABLE `exams` (
 --
 
 INSERT INTO `exams` (`testCode`, `exOrder`, `exCode`, `ex_quesIDs`) VALUES
-('ENG01', 'A', 'ENG01A', '424,426,429,432,434,427,430,433,447,457'),
-('ENG01', 'B', 'ENG01B', '435,436,437,438,439,440,441,442,443,444'),
 ('ENG01', 'C', 'ENG01C', '445,446,447,448,449,450,451,452,453,454'),
+('ENG010', 'A', 'ENG010A', '[431, 446, 461, 442, 439]'),
 ('ENG02', 'A', 'ENG02A', '424,427,430,433,436,439,442,445,448,451'),
 ('ENG02', 'B', 'ENG02B', '426,429,432,435,438,441,444,447,450,453'),
 ('ENG02', 'C', 'ENG02C', '434,437,440,443,446,449,452,455,458,461'),
@@ -562,7 +561,10 @@ INSERT INTO `exams` (`testCode`, `exOrder`, `exCode`, `ex_quesIDs`) VALUES
 ('MATH02', 'C', 'MATH02C', '386,389,392,395,398,401,404,407,410,413'),
 ('MATH03', 'A', 'MATH03A', '384,386,388,390,392,394,396,398,400,402'),
 ('MATH03', 'B', 'MATH03B', '385,387,389,391,393,395,397,399,401,403'),
-('MATH03', 'C', 'MATH03C', '404,405,406,407,408,409,410,411,412,413');
+('MATH03', 'C', 'MATH03C', '404,405,406,407,408,409,410,411,412,413'),
+('MATH10000', 'F', 'MATH10000F', '407, 406, 391, 409, 395, 411, 385, 386, 387'),
+('MATH11111', 'A', 'MATH11111A', '410, 394, 391, 413, 401, 385, 387, 386'),
+('MATH11111111111', 'B', 'MATH11111111111B', '419, 398, 420, 393, 396, 401, 411, 385, 387, 386');
 
 -- --------------------------------------------------------
 
@@ -598,11 +600,11 @@ CREATE TABLE `questions` (
 --
 
 INSERT INTO `questions` (`qID`, `qContent`, `qPictures`, `qTopicID`, `qLevel`, `qStatus`) VALUES
-(384, 'What is 5 + 7?', '', 1, 'Dễ', 1),
-(385, 'Solve: 3x = 12', '', 1, 'Khó', 1),
-(386, 'What is the area of a square with side 4?', '', 1, 'Dễ', 1),
-(387, 'What is 20% of 50?', '', 1, 'Dễ', 1),
-(388, 'If x² = 25, what is x?', '', 1, 'medium', 1),
+(384, 'What is 5 + 7?', '', 1, 'Easy', 1),
+(385, 'Solve: 3x = 12', '', 1, 'Diff', 1),
+(386, 'What is the area of a square with side 4?', '', 1, 'Diff', 1),
+(387, 'What is 20% of 50?', '', 1, 'Diff', 1),
+(388, 'If x² = 25, what is x?', '', 1, 'Medium', 1),
 (389, 'What is 9 - 4?', '', 1, 'Dễ', 1),
 (390, 'Solve: 2x + 3 = 11', '', 1, 'medium', 1),
 (391, 'What is the perimeter of a rectangle with length 5 and width 3?', '', 1, 'easy', 1),
@@ -644,7 +646,7 @@ INSERT INTO `questions` (`qID`, `qContent`, `qPictures`, `qTopicID`, `qLevel`, `
 (428, 'What is the synonym of \"happy\"?', '', 2, 'medium', 1),
 (429, 'What is the plural of \"cat\"?', '', 2, 'easy', 1),
 (430, 'He ___ playing football now.', '', 2, 'medium', 1),
-(431, 'What does \"big\" mean?', '', 2, 'easy', 1),
+(431, 'What does \"big\" mean?', '', 2, 'Diff', 1),
 (432, 'Choose the correct word: I ___ a student.', '', 2, 'easy', 1),
 (433, 'What is the opposite of \"hot\"?', '', 2, 'medium', 1),
 (434, 'What is the past tense of \"eat\"?', '', 2, 'easy', 1),
@@ -706,7 +708,7 @@ INSERT INTO `questions` (`qID`, `qContent`, `qPictures`, `qTopicID`, `qLevel`, `
 (490, 'Who was the leader of the Soviet Union during World War II?', '', 3, 'medium', 1),
 (491, 'What was the name of the ship that carried the Pilgrims to America?', '', 3, 'easy', 1),
 (492, 'In which year did India gain independence from Britain?', '', 3, 'medium', 1),
-(493, 'Who was the first Emperor of the Roman Empire?', '', 3, 'medium', 1),
+(493, 'Who was the first Emperor of the Roman Empire?', '', 3, 'Diff', 1),
 (494, 'What year did the Spanish Armada attempt to invade England?', '', 3, 'medium', 1),
 (495, 'Who invented the printing press?', '', 3, 'easy', 1),
 (496, 'In which year did the Great Depression begin?', '', 3, 'medium', 1),
@@ -715,7 +717,7 @@ INSERT INTO `questions` (`qID`, `qContent`, `qPictures`, `qTopicID`, `qLevel`, `
 (499, 'What year did Nelson Mandela become President of South Africa?', '', 3, 'medium', 1),
 (500, 'Who was the leader of France during the French Revolution?', '', 3, 'medium', 1),
 (501, 'In which year did the Vietnam War end?', '', 3, 'easy', 1),
-(502, 'What empire ruled Spain before the Reconquista?', '', 3, 'medium', 1),
+(502, 'What empire ruled Spain before the Reconquista?', '', 3, 'Diff', 1),
 (503, 'Who was the first person to circumnavigate the globe?', '', 3, 'medium', 1);
 
 -- --------------------------------------------------------
@@ -787,7 +789,19 @@ INSERT INTO `result` (`rs_num`, `userID`, `exCode`, `rs_anwsers`, `rs_mark`, `rs
 (72, 5, 'MATH01', '{\"q1\":\"C\",\"q2\":\"?\",\"q3\":\"?\",\"q4\":\"?\",\"q5\":\"?\",\"q6\":\"?\",\"q7\":\"?\",\"q8\":\"?\"}', 0, '2025-03-16 00:00:00'),
 (73, 5, 'MATH02', '{\"q1\":\"A\",\"q2\":\"A\",\"q3\":\"A\",\"q4\":\"B\",\"q5\":\"A\",\"q6\":\"B\",\"q7\":\"A\",\"q8\":\"A\"}', 8, '2025-03-16 00:00:00'),
 (74, 5, 'HIST02', '{\"q1\":\"?\",\"q2\":\"?\",\"q10\":\"?\",\"q3\":\"?\",\"q4\":\"?\",\"q5\":\"?\",\"q6\":\"?\",\"q7\":\"?\",\"q8\":\"?\",\"q9\":\"?\"}', 0, '2025-03-16 00:00:00'),
-(75, 6, 'MATH01', '{\"q1\":\"B\",\"q2\":\"B\",\"q3\":\"A\",\"q4\":\"A\",\"q5\":\"A\",\"q6\":\"A\",\"q7\":\"A\",\"q8\":\"D\"}', 6, '2025-03-16 00:00:00');
+(75, 6, 'MATH01', '{\"q1\":\"B\",\"q2\":\"B\",\"q3\":\"A\",\"q4\":\"A\",\"q5\":\"A\",\"q6\":\"A\",\"q7\":\"A\",\"q8\":\"D\"}', 6, '2025-03-16 00:00:00'),
+(76, 6, 'MATH19', '{\"q1\":\"B\",\"q2\":\"?\",\"q3\":\"?\"}', 0, '2025-03-17 00:00:00'),
+(77, 6, 'ENG010', '{\"q1\":\"?\",\"q2\":\"?\",\"q3\":\"?\",\"q4\":\"?\",\"q5\":\"?\"}', 0, '2025-03-17 00:00:00'),
+(78, 6, 'MATH100', '{\"q1\":\"A\",\"q2\":\"A\",\"q3\":\"A\",\"q4\":\"A\",\"q5\":\"B\",\"q6\":\"A\",\"q7\":\"A\"}', 9, '2025-03-17 00:00:00'),
+(79, 6, 'MATH012', '{\"q1\":\"A\",\"q2\":\"B\",\"q3\":\"C\",\"q4\":\"C\",\"q5\":\"B\",\"q6\":\"C\",\"q7\":\"D\",\"q8\":\"C\"}', 1, '2025-03-17 00:00:00'),
+(80, 6, 'MATH1001', '{\"q1\":\"A\",\"q2\":\"B\",\"q3\":\"B\",\"q4\":\"A\",\"q5\":\"B\",\"q6\":\"B\",\"q7\":\"C\",\"q8\":\"C\",\"q9\":\"C\"}', 2, '2025-03-17 00:00:00'),
+(81, 6, 'MATH111', '{\"q1\":\"B\",\"q2\":\"B\",\"q3\":\"B\",\"q4\":\"B\",\"q5\":\"B\",\"q6\":\"C\",\"q7\":\"C\",\"q8\":\"B\",\"q9\":\"B\"}', 0, '2025-03-17 00:00:00'),
+(82, 6, 'MATH111', '{\"q1\":\"A\",\"q2\":\"A\",\"q3\":\"A\",\"q4\":\"A\",\"q5\":\"A\",\"q6\":\"B\",\"q7\":\"B\",\"q8\":\"B\",\"q9\":\"C\"}', 6, '2025-03-17 00:00:00'),
+(83, 6, 'MATH10000', '{\"q1\":\"B\",\"q2\":\"B\",\"q3\":\"B\",\"q4\":\"B\",\"q5\":\"C\",\"q6\":\"C\"}', 0, '2025-03-17 00:00:00'),
+(84, 6, 'MATH10000', '{\"q1\":\"C\",\"q2\":\"C\",\"q3\":\"C\",\"q4\":\"B\",\"q5\":\"?\",\"q6\":\"?\"}', 0, '2025-03-17 00:00:00'),
+(85, 6, 'MATH1221', '{\"q1\":\"B\",\"q2\":\"C\",\"q3\":\"B\",\"q4\":\"B\",\"q5\":\"C\",\"q6\":\"C\",\"q7\":\"C\",\"q8\":\"C\",\"q9\":\"C\"}', 0, '2025-03-17 00:00:00'),
+(86, 6, 'MATH1122', '{\"q1\":\"D\",\"q2\":\"B\",\"q3\":\"B\",\"q4\":\"B\",\"q5\":\"C\",\"q6\":\"C\",\"q7\":\"B\",\"q8\":\"B\",\"q9\":\"C\"}', 0, '2025-03-17 00:00:00'),
+(87, 6, 'MATH10000', '{\"q1\":\"B\",\"q2\":\"B\",\"q3\":\"C\",\"q4\":\"B\",\"q5\":\"C\",\"q6\":\"C\",\"q7\":\"B\",\"q8\":\"C\",\"q9\":\"B\"}', 0, '2025-03-17 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -818,7 +832,8 @@ INSERT INTO `test` (`testID`, `testCode`, `testTitle`, `testTime`, `testLimit`, 
 (10, 'HIST03', 'History Practice Test 3', 15, 1, '2025-03-15', 1),
 (11, 'MATH01', 'Math Practice Test 1', 15, 1, '2025-03-15', 1),
 (12, 'MATH02', 'Math Practice Test 2', 15, 1, '2025-03-15', 1),
-(13, 'MATH03', 'Math Practice Test 3', 15, 1, '2025-03-15', 1);
+(13, 'MATH03', 'Math Practice Test 3', 15, 1, '2025-03-15', 1),
+(28, 'MATH10000', 'PAA', 10, 1, '1000-10-10', 1);
 
 -- --------------------------------------------------------
 
@@ -839,13 +854,17 @@ CREATE TABLE `test_structure` (
 --
 
 INSERT INTO `test_structure` (`testCode`, `tpID`, `numberEasy`, `numberMedium`, `numberDiff`) VALUES
+('ENG010', 2, 5, 0, 0),
 ('ENG02', 2, 5, 5, 0),
 ('ENG03', 2, 5, 5, 0),
 ('HIST02', 3, 5, 5, 0),
 ('HIST03', 3, 5, 5, 0),
+('HIST10', 3, 1, 1, 1),
 ('MATH01', 1, 5, 3, 2),
+('MATH012', 1, 4, 4, 4),
 ('MATH02', 1, 5, 3, 2),
-('MATH03', 1, 5, 3, 2);
+('MATH03', 1, 5, 3, 2),
+('MATH10000', 1, 3, 3, 3);
 
 -- --------------------------------------------------------
 
@@ -989,13 +1008,13 @@ ALTER TABLE `questions`
 -- AUTO_INCREMENT cho bảng `result`
 --
 ALTER TABLE `result`
-  MODIFY `rs_num` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+  MODIFY `rs_num` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=88;
 
 --
 -- AUTO_INCREMENT cho bảng `test`
 --
 ALTER TABLE `test`
-  MODIFY `testID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `testID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT cho bảng `topics`
@@ -1018,12 +1037,6 @@ ALTER TABLE `users`
 --
 ALTER TABLE `answers`
   ADD CONSTRAINT `answers_ibfk_1` FOREIGN KEY (`qID`) REFERENCES `questions` (`qID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
---
--- Các ràng buộc cho bảng `exams`
---
-ALTER TABLE `exams`
-  ADD CONSTRAINT `exams_ibfk_1` FOREIGN KEY (`exCode`) REFERENCES `result` (`exCode`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --
 -- Các ràng buộc cho bảng `logs`
